@@ -1,0 +1,17 @@
+{
+  "segments": [
+    "exit_code",
+    "time",
+    "virtual_env",
+    "ssh",
+    "cwd",
+    "git",
+    "hg",
+    "jobs",
+    "root"
+  ],
+  "mode": "compatible",
+  "time": {
+    "format": "%H:%M"
+  }
+}

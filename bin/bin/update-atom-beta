@@ -1,0 +1,10 @@
+#!/bin/bash
+# Update atom from downloaded deb file
+
+p=/tmp/atom-beta.deb
+
+rm -f $p
+curl -L 'https://atom.io/download/deb?channel=beta' > $p
+
+(cd /tmp && dpkg-repack atom-beta)
+dpkg --install $p

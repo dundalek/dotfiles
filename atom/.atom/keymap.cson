@@ -1,0 +1,65 @@
+# Your keymap
+#
+# Atom keymaps work similarly to style sheets. Just as style sheets use
+# selectors to apply styles to elements, Atom keymaps use selectors to associate
+# keystrokes with events in specific contexts.
+#
+# You can create a new keybinding in this file by typing "key" and then hitting
+# tab.
+#
+# Here's an example taken from Atom's built-in keymap:
+#
+# 'atom-text-editor':
+#   'enter': 'editor:newline'
+#
+# 'atom-workspace':
+#   'ctrl-shift-p': 'core:move-up'
+#   'ctrl-p': 'core:move-down'
+#
+# You can find more information about keymaps in these guides:
+# * https://atom.io/docs/latest/using-atom-basic-customization#customizing-key-bindings
+# * https://atom.io/docs/latest/behind-atom-keymaps-in-depth
+#
+# This file uses CoffeeScript Object Notation (CSON).
+# If you are unfamiliar with CSON, you can read more about it here:
+# https://github.com/bevry/cson#what-is-cson
+
+'atom-text-editor.vim-mode-plus':
+  'ctrl-c': 'unset!'
+  'ctrl-[': 'unset!'
+
+'atom-text-editor.vim-mode-plus.normal-mode':
+  'ctrl-v': 'unset!'
+
+'atom-text-editor.vim-mode-plus.visual-mode':
+  'ctrl-v': 'unset!'
+
+'atom-text-editor.vim-mode-plus:not(.normal-mode)':
+  'ctrl-[': 'unset!'
+
+'atom-text-editor.vim-mode-plus.insert-mode':
+  'ctrl-o': 'unset!'
+
+'atom-workspace atom-text-editor:not([mini])':
+  'ctrl-e': 'proto-repl:execute-block'
+  'ctrl-alt-e': 'proto-repl:execute-selected-text'
+
+'atom-workspace':
+  'ctrl-alt-m': 'markdown-mindmap:toggle'
+
+'atom-text-editor[data-grammar~="clojure"].autocomplete-active':
+  'enter':          'autocomplete-plus:confirm'
+
+'atom-text-editor[data-grammar~="clojure"]':
+
+  # Indent the current selection
+  'cmd-i':          'lisp-paredit:indent'
+
+  # Expand the selection up a block
+  'ctrl-shift-m':   'lisp-paredit:expand-selection'
+
+  # Provides proper indentation when enter is pressed. (I disable normal lisp-paredit keybindings)
+  'enter':          'lisp-paredit:newline'
+
+'ink-console atom-text-editor[data-grammar~="clojure"]':
+  'enter':          'editor:newline'
