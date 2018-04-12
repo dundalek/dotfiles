@@ -28,6 +28,9 @@
 
 (source-shell "export PATH=\"$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH\"")
 
+; Rust language
+(setenv "PATH" (str (getenv "HOME") "/.cargo/bin" ":" (getenv "PATH")))
+
 
 (defalias ls "ls --color=auto")
 
