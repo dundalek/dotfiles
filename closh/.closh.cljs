@@ -31,6 +31,8 @@
 ; Rust language
 (setenv "PATH" (str (getenv "HOME") "/.cargo/bin" ":" (getenv "PATH")))
 
+(defcmd history []
+  (sh sqlite3 (str (getenv "HOME") "/.closh/closh.sqlite") "SELECT command FROM history ORDER BY id ASC" | cat))
 
 (defalias ls "ls --color=auto")
 
