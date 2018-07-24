@@ -60,6 +60,11 @@
   (println "gzipped size (bytes): ")
   (sh gzip -c  (str f)  | wc -c))
 
+(defcmd ppr
+  "Fetches and checks out a branch for a given PR number. Useful to quickly test contributions."
+  [n]
+  (sh git fetch origin (str "pull/" n "/head:PR-" n) && git checkout (str "PR-" n)))
+
 ;; === autojump
 
 (require 'path)
