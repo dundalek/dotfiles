@@ -52,6 +52,13 @@
 (defabbr gco "git checkout")
 (defabbr gc "git clone")
 
+(defcmd gz
+  "Compare original and gzipped size of a file"
+  [f]
+  (println "orig size    (bytes): ")
+  (sh cat (str f) | wc -c)
+  (println "gzipped size (bytes): ")
+  (sh gzip -c  (str f)  | wc -c))
 
 ;; === autojump
 
