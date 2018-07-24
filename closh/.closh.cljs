@@ -1,6 +1,7 @@
 
-(require '[cljs.nodejs])
-(require-macros '[closh.core :refer [sh-str]])
+(require '[cljs.nodejs]
+         '[clojure.string :as str]
+         '[lumo.io :refer [slurp spit]])
 
 ; workaround
 ; (defn load-file [f]
@@ -64,6 +65,12 @@
   "Fetches and checks out a branch for a given PR number. Useful to quickly test contributions."
   [n]
   (sh git fetch origin (str "pull/" n "/head:PR-" n) && git checkout (str "PR-" n)))
+
+(defcmd cdx
+  "Quickly jump to a selected folder using ranger."
+  []
+  (let [f (str (getenv "HOME") "/.rangerdir")]
+    (sh ranger --choosedir (str f) && cd (slurp f))))
 
 ;; === autojump
 
