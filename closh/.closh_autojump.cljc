@@ -1,13 +1,21 @@
-(require 'path)
+(require #?(:cljs 'path :clj 'clojure.java.io))
 
 (setenv "AUTOJUMP_SOURCED" 1)
+
+(defn- dirname [filename]
+  #?(:cljs (path.dirname filename)
+     :clj (.getParent (clojure.java.io/file filename))))
+
+(def ^:private is-mac
+  #?(:cljs (= js/process.platform "darwin")
+     :clj (pos? (.indexOf (.toLowerCase (System/getProperty "os.name")) "mac"))))
 
 (when (sh-ok test -d (str (getenv "HOME") "/.autojump"))
   (setenv "PATH" (str (getenv "HOME") "/.autojump/bin" ":" (getenv "PATH"))))
 
 (def AUTOJUMP_ERROR_PATH
   (cond
-    (= js/process.platform "darwin")
+    is-mac
     (str (getenv "HOME") "/Library/autojump/errors.log")
 
     (sh-ok test -d (getenv "XDG_DATA_HOME"))
@@ -15,8 +23,8 @@
 
     :else (str (getenv "HOME") "/.local/share/autojump/errors.log")))
 
-(if-not (sh-ok test -d (path.dirname AUTOJUMP_ERROR_PATH))
-  (sh mkdir -p (path.dirname AUTOJUMP_ERROR_PATH)))
+(if-not (sh-ok test -d (dirname AUTOJUMP_ERROR_PATH))
+  (sh mkdir -p (dirname AUTOJUMP_ERROR_PATH)))
 
 (def original-closh-prompt closh-prompt)
 
@@ -42,7 +50,7 @@
 
 (defn autojump-open [& args]
   (let [output (apply autojump args)
-        cmd (if (= js/process.platform "darwin") "open" "xdg-open")]
+        cmd (if is-mac "open" "xdg-open")]
     (shx cmd [output])))
 
 (defn- autojump-wrap-child [f]
