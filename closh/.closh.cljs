@@ -38,6 +38,8 @@
 
 (defalias ls "ls --color=auto")
 
+(defalias gk "gitkraken --path")
+
 (defalias s "browser-sync start --server --directory --index=index.html \"--files=**/*\"")
 (defalias ss "browser-sync start --server --index=index.html \"--files='**/*\"")
 
