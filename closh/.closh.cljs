@@ -64,6 +64,12 @@
   (println "gzipped size (bytes): ")
   (sh gzip -c  (str f)  | wc -c))
 
+(defcmd amp3
+  "Extract audio tracks from video files in a current folder"
+  []
+  (doseq [f (expand "*.{mp4,flv}")]
+    (sh ffmpeg -i (str f) -vn -acodec copy (str/replace f #"\.mp4|\.flv$" ".m4a"))))
+
 (defcmd ppr
   "Fetches and checks out a branch for a given PR number. Useful to quickly test contributions."
   [n]
