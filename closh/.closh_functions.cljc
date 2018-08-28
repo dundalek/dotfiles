@@ -45,3 +45,10 @@
   []
   (let [f (str (getenv "HOME") "/.rangerdir")]
     (sh ranger --choosedir (str f) && cd (slurp f))))
+
+(defn open-links
+  "Opens links from input in firefox. Use like `cat links.txt | (open-links)`"
+  [s]
+  (->> s
+    (re-seq #"https?://[^\s]+")
+    (map #(sh firefox -private-window (identity %)))))
