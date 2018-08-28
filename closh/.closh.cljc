@@ -27,6 +27,16 @@
 ; Rust language
 (setenv "PATH" (str (getenv "HOME") "/.cargo/bin" ":" (getenv "PATH")))
 
+; Go lang
+(setenv "GOPATH" "/home/me/bin/gocode")
+(setenv "GOROOT" "/usr/lib/go-1.10")
+(setenv "PATH" (str (getenv "GOPATH") "/bin:" (getenv "GOROOT") "/bin:" (getenv "PATH")))
+
+; Python's pip3 installed packages
+(setenv "PATH" (str (getenv "HOME") "/.local/bin" ":" (getenv "PATH")))
+
+(setenv "GRAALVM_HOME" (str (getenv "HOME") "/bin/bin/graalvm-ce-1.0.0-rc5"))
+
 (load-file (str (getenv "HOME") "/.closh_macros.clj"))
 (load-file (str (getenv "HOME") "/.closh_functions.cljc"))
 (load-file (str (getenv "HOME") "/.closh_private.cljc"))
