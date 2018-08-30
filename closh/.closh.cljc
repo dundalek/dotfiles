@@ -29,7 +29,7 @@
 
 ; Go lang
 (setenv "GOPATH" "/home/me/bin/gocode")
-(setenv "GOROOT" "/usr/lib/go-1.10")
+(setenv "GOROOT" "/usr/local/go")
 (setenv "PATH" (str (getenv "GOPATH") "/bin:" (getenv "GOROOT") "/bin:" (getenv "PATH")))
 
 ; Python's pip3 installed packages
