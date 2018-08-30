@@ -52,3 +52,8 @@
   (->> s
     (re-seq #"https?://[^\s]+")
     (map #(sh firefox -private-window (identity %)))))
+
+(defcmd man
+  "Displays manual page but enhances it by showing also tldr page content first."
+  [name]
+  (sh bash -c (str "{ unbuffer tldr --theme ocean " name "; unbuffer /usr/bin/man -P cat " name "; } | less -R")))
