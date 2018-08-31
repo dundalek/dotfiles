@@ -55,5 +55,8 @@
 
 (defcmd man
   "Displays manual page but enhances it by showing also tldr page content first."
-  [name]
-  (sh bash -c (str "{ unbuffer tldr --theme ocean " name "; unbuffer /usr/bin/man -P cat " name "; } | less -R")))
+  [& args]
+  (if (= 1 (count args))
+    (let [name (first args)]
+      (sh bash -c (str "{ unbuffer tldr --theme ocean " name "; unbuffer /usr/bin/man -P cat " name "; } | less -RF")))
+    (closh.zero.pipeline/wait-for-pipeline (shx "man" args))))
