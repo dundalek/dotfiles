@@ -16,6 +16,14 @@
 (defalias pbcopy "xclip -selection c")
 (defalias pbpaste "xclip -selection clipboard -o")
 
+; https://github.com/sharkdp/bat
+(defalias cat "bat --paging never")
+
+; http://denilson.sa.nom.br/prettyping/
+(defalias ping "prettyping --nolegend")
+
+; https://dev.yorhel.nl/ncdu
+(defalias du "ncdu --color dark -x --exclude .git --exclude node_modules")
 
 (defabbr gaa "git add --all")
 (defabbr gco "git checkout")
