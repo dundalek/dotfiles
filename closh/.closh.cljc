@@ -40,4 +40,4 @@
 (load-file (str (getenv "HOME") "/.closh_macros.clj"))
 (load-file (str (getenv "HOME") "/.closh_functions.cljc"))
 (load-file (str (getenv "HOME") "/.closh_private.cljc"))
-#?(:cljs (load-file (str (getenv "HOME") "/.closh_autojump.cljc")))
+(load-file (str (getenv "HOME") "/.closh_autojump.cljc"))
