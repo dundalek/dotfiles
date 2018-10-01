@@ -9,15 +9,15 @@
 #
 # Please see http://i3wm.org/docs/userguide.html for a complete reference!
 
-set $mod Mod1
+set $mod Mod4
 
 # Font for window titles. Will also be used by the bar unless a different font
 # is used in the bar {} block below.
-font pango:monospace 8
+#font pango:monospace 8
 
 # This font is widely installed, provides lots of unicode glyphs, right-to-left
 # text rendering and scalability on retina/hidpi displays (thanks to pango).
-#font pango:DejaVu Sans Mono 8
+font pango:DejaVu Sans Mono 8
 
 # Before i3 v4.8, we used to recommend this one as the default:
 # font -misc-fixed-medium-r-normal--13-120-75-75-C-70-iso10646-1
@@ -34,9 +34,13 @@ bindsym $mod+Return exec i3-sensible-terminal
 
 # kill focused window
 bindsym $mod+Shift+q kill
+bindsym Mod1+F4  kill
 
 # start dmenu (a program launcher)
-bindsym $mod+d exec dmenu_run
+#bindsym $mod+d exec dmenu_run
+
+bindsym $mod+d exec "rofi -show combi -combi-modi 'window,drun,run' -modi combi"
+
 # There also is the (new) i3-dmenu-desktop which only displays applications
 # shipping a .desktop file. It is a wrapper around dmenu, so you need that
 # installed.
@@ -155,3 +159,105 @@ bar {
         status_command i3status
         tray_output primary
 }
+
+# Background
+#exec_always --no-startup-id "xsetroot -solid '#000000'"
+#exec_always --no-startup-id "feh --bg-scale background.png"
+
+# move focused workspace between monitors
+bindsym $mod+Ctrl+greater move workspace to output right
+bindsym $mod+Ctrl+less move workspace to output left
+
+# Alternative app launcher
+bindsym $mod+Shift+d exec xfce4-appfinder
+for_window [title="Application Finder"] floating enable
+for_window [title="Application Finder"] resize set 600 px 600 px
+
+
+
+# Close window by clicking with mouse wheel on the title
+bindsym --release button2 kill
+
+
+
+# https://faq.i3wm.org/question/239/how-do-i-suspendlockscreen-and-logout.1.html#post-id-1927
+# system management -- quitting i3 & alike
+set $mode_system System (l) lock, (Shift+e) logout, (s) suspend, (Shift+r) reboot, (Shift+s) shutdown
+
+mode "$mode_system" {
+    bindsym l exec --no-startup-id i3exit lock, mode "default"
+    bindsym Shift+e exec --no-startup-id i3exit logout, mode "default"
+    bindsym s exec --no-startup-id i3exit suspend, mode "default"
+    bindsym Shift+r exec --no-startup-id i3exit reboot, mode "default"
+    bindsym Shift+s exec --no-startup-id i3exit shutdown, mode "default"
+
+    # back to normal: Enter or Escape
+    bindsym Return mode "default"
+    bindsym Escape mode "default"
+}
+
+bindsym $mod+Escape mode "$mode_system"
+
+# Lock screen
+bindsym $mod+Ctrl+l exec --no-startup-id i3exit lock
+
+
+# Pulse Audio controls
+# bindsym XF86AudioRaiseVolume exec --no-startup-id pactl set-sink-volume 0 +5% #increase sound volume
+# bindsym XF86AudioLowerVolume exec --no-startup-id pactl set-sink-volume 0 -5% #decrease sound volume
+# bindsym XF86AudioMute exec --no-startup-id pactl set-sink-mute 0 toggle # mute sound
+
+# Sreen brightness controls
+bindsym XF86MonBrightnessUp exec xbacklight -inc 10 # increase screen brightness
+bindsym XF86MonBrightnessDown exec xbacklight -dec 10 # decrease screen brightness
+
+# Media player controls
+bindsym XF86AudioPlay exec playerctl play
+bindsym XF86AudioPause exec playerctl pause
+bindsym XF86AudioNext exec playerctl next
+bindsym XF86AudioPrev exec playerctl previous
+
+
+# Auto lock after certain time
+# exec_always --no-startup-id xautolock -time 10 -locker "i3exit lock"
+
+# Using i3blocks for status
+# status_command i3blocks -c ~/.config/i3blocks/i3blocks.conf
+
+
+# Find out autostrat apps with `grep -r Exec ~/.config/autostart`
+# Then copy here
+exec --no-startup-id nm-applet
+exec --no-startup-id blueman-applet
+exec --no-startup-id dropbox start
+exec --no-startup-id /usr/bin/syncthing-gtk
+exec --no-startup-id xflux -l 50 -g 15
+exec --no-startup-id xfce4-power-manager
+exec --no-startup-id clipit
+
+# https://github.com/rliou92/umonitor
+# For new configuration use arandr or lxrandr
+# Then run `umonitor --save <profile_name>`
+exec --no-startup-id umonitor --listen --quiet
+
+# TODO: lighter volume control
+# Maybe pnmixer
+exec --no-startup-id kmix
+
+
+#exec "xfce4-clipman"
+
+
+# Compositor compton
+
+exec_always --no-startup-id compton
+
+
+# exec --no-startup-id /usr/lib/x86_64-linux-gnu/indicator-messages/indicator-messages-service
+# exec --no-startup-id /usr/lib/x86_64-linux-gnu/indicator-power/indicator-power-service
+# exec --no-startup-id /usr/lib/x86_64-linux-gnu/indicator-datetime/indicator-datetime-service
+# exec --no-startup-id /usr/lib/x86_64-linux-gnu/indicator-keyboard/indicator-keyboard-service --use-gtk
+# exec --no-startup-id /usr/lib/x86_64-linux-gnu/indicator-sound/indicator-sound-service
+# exec --no-startup-id /usr/lib/x86_64-linux-gnu/indicator-printers/indicator-printers-service
+# exec --no-startup-id /usr/lib/x86_64-linux-gnu/indicator-session/indicator-session-service
+# exec --no-startup-id /usr/lib/x86_64-linux-gnu/indicator-application/indicator-application-service
