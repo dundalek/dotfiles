@@ -19,6 +19,7 @@
       ]
     disabledPackages: [
       "vim-mode"
+      "linter"
     ]
     packagesWithKeymapsDisabled: [
       "lisp-paredit"
@@ -29,6 +30,7 @@
       "atom-light-syntax"
     ]
   editor:
+    autoIndentOnPaste: false
     fontFamily: "dejavu sans mono"
     fontSize: 10
     lineHeight: 1.2
@@ -41,6 +43,8 @@
   "fuzzy-finder":
     preserveLastSearch: true
   "graphviz-preview-plus": {}
+  "linter-ui-default":
+    panelHeight: 566
   "lisp-paredit":
     strict: false
   "markdown-mindmap":

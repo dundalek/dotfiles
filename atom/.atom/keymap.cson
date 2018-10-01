@@ -27,6 +27,7 @@
 'atom-text-editor.vim-mode-plus':
   'ctrl-c': 'unset!'
   'ctrl-[': 'unset!'
+  'ctrl-r': 'unset!'
 
 'atom-text-editor.vim-mode-plus.normal-mode':
   'ctrl-v': 'unset!'
@@ -39,6 +40,7 @@
 
 'atom-text-editor.vim-mode-plus.insert-mode':
   'ctrl-o': 'unset!'
+  'ctrl-r': 'unset!'
 
 'atom-workspace atom-text-editor:not([mini])':
   'ctrl-e': 'proto-repl:execute-block'
