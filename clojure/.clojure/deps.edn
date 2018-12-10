@@ -35,7 +35,14 @@
   ;  :test {:extra-paths ["test"]}}}
   {:nrepl
    {:extra-deps {nrepl/nrepl {:mvn/version "0.5.1"}}
-    :main-opts ["-m" "nrepl.cmdline"]}}}
+    :main-opts ["-m" "nrepl.cmdline"]}
+
+   :deps-try
+   {:extra-deps
+    {deps-try
+        {:git/url "https://gitlab.com/eval/deps-try",
+         :sha "9c5eb7d54fadbfc8f5c8b312678c7fee3cc69050"}},
+    :main-opts ["-m" "deps-try.main"]}}}
 
   ;; Provider attributes
 
