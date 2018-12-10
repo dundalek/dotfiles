@@ -1,7 +1,9 @@
 {:user
  {:plugins [
-	    ;[lein-ancient "0.6.5"]
+      ;[lein-ancient "0.6.5"]
             ;[lein-plz "0.4.0-SNAPSHOT" :exclusions [[rewrite-clj] [ancient-clj]]]
+
+	    [lein-cljfmt "0.6.1"]
 
             [lein-kibit "0.1.6-beta2"]
             [lein-bikeshed "0.5.0"]
@@ -10,13 +12,14 @@
 
             ;[lein-ns-dep-graph "0.2.0-SNAPSHOT"]
             [lein-hiera "0.9.5"]
-            [lein-gossip "0.1.0-SNAPSHOT"]
+            ; [lein-gossip "0.1.0-SNAPSHOT"]
 
-	    [lein-try "0.4.3"]
-	    [com.cemerick/drawbridge "0.0.7"]
-	    ;[com.cemerick/drawbridge "0.1.0-SNAPSHOT"]
+            [lein-try "0.4.3"]
+            [com.cemerick/drawbridge "0.0.7"]
+      ;[com.cemerick/drawbridge "0.1.0-SNAPSHOT"]
 
             [lein-instant-cheatsheet "2.2.1"]]
+
 
   :aliases {"lint"
             ["do" ["kibit"] ["eastwood"] ["bikeshed"] ["yagni"]]
