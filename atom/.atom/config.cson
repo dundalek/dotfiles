@@ -17,10 +17,6 @@
       "source.python": [
         "BUCK"
       ]
-    disabledPackages: [
-      "vim-mode"
-      "linter"
-    ]
     packagesWithKeymapsDisabled: [
       "lisp-paredit"
     ]
