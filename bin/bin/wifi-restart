@@ -1,0 +1,8 @@
+#!/bin/bash
+
+rmmod iwlmvm
+rmmod iwlwifi
+sleep 1
+modprobe iwlwifi iwlmvm
+sleep 1
+service avahi-daemon stop

@@ -1,0 +1,13 @@
+#!/bin/bash
+
+tmux new -d -s persista
+tmux send-keys 'cd ~/w/git/persista/permitguide-api' 'C-m' 'docker-compose -f docker-compose.dev.yml up db fakes3 mailcatcher' 'C-m'
+tmux splitw -v -t persista
+tmux send-keys 'cd ~/w/git/persista/permitguide-api' 'C-m' 'rails s' 'C-m'
+tmux splitw -v -t persista
+tmux send-keys 'cd ~/w/git/persista/permitguide-frontend' 'C-m' 'yarn start:dev' 'C-m'
+tmux splitw -v -t persista
+tmux send-keys 'cd ~/w/git/persista/ui' 'C-m' 'yarn watch' 'C-m'
+tmux select-layout -t persista main-vertical
+tmux rotate-window -t persista -U
+tmux attach -t persista

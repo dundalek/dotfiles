@@ -1,0 +1,24 @@
+#!/usr/bin/env lumo
+
+; Monitors clipboard and collects content over time.
+; Useful to collect notes when browsing web for research.
+; Use like `clipboard-monitor >> notes.md` to append clipboard changes to a file.
+
+; Would be nice to get rid of polling and use something like
+; QClipboard's void selectionChanged() and void dataChanged()
+; or like GTK's owner-changed.
+
+(def separator "")
+
+(def exec-sync (-> (js/require "child_process") (.-execSync)))
+
+(defn get-clipboard []
+  (exec-sync "xclip -selection clipboard -o" #js{:encoding "utf-8"}))
+
+(defn check-clipboard [content]
+  (let [val (get-clipboard)]
+    (when (not= content val)
+      (js/console.log (str separator val)))
+    (js/setTimeout #(check-clipboard val) 250)))
+
+(check-clipboard (get-clipboard))

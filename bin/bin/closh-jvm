@@ -1,0 +1,7 @@
+#!/bin/sh
+
+export CLOSH_SOURCES_PATH=/home/me/github/closh
+
+# clojure -A:rebel -Sdeps '{:deps {closh {:git/url "https://github.com/dundalek/closh.git" :sha "53708878817a8b8c0fdc0b62a89f0f4ab8a7b9e7"}}}' -m closh.zero.frontend.rebel-readline
+
+clojure -Sdeps '{:deps {closh {:local/root "/home/me/github/closh"} org.clojure/tools.reader {:git/url "https://github.com/dundalek/tools.reader" :sha "64a792b8ab6f774cab01c64d143c306ea81c84ff"}}}' -m closh.zero.frontend.rebel

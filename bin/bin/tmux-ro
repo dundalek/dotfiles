@@ -1,0 +1,15 @@
+#!/bin/bash
+
+session=swrve
+repo=~/ro/git/ro_html5-ott-sdk
+
+tmux new -d -s $session
+tmux send-keys "cd $repo" 'C-m' 'nodemon -e ts -x "yarn build:sdk"' 'C-m'
+tmux splitw -v -t $session
+tmux send-keys "cd $repo" 'C-m' 'nodemon -e ts -x "yarn lint"' 'C-m'
+tmux splitw -v -t $session
+tmux send-keys "cd $repo" 'C-m' 'nodemon -e ts -x "yarn test"' 'C-m'
+tmux splitw -v -t $session
+tmux send-keys "cd $repo" 'C-m' 'yarn run:demo' 'C-m'
+tmux select-layout -t $session main-vertical
+tmux attach -t $session
