@@ -90,3 +90,13 @@
 ;   (-> s
 ;     ((resolve 'hickory.core/parse))
 ;     ((resolve 'hickory.core/as-hiccup))))
+
+
+; Misc
+; ====================
+
+(defcmd to-slug [s]
+  (when-not (find-ns 'slugger.core)
+    (add-dependencies :coordinates '[[slugger "1.0.1"]])
+    (require '[slugger.core]))
+  ((resolve 'slugger.core/->slug) s))
