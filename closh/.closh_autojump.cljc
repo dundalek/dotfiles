@@ -3,7 +3,7 @@
 (setenv "AUTOJUMP_SOURCED" 1)
 
 (defn- dirname [filename]
-  #?(:cljs (path.dirname filename)
+  #?(:cljs (path/dirname filename)
      :clj (.getParent (clojure.java.io/file filename))))
 
 (def ^:private is-mac
