@@ -62,9 +62,24 @@
     (map #(sh firefox -private-window (identity %)))))
 
 (defcmd man
-  "Displays manual page but enhances it by showing also tldr page content first."
+  "Displays manual page but enhances it by showing also tldr page content first. To install the `unbuffer dependency` run `sudo apt install expect`. To install tldr client one can use `npm install -g tldr`."
   [& args]
   (if (= 1 (count args))
     (let [name (first args)]
       (sh bash -c (str "{ unbuffer tldr --theme ocean " name "; unbuffer /usr/bin/man -P cat " name "; } | less -RF")))
     (closh.zero.pipeline/wait-for-pipeline (shx "man" args))))
+
+(defcmd github-user-email
+  "Get an email for a given github user."
+  [username]
+  (->>
+    (sh-str curl (str "https://api.github.com/users/" username "/events"))
+    from-json
+    (mapcat #(-> % :payload :commits))
+    (map #(-> % :author))
+    (frequencies)))
+
+(defcmd git-delete-merged-branches
+  "Deletes local git branches that are merged in remote master"
+  []
+  (sh git branch --merged origin/master | grep -v master | xargs --verbose --max-args=1 git branch -d))
