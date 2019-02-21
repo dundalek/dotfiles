@@ -101,10 +101,10 @@ fi
 unset color_prompt force_color_prompt
 
 #https://github.com/magicmonty/bash-git-prompt
-GIT_PROMPT_ONLY_IN_REPO=1
-GIT_PROMPT_START="\[$IBlack\]\A \[\033[01;32m\]\u@\h\[\033[01;34m\] \w\[\033[00m\]"
-GIT_PROMPT_END=" \[\033[01;34m\]\$\[\033[00m\] "
-source ~/.bash-git-prompt/gitprompt.sh
+# GIT_PROMPT_ONLY_IN_REPO=1
+# GIT_PROMPT_START="\[$IBlack\]\A \[\033[01;32m\]\u@\h\[\033[01;34m\] \w\[\033[00m\]"
+# GIT_PROMPT_END=" \[\033[01;34m\]\$\[\033[00m\] "
+# source ~/.bash-git-prompt/gitprompt.sh
 
 # If this is an xterm set the title to user@host:dir
 case "$TERM" in
@@ -170,6 +170,3 @@ export TODOTXT_AUTO_ARCHIVE=1
 export TODOTXT_DATE_ON_ADD=1
 export TODOTXT_DEFAULT_ACTION=ls
 alias t='todo-txt'
-
-. ~/bin/z
-. ~/bin/bin/z/z.sh
