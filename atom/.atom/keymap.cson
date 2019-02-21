@@ -42,9 +42,26 @@
   'ctrl-o': 'unset!'
   'ctrl-r': 'unset!'
 
-'atom-workspace atom-text-editor:not([mini])':
-  'ctrl-e': 'proto-repl:execute-block'
-  'ctrl-alt-e': 'proto-repl:execute-selected-text'
+# 'atom-workspace atom-text-editor:not([mini])':
+#   'ctrl-e': 'proto-repl:execute-block'
+#   'ctrl-alt-e': 'proto-repl:execute-selected-text'
+
+'atom-text-editor.vim-mode-plus.normal-mode[data-grammar="source clojure"]':
+  'ctrl-e':  'chlorine:evaluate-block'
+  # 'g f':          'chlorine:go-to-var-definition'
+  # 'ctrl-d':       'chlorine:doc-for-var'
+  # 'space c':      'chlorine:connect-clojure-socket-repl'
+  # 'space l':      'chlorine:clear-console'
+  # 'shift-enter':  'chlorine:evaluate-block'
+  # 'ctrl-enter':   'chlorine:evaluate-top-block'
+  # 'space space':  'inline-results:clear-all'
+  # 'space x':      'chlorine:run-tests-in-ns'
+  # 'space t':      'chlorine:run-test-for-var'
+
+'atom-text-editor.vim-mode-plus.insert-mode[data-grammar="source clojure"]':
+  'ctrl-e':  'chlorine:evaluate-block'
+  # 'shift-enter': 'chlorine:evaluate-block'
+  # 'ctrl-enter': 'chlorine:evaluate-top-block'
 
 'atom-workspace':
   'ctrl-alt-m': 'markdown-mindmap:toggle'

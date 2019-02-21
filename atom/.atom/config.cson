@@ -17,6 +17,10 @@
       "source.python": [
         "BUCK"
       ]
+    disabledPackages: [
+      "proto-repl"
+      "proto-repl-charts"
+    ]
     packagesWithKeymapsDisabled: [
       "lisp-paredit"
     ]

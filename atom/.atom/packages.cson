@@ -6,6 +6,7 @@ packages: [
   "autocomplete-paths"
   "busy-signal"
   "chestnut-light-atom-syntax"
+  "chlorine"
   "editorconfig"
   "file-icons"
   "highlight-selected"
