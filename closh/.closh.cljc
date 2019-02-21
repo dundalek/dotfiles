@@ -37,6 +37,17 @@
 
 (setenv "GRAALVM_HOME" (str (getenv "HOME") "/bin/bin/graalvm-ce-1.0.0-rc5"))
 
+#?(:cljs
+    (defcmd from-json [& args]
+      (-> (js/JSON.parse (first args))
+          (js->clj :keywordize-keys true))))
+
+#?(:cljs
+    (defcmd to-json [& args]
+      (-> (clj->js (first args))
+          (js/JSON.stringify))))
+
+#?(:clj (load-file (str (getenv "HOME") "/.closh_data_utils.cljc")))
 (load-file (str (getenv "HOME") "/.closh_macros.clj"))
 (load-file (str (getenv "HOME") "/.closh_functions.cljc"))
 (load-file (str (getenv "HOME") "/.closh_private.cljc"))
