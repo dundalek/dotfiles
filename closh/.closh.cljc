@@ -32,6 +32,9 @@
 (setenv "GOROOT" "/usr/local/go")
 (setenv "PATH" (str (getenv "GOPATH") "/bin:" (getenv "GOROOT") "/bin:" (getenv "PATH")))
 
+; Ruby - find the location with `gem environment`
+(setenv "PATH" (str (getenv "HOME") "/.gem/bin:" (getenv "PATH")))
+
 ; Python's pip3 installed packages
 (setenv "PATH" (str (getenv "HOME") "/.local/bin" ":" (getenv "PATH")))
 
