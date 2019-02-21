@@ -3,7 +3,7 @@
       ;[lein-ancient "0.6.5"]
             ;[lein-plz "0.4.0-SNAPSHOT" :exclusions [[rewrite-clj] [ancient-clj]]]
 
-	    [lein-cljfmt "0.6.1"]
+            [lein-cljfmt "0.6.1"]
 
             [lein-kibit "0.1.6-beta2"]
             [lein-bikeshed "0.5.0"]
@@ -30,14 +30,14 @@
 
             "namespace-graph"
             ["with-profile" "+clj-usage-graph" "run"
-             "-m" "com.gfredericks.clj-usage-graph/namespace-graph"]}}
+             "-m" "com.gfredericks.clj-usage-graph/namespace-graph"]}}}
 
  ;; separate profile so that we only have these deps when we're
  ;; actually using clj-usage-graph
- :clj-usage-graph
- {:dependencies [[com.gfredericks/clj-usage-graph "0.3.0"]]}
-
- :repl {:plugins [[cider/cider-nrepl "0.10.0-SNAPSHOT"]
-                  [refactor-nrepl "2.0.0-SNAPSHOT"]]
-        :dependencies [[alembic "0.3.2"]
-                       [org.clojure/tools.nrepl "0.2.12"]]}}
+ ; :clj-usage-graph
+ ; {:dependencies [[com.gfredericks/clj-usage-graph "0.3.0"]]}
+ ;
+ ; :repl {:plugins [[cider/cider-nrepl "0.10.0-SNAPSHOT"]
+ ;                  [refactor-nrepl "2.0.0-SNAPSHOT"]]
+ ;        :dependencies [[alembic "0.3.2"]
+ ;                       [org.clojure/tools.nrepl "0.2.12"]]}}

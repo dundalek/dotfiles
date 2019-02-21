@@ -33,16 +33,20 @@
   :aliases
   ; {:deps {:extra-deps {org.clojure/tools.deps.alpha {:mvn/version "0.5.398"}}}
   ;  :test {:extra-paths ["test"]}}}
-  {:nrepl
-   {:extra-deps {nrepl/nrepl {:mvn/version "0.5.1"}}
-    :main-opts ["-m" "nrepl.cmdline"]}
+  {:nrepl {:extra-deps {nrepl/nrepl {:mvn/version "RELEASE"}}
+           :main-opts ["-m" "nrepl.cmdline"]}
 
-   :deps-try
-   {:extra-deps
-    {deps-try
-        {:git/url "https://gitlab.com/eval/deps-try",
-         :sha "9c5eb7d54fadbfc8f5c8b312678c7fee3cc69050"}},
-    :main-opts ["-m" "deps-try.main"]}}}
+   ;; - start a Socket REPL on port 50505:
+   :socket {:jvm-opts ["-Dclojure.server.repl={:port,50505,:accept,clojure.core.server/repl}"]}
+
+   :rebel {:extra-deps {com.bhauman/rebel-readline {:mvn/version "0.1.4"}}
+           :main-opts  ["-m" "rebel-readline.main"]}
+
+   :deps-try {:extra-deps
+              {deps-try
+                  {:git/url "https://gitlab.com/eval/deps-try",
+                   :sha "9c5eb7d54fadbfc8f5c8b312678c7fee3cc69050"}},
+              :main-opts ["-m" "deps-try.main"]}}}
 
   ;; Provider attributes
 
