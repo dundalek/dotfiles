@@ -35,6 +35,9 @@
 ; Python's pip3 installed packages
 (setenv "PATH" (str (getenv "HOME") "/.local/bin" ":" (getenv "PATH")))
 
+; Lua
+(setenv "PATH" (str (getenv "HOME") "/.luarocks/bin/" ":" (getenv "PATH")))
+
 (setenv "GRAALVM_HOME" (str (getenv "HOME") "/bin/bin/graalvm-ce-1.0.0-rc5"))
 
 #?(:cljs
