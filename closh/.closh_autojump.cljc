@@ -34,13 +34,13 @@
 
 (defn autojump [& args]
   (-> (shx "autojump" args)
-      (process-output)
+      (closh.zero.pipeline/process-output)
       (clojure.string/trim)))
 
 (defn autojump-cd [& args]
   (if (= (ffirst args) "-")
     (-> (shx "autojump" args)
-        (wait-for-pipeline))
+        (closh.zero.pipeline/wait-for-pipeline))
     (let [output (apply autojump args)]
       (if (= output ".")
         (apply cd args)
