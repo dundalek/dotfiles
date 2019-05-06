@@ -36,8 +36,8 @@
   {:nrepl {:extra-deps {nrepl/nrepl {:mvn/version "RELEASE"}}
            :main-opts ["-m" "nrepl.cmdline"]}
 
-   ;; - start a Socket REPL on port 50505:
-   :socket {:jvm-opts ["-Dclojure.server.repl={:port,50505,:accept,clojure.core.server/repl}"]}
+   ;; - start a Socket REPL on port 5555:
+   :socket {:jvm-opts ["-Dclojure.server.repl={:port,5555,:accept,clojure.core.server/repl}"]}
 
    :rebel {:extra-deps {com.bhauman/rebel-readline {:mvn/version "0.1.4"}}
            :main-opts  ["-m" "rebel-readline.main"]}
