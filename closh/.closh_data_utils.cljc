@@ -91,6 +91,13 @@
 ;     ((resolve 'hickory.core/parse))
 ;     ((resolve 'hickory.core/as-hiccup))))
 
+(defcmd hiccup->html [s]
+  (when-not (find-ns 'hickory.render)
+    (add-dependencies :coordinates '[[hickory "0.7.1"]])
+    (require '[hickory.render]))
+  (let [forms (if (string? s) (from-edn s) s)
+        forms (if (keyword? (first forms)) [forms] forms)]
+    ((resolve 'hickory.render/hiccup-to-html) forms)))
 
 ; Misc
 ; ====================
