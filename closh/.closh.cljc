@@ -59,5 +59,6 @@
 #?(:clj (load-file (str (getenv "HOME") "/.closh_data_utils.cljc")))
 (load-file (str (getenv "HOME") "/.closh_macros.clj"))
 (load-file (str (getenv "HOME") "/.closh_functions.cljc"))
+(load-file (str (getenv "HOME") "/.closh_lib.cljc"))
 (load-file (str (getenv "HOME") "/.closh_private.cljc"))
 (load-file (str (getenv "HOME") "/.closh_autojump.cljc"))
