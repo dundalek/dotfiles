@@ -41,6 +41,9 @@
 ; Lua
 (setenv "PATH" (str (getenv "HOME") "/.luarocks/bin/" ":" (getenv "PATH")))
 
+; OCaml
+(source-shell "eval $(opam env)")
+
 (setenv "GRAALVM_HOME" (str (getenv "HOME") "/bin/bin/graalvm-ce-1.0.0-rc5"))
 
 #?(:cljs
