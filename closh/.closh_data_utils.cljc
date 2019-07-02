@@ -17,6 +17,15 @@
 (defcmd to-edn [& more]
   (apply prn-str more))
 
+(defcmd edn-diff [a b]
+  (when-not (find-ns 'lambdaisland.deep-diff)
+    (add-dependencies :coordinates '[[lambdaisland/deep-diff "0.0-47"]])
+    (require '[lambdaisland.deep-diff]))
+  (let [diff (resolve 'lambdaisland.deep-diff/diff)
+        pretty-print (resolve 'lambdaisland.deep-diff/pretty-print)]
+    (-> (diff (from-edn (slurp a))
+              (from-edn (slurp b)))
+        (pretty-print))))
 
 ; JSON
 ; ====================
