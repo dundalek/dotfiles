@@ -37,7 +37,7 @@
 
 ; (defcmd [] switch-user)
 
-;; == Audio
+;; == Audio / Sound
 
 (defn get-default-sink []
   "@DEFAULT_SINK@")
@@ -67,9 +67,11 @@
   ([] (mute-on (get-default-sink)))
   ([target] (sh-ok pactl set-sink-mute (str target) "1")))
 
-(defn mute-off
+(defcmd mute-off
   ([] (mute-off (get-default-sink)))
   ([target] (sh-ok pactl set-sink-mute (str target) "0")))
+
+;; (defcmd play-sound [file])
 
 (comment
   (volume-up)
@@ -81,3 +83,21 @@
   (mute)
   (mute-on)
   (mute-off))
+
+
+;; Network
+
+(defcmd wifi-on []
+  (sh nmcli radio wifi on))
+
+(defcmd wifi-off []
+  (sh nmcli radio wifi off))
+
+(defcmd change-mac
+  ([] (change-mac "eth0"))
+  ([device]
+   (let [mac (sh-str openssl rand -hex 6 | sed "s/\\(..\\)/\\1:/g; s/.$//")]
+     (sh sudo ifconfig (str device) down)
+     (sh sudo ifconfig (str device) hw ether (str mac))
+     (sh sudo ifconfig (str device) up)
+     (println "Your new physical address is " mac))))
