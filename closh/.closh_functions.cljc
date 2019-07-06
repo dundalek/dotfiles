@@ -29,6 +29,9 @@
 (defabbr gco "git checkout")
 (defabbr gc "git clone")
 
+(defabbr yt "youtube-dl --no-mtime --add-metadata")
+(defabbr yta "youtube-dl --no-mtime --add-metadata --extract-audio")
+
 (defcmd gz
   "Compare original and gzipped size of a file"
   [f]
