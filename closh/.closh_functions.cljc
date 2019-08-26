@@ -86,3 +86,16 @@
   "Deletes local git branches that are merged in remote master"
   []
   (sh git branch --merged origin/master | grep -v master | xargs --verbose --max-args=1 git branch -d))
+
+(defcmd ghclone
+  "Clones a git repo. Argument can be:
+  - `username/repo` in which case it will cloned from GitHub
+  - copied from browser location bar like `https://github.com/username/repo`
+  - or any full git url like `git@github:..` or `git://...` etc."
+  [repo]
+  (let [url (cond
+              (re-matches #"^[^/]+/[^/]+$" repo) (str "https://github.com/" repo ".git")
+              (not (re-find #"\.git$" repo)) (str repo ".git")
+              :else repo)]
+    (sh cd (str (getenv "HOME") "/dl/git") \;
+        git clone (str url))))
