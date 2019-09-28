@@ -82,3 +82,6 @@
 
 'ink-console atom-text-editor[data-grammar~="clojure"]':
   'enter':          'editor:newline'
+
+'atom-text-editor':
+  'ctrl-space': 'atom-notes:toggle'

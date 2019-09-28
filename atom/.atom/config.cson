@@ -2,6 +2,8 @@
   "atom-beautify":
     general:
       _analyticsUserId: "33b01e93-9c6d-47b8-9e26-3c211955851f"
+  "atom-notes":
+    directory: "/home/me/Dropbox/myfiles"
   "autocomplete-plus":
     confirmCompletion: "tab always, enter when suggestion explicitly selected"
   core:
