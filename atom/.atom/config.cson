@@ -20,7 +20,6 @@
         "BUCK"
       ]
     disabledPackages: [
-      "proto-repl"
       "proto-repl-charts"
     ]
     packagesWithKeymapsDisabled: [
@@ -76,6 +75,12 @@
     forceOverwrite: true
   parinfer:
     "use-smart-mode?": true
+  "proto-repl":
+    autoPrettyPrint: true
+    openReplInRightPane: false
+    refreshBeforeRunningSingleTest: false
+    refreshBeforeRunningTestFile: false
+    refreshOnReplStart: false
   "vim-mode":
     startInInsertMode: true
   "vim-mode-plus":
