@@ -1,0 +1,6 @@
+#!/usr/bin/env sh
+
+sudo apt-get install "$@"
+# set IN_NIX_SHELL so that it will be show in prompt indicator
+IN_NIX_SHELL=apt ${SHELL:-bash}
+sudo apt-get remove --autoremove --purge "$@"

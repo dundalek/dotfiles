@@ -1,0 +1,30 @@
+#!/usr/bin/env bb
+;; -*- clojure -*-
+;; vim: set filetype=clojure:
+
+;; improvements:
+;; - flatten
+
+
+(require '[clojure.java.io :as io])
+(require '[clojure.string :as str])
+
+(def heading-pattern #"^(#+)\s*(.*)$")
+
+(defn pad [n]
+  (->> (repeat n "  ")
+       (str/join "")))
+
+(defn match-heading [line]
+  (when-some [[_ level title] (re-matches heading-pattern line)]
+    (str "interface!" (pad (dec (count level))) title)))
+
+(let [fname (first *command-line-args*)]
+  (with-open [rdr (io/reader fname)]
+    (let [lines (->> (line-seq rdr)
+                     (keep-indexed (fn [idx line]
+                                     (when-some [heading (match-heading line)]
+                                       (str fname ":" (inc idx) ":" heading)))))]
+      (doseq [line lines]
+        (println line)))))
+

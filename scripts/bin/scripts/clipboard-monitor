@@ -1,4 +1,6 @@
 #!/usr/bin/env lumo
+;; -*- clojure -*-
+;; vim: set filetype=clojure:
 
 ; Monitors clipboard and collects content over time.
 ; Useful to collect notes when browsing web for research.

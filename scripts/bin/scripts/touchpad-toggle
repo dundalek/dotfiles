@@ -1,4 +1,6 @@
 #!/usr/bin/env fennel
+;; -*- clojure -*-
+;; vim: set filetype=clojure:
 
 (fn sh-str [cmd]
   (let [file (io.popen cmd "r")

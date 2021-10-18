@@ -1,0 +1,2 @@
+# Private files are ignored for git, but enable them for fuzzy finding with ripgrep
+!/private

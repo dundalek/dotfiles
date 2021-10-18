@@ -239,4 +239,10 @@ if [ -d "$HOME/.local/bin" ] ; then
     PATH="$HOME/.local/bin:$PATH"
 fi
 
-export PATH="$HOME/Dropbox/myfiles/scripts:$PATH"
+if [ -d "$HOME/bin/scripts" ] ; then
+    PATH="$HOME/bin/scripts:$PATH"
+fi
+
+if [ -d "$HOME/bin/private" ] ; then
+    PATH="$HOME/bin/private:$PATH"
+fi
