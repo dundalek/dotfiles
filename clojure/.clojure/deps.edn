@@ -43,7 +43,7 @@
            :main-opts  ["-m" "rebel-readline.main"]}
 
    :deps-try {:extra-deps
-              {deps-try
+              {deps-try/deps-try
                   {:git/url "https://gitlab.com/eval/deps-try",
                    :sha "9c5eb7d54fadbfc8f5c8b312678c7fee3cc69050"}},
               :main-opts ["-m" "deps-try.main"]}}}

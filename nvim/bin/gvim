@@ -1,0 +1,3 @@
+#!/usr/bin/env sh
+
+exec alacritty --class "NVIM,NVIM" -e nvim "$@"

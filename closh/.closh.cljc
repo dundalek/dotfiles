@@ -20,68 +20,41 @@
 
 (defn closh-prompt []
   ; (source-shell "bash" "eval \"$(direnv export bash)\"")
-  (str (sh-str powerline-shell --shell bare) #?(:cljs " js> " :clj " ")))
+  ;(str (sh-str powerline-shell --shell bare) #?(:cljs " js> " :clj " ")))
+  (str (sh-str powerline-go -shell bare -mode compatible -modules "time,nix-shell,venv,ssh,cwd,perms,git,hg,jobs,exit,root" -git-disable-stats stashed)
+       #_(when (getenv "IN_NIX_SHELL") "[nix]")
+       " "))
 
-(source-shell "export NVM_DIR=\"$HOME/.nvm\"; [ -s \"$NVM_DIR/nvm.sh\" ] && . \"$NVM_DIR/nvm.sh\"")
+;; Putting ENV variable setting in ~/.profile
+;; There will always be some legacy setting, so we at least source external shell only once
+(source-shell ". ~/.bashrc")
 
-(defn args->str [args]
-  (->> args
-    (map #(str "'" (clojure.string/replace % #"'" "'\"'\"'") "'"))
-    (clojure.string/join " ")))
+; (defn args->str [args]
+;   (->> args
+;     (map #(str "'" (clojure.string/replace % #"'" "'\"'\"'") "'"))
+;     (clojure.string/join " ")))
+;
+; (defcmd nvm [& args]
+;   (print (source-shell (str ". \"$NVM_DIR/nvm.sh\"; nvm " (args->str args)))))
 
-(defcmd nvm [& args]
-  (print (source-shell (str ". \"$NVM_DIR/nvm.sh\"; nvm " (args->str args)))))
+; #?(:cljs
+;     (defcmd from-json [& args]
+;       (-> (js/JSON.parse (first args))
+;           (js->clj :keywordize-keys true))))
+;
+; #?(:cljs
+;     (defcmd to-json [& args]
+;       (-> (clj->js (first args))
+;           (js/JSON.stringify))))
 
-(setenv "EDITOR" "/usr/bin/vim")
-
-(source-shell "export PATH=\"$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH\"")
-
-; Rust language
-(setenv "PATH" (str (getenv "HOME") "/.cargo/bin" ":" (getenv "PATH")))
-
-; Go lang
-(setenv "GOPATH" "/home/me/bin/gocode")
-(setenv "GOROOT" "/usr/local/go")
-(setenv "PATH" (str (getenv "GOPATH") "/bin:" (getenv "GOROOT") "/bin:" (getenv "PATH")))
-
-; Ruby - find the location with `gem environment`
-(setenv "PATH" (str (getenv "HOME") "/.gem/bin:" (getenv "PATH")))
-
-; Python's pip3 installed packages
-(setenv "PATH" (str (getenv "HOME") "/.local/bin" ":" (getenv "PATH")))
-
-; Lua
-(setenv "PATH" (str (getenv "HOME") "/.luarocks/bin/" ":" (getenv "PATH")))
-
-; OCaml
-(source-shell "eval $(opam env)")
-
-;; Linuxbrew
-(source-shell "test -d ~/.linuxbrew && eval $(~/.linuxbrew/bin/brew shellenv)")
-(setenv "PATH" (str (getenv "HOME") "/.linuxbrew/bin" ":" (getenv "PATH")))
-
-(setenv "GRAALVM_HOME" (str (getenv "HOME") "/bin/bin/graalvm-ce-1.0.0-rc5"))
-
-
-(setenv "PATH" (str (getenv "HOME") "/Dropbox/myfiles/scripts" ":" (getenv "PATH")))
-
-
-#?(:cljs
-    (defcmd from-json [& args]
-      (-> (js/JSON.parse (first args))
-          (js->clj :keywordize-keys true))))
-
-#?(:cljs
-    (defcmd to-json [& args]
-      (-> (clj->js (first args))
-          (js/JSON.stringify))))
-
-#?(:clj (load-file (str (getenv "HOME") "/.closh_data_utils.cljc")))
+; (when-not (getenv "__CLOSH_USE_SCI_EVAL__")
+;   #?(:clj (load-file (str (getenv "HOME") "/.closh_data_utils.cljc"))))
 (load-file (str (getenv "HOME") "/.closh_macros.clj"))
 (load-file (str (getenv "HOME") "/.closh_functions.cljc"))
-(load-file (str (getenv "HOME") "/.closh_lib.cljc"))
 (load-file (str (getenv "HOME") "/.closh_private.cljc"))
 (load-file (str (getenv "HOME") "/.closh_autojump.cljc"))
+; (when-not (getenv "__CLOSH_USE_SCI_EVAL__")
+;   (load-file (str (getenv "HOME") "/.closh_nushell.cljc")))
 
 (comment
   #?(:clj
@@ -92,3 +65,34 @@
          :repositories (merge cemerick.pomegranate.aether/maven-central
                               {"clojars" "https://clojars.org/repo"}))
        (require '[datoteka.core :as f]))))
+
+; (defcmd rebl [x]
+;   ; (when-not (find-ns 'cemerick.pomegranate)
+;   ;   (require '[cemerick.pomegranate]))
+;   ; ((resolve 'cemerick.pomegranate/add-dependencies)
+;   ;  :coordinates '[[org.clojure/core.async "0.4.490"]
+;   ;                 [org.openjfx/javafx-fxml "11.0.1"]
+;   ;                 [org.openjfx/javafx-controls "11.0.1"]
+;   ;                 [org.openjfx/javafx-swing    "11.0.1"]
+;   ;                 [org.openjfx/javafx-base     "11.0.1"]
+;   ;                 [org.openjfx/javafx-web      "11.0.1"]])
+;   ; ((resolve 'cemerick.pomegranate/add-classpath)
+;   ;  (clojure.java.io/file "/home/me/bin/vendor/REBL-0.9.220.jar"))
+;   (when-not (find-ns 'cognitect.rebl)
+;     (require '[cognitect.rebl]))
+;   ((resolve 'cognitect.rebl/ui))
+;   ((resolve 'cognitect.rebl/inspect) x 1))
+
+; (require '[cognitect.rebl])
+;
+; (defcmd rebl-start []
+;   (cognitect.rebl/ui))
+;
+; (defcmd rebl [x]
+;   (cognitect.rebl/inspect x))
+;
+; (defn extension [s] (re-find #"[^.]*$" s))
+;
+; (defn from-edn [s] (clojure.edn/read-string s))
+;
+; (defcmd from-edn [s] (clojure.edn/read-string s))

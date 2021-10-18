@@ -1,0 +1,3 @@
+#!/bin/sh
+
+"rofi" "-i" "-combi-modi" "window,drun,run" "-show" "combi" "-modi" "combi"

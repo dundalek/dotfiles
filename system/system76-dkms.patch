@@ -1,0 +1,28 @@
+--- system76.c	2020-06-27 11:31:31.002984872 +0200
++++ system76-new.c	2020-06-27 12:25:53.329403027 +0200
+@@ -316,6 +316,17 @@
+ 	.driver_data = (void *)(uint64_t)(DATA), \
+ }
+ 
++// Devices that launched with DKMS support for OEM vendors
++#define DMI_TABLE_OEM(VENDOR, PRODUCT, DATA) { \
++	.ident = VENDOR " " PRODUCT, \
++	.matches = { \
++		DMI_MATCH(DMI_SYS_VENDOR, VENDOR), \
++		DMI_MATCH(DMI_PRODUCT_NAME, PRODUCT), \
++	}, \
++	.callback = s76_dmi_matched, \
++	.driver_data = (void *)(uint64_t)(DATA), \
++}
++
+ static struct dmi_system_id s76_dmi_table[] __initdata = {
+ 	DMI_TABLE_LEGACY("bonw13", DRIVER_AP_KEY | DRIVER_AP_LED | DRIVER_HWMON | DRIVER_KB_LED),
+ 	DMI_TABLE_LEGACY("galp2", DRIVER_AP_KEY | DRIVER_AP_LED | DRIVER_HWMON),
+@@ -328,6 +339,7 @@
+ 	DMI_TABLE("galp3-b", DRIVER_AP_KEY | DRIVER_AP_LED | DRIVER_HWMON),
+ 	DMI_TABLE("galp3-c", DRIVER_AP_LED | DRIVER_HWMON),
+ 	DMI_TABLE("galp4", DRIVER_AP_LED | DRIVER_HWMON),
++	DMI_TABLE_OEM("PC Specialist LTD", "N141CU", DRIVER_AP_LED | DRIVER_HWMON),
+ 	DMI_TABLE("gaze13", DRIVER_AP_KEY | DRIVER_AP_LED | DRIVER_HWMON),
+ 	DMI_TABLE("gaze14", DRIVER_AP_LED | DRIVER_KB_LED),
+ 	DMI_TABLE("gaze15", DRIVER_AP_LED | DRIVER_KB_LED),

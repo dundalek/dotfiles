@@ -1,0 +1,2 @@
+ACTION=="add", SUBSYSTEM=="usb", RUN+="/home/me/bin/autonumlock"
+ACTION=="remove", SUBSYSTEM=="usb", RUN+="/home/me/bin/autonumlock"

@@ -1,0 +1,11 @@
+configuration {
+  modi: "window,drun";
+  font: "San Francisco Display 13";
+  show-icons: true;
+  //icon-theme: "la-capitaine";
+  display-drun: "Apps:";
+  display-window: "Windows: ";
+  lines: 10;
+
+  theme: "rice";
+}

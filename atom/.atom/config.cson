@@ -1,10 +1,16 @@
 "*":
+  _dart:
+    _firstRun: true
+    _version: "1.0.1"
   "atom-beautify":
     general:
       _analyticsUserId: "33b01e93-9c6d-47b8-9e26-3c211955851f"
   "atom-notes":
     directory: "/home/me/Dropbox/myfiles"
+  "atom-toolbar":
+    visible: false
   "autocomplete-plus":
+    autoActivationDelay: 500
     confirmCompletion: "tab always, enter when suggestion explicitly selected"
   core:
     customFileTypes:
@@ -21,6 +27,11 @@
       ]
     disabledPackages: [
       "proto-repl-charts"
+      "atom-notes"
+      "minimap-autohide"
+      "minimap"
+      "github"
+      "open-on-github"
     ]
     packagesWithKeymapsDisabled: [
       "lisp-paredit"
@@ -30,10 +41,11 @@
       "one-light-ui"
       "atom-light-syntax"
     ]
+  dart: {}
   editor:
     autoIndentOnPaste: false
-    fontFamily: "dejavu sans mono"
-    fontSize: 10
+    fontFamily: "Dejavu Sans Mono"
+    fontSize: 12
     lineHeight: 1.2
     softWrap: true
     tabType: "soft"
@@ -44,8 +56,7 @@
   "fuzzy-finder":
     preserveLastSearch: true
   "graphviz-preview-plus": {}
-  "linter-ui-default":
-    panelHeight: 566
+  "linter-ui-default": {}
   "lisp-paredit":
     strict: false
   "markdown-mindmap":
@@ -77,6 +88,7 @@
     "use-smart-mode?": true
   "proto-repl":
     autoPrettyPrint: true
+    inkConsole: false
     openReplInRightPane: false
     refreshBeforeRunningSingleTest: false
     refreshBeforeRunningTestFile: false

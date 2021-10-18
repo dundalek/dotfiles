@@ -1,0 +1,710 @@
+#!/usr/bin/env bb
+;; -*- clojure -*-
+;; vim: set filetype=clojure:
+
+(require '[clojure.java.shell :as shell]
+         '[clojure.string :as str])
+
+(defn getenv [name]
+  (System/getenv name))
+
+(defmacro sh [& body]
+  `(clojure.java.shell/sh ~@(map #(if (or (number? %) (symbol? %))
+                                    (str %)
+                                    %)
+                                 body)))
+
+(defmacro sh-ok [& body]
+  `(zero? (:exit (sh ~@body))))
+
+(defmacro sh-str [& body]
+  `(:out (sh ~@body)))
+
+(def TERMINAL "gnome-terminal"
+  #_"alacritty")
+
+(def wait-for-key-cmd "echo -n '\nPress key to close '; read -n 1")
+
+(defn shell-escape [s]
+  (str "'" (str/replace s "'" "'\"'\"'") "'"))
+
+(defmacro in-terminal [& body]
+  ;; `(sh "alacritty" "-e" ~@body)
+  `(sh "gnome-terminal" "--" ~@body))
+
+(defmacro in-terminal-wait [& body]
+  ;; `(sh "alacritty" "-e" ~@body)
+  `(sh "gnome-terminal" "--wait" "--" ~@body))
+
+(defn edit-file [f]
+  ; (in-terminal vim (str f))
+  (sh gvim (str f)))
+
+(defn typeout [s]
+  ;; Replace LF with CR to preserve new lines when typing out
+  (let [s (str/replace s #"\n" "\r")]
+    (sh setxkbmap us)
+    (sh "xdotool" "type" "--clearmodifiers" "--delay" "0" (str s))))
+
+(defn typeout-via-xclip
+  "Copies given string into primary selection and then triggers mouse middle click to paste it."
+  [s]
+  (sh xclip :in (str s))
+  (sh xdotool click 2))
+
+(defn text-selection []
+  (sh-str xclip -selection primary -out))
+
+(defn clipboard-text []
+  (sh-str xclip -selection clipboard -out))
+
+(defn active-window-id []
+  (->> (str/split-lines (sh-str xprop -root))
+       (filter #(re-find #"_NET_ACTIVE_WINDOW\(WINDOW\)" %))
+       (map #(-> % (str/split #"\s+")
+                 (last)))
+       (first)))
+
+(defn app-info [window-id]
+  (let [props (->> (sh-str xprop -id (str window-id))
+                   (str/split-lines)
+                   (keep #(re-matches #"^([^(]+)\([^)]+\) = (.*)$" %))
+                   (map (fn [[_ prop value]]
+                          [prop value]))
+                   (into {}))
+        {app-name "WM_CLASS"
+         pid "_NET_WM_PID"
+         window-title "WM_NAME"} props]
+    {:app-name app-name
+     :window-title window-title ;; TOOD: split
+     :pid pid
+     :cwd (str/trim (sh-str readlink (str "/proc/" pid "/cwd")))}))
+
+(defn child-process-info [pid]
+  (let [line (->> (sh-str pstree -lpA (str pid))
+                  (str/split-lines)
+                  (first))]
+    (when-let [[_ child-program child-pid] (re-find #"---\{([^}]+)\}\((\d+)\)$" line)]
+      {:child-program child-program
+       :child-pid child-pid})))
+
+(def *context*
+  (let [{:keys [pid] :as app} (app-info (active-window-id))
+        child (child-process-info pid)]
+    (merge app
+           child
+           {:selected-text (text-selection)
+            :clipboard-text (clipboard-text)})))
+   ; :clipboard  ;; TODO iterate different mimes
+   ; :filename
+   ; :mime
+   ; current url if browser window is active
+
+; PID=$(xprop -id "$(xprop -root | awk '/_NET_ACTIVE_WINDOW\(WINDOW\)/{print $NF}')" | grep -m 1 PID | cut -d " " -f 3)
+; PID=$(echo "$(pstree -lpA "$PID" | tail -n 1)" | awk -F'---' '{print $NF}' | sed -re 's/[^0-9]//g')
+; cd "$(readlink /proc/"$PID"/cwd)"
+
+  ; winprog=$(ps -o comm,args -p `xdotool getwindowfocus getwindowpid` | tail -n 1)
+  ; wintitle=$(xdotool getactivewindow getwindowname))
+
+; WM_NAME(UTF8_STRING) = "﻿ - Google Chrome"
+; _NET_WM_PID(CARDINAL) = 25220
+; WM_CLASS(STRING) = "Alacritty", "Alacritty"
+; WM_WINDOW_ROLE(STRING) = "browser"
+
+;; xwininfo - prints also window dimensions which could perhaps come in handy
+
+(declare run-menu)
+
+;; == Edit Scripts
+
+(def script-path (str (getenv "HOME") "/dotfiles/rice/bin"))
+
+(def menu-edit-scripts
+  (->> (sh-str ls (str script-path))
+       (str/split-lines)
+       (map (fn [filename]
+              {:name filename
+               :action (fn [] (edit-file (str script-path "/" filename)))}))))
+
+;; == Keyboard shortcut
+
+(def keys-path (str (getenv "HOME") "/dotfiles/rice/.config/rice-keys"))
+
+(defn show-shortcuts [app]
+  (sh "rofi" "-i" "-dmenu" -p (str app " shortcuts:")
+      :in (slurp (str keys-path "/" app))))
+
+(def shortcut-apps
+  {"\"zathura\", \"Zathura\"" "zathura"
+   "\"gl\", \"mpv\"" "mpv"})
+
+(def menu-keys
+  (->> (sh-str ls (str keys-path))
+       (str/split-lines)
+       (map (fn [filename]
+              {:name filename
+               :action #(show-shortcuts filename)}))))
+
+;; Network
+
+(defn wifi-on []
+  (sh nmcli radio wifi on))
+
+(defn wifi-off []
+  (sh nmcli radio wifi off))
+
+(comment
+  (defn change-mac
+    ([] (change-mac "eth0"))
+    ([device]
+     (let [mac (sh-str openssl rand -hex 6 | sed "s/\\(..\\)/\\1:/g; s/.$//")]
+       (sh sudo ifconfig (str device) down)
+       (sh sudo ifconfig (str device) hw ether (str mac))
+       (sh sudo ifconfig (str device) up)
+       (println "Your new physical address is " mac)))))
+
+(def menu-network
+  [{:name "Wifi Restart"
+    :action (fn []
+              (wifi-off)
+              (wifi-on))}
+   {:name "Wifi On"
+    :action wifi-on}
+   {:name "Wifi Off"
+    :action wifi-off}
+   {:name "Network Settings"
+    :action (fn [] (in-terminal nmtui))}])
+
+;; Bluetooth
+
+(defn bluetooth-on []
+  (sh rfkill unblock bluetooth))
+
+(defn bluetooth-off []
+  (sh rfkill block bluetooth))
+
+(def menu-bluetooth
+  [{:name "Bluetooth On"
+    :action bluetooth-on}
+   {:name "Bluetooth Off"
+    :action bluetooth-off}
+   {:name "Bluetooth Settings"
+    :action (fn [] (sh blueman-manager))}])
+
+;; Display / Screen
+
+(defn brightness [value]
+  (sh brightnessctl set (str value)))
+
+(defn brightness-up []
+  (sh brightnessctl set "10%+"))
+
+(defn brightness-down [value]
+  (sh brightnessctl set "10%-"))
+
+(def menu-display
+  (concat
+   [{:name "Display Resolution"
+     :action (fn [] (sh rice-randr))}
+    {:name "Brightness Up"
+     :action brightness-up}
+    {:name "Brightness Down"
+     :action brightness-down}]
+   (for [level (range 100 0 -10)]
+     {:name (str "Brightness " level "%")
+      :action #(brightness (str level "%"))})))
+
+;; == Audio / Sound
+
+(defn get-default-sink []
+  "@DEFAULT_SINK@")
+
+(defn get-default-volume-increment []
+  6)
+
+(defn volume
+  ([value] (volume (get-default-sink) value))
+  ([target value] (sh-ok pactl set-sink-volume (str target) (str value "%"))))
+
+(defn volume-up
+  ([] (volume-up (get-default-sink)))
+  ([target] (volume-up target (get-default-volume-increment)))
+  ([target value] (sh-ok pactl set-sink-volume (str target) (str "+" value "%"))))
+
+(defn volume-down
+  ([] (volume-down (get-default-sink)))
+  ([target] (volume-down target (get-default-volume-increment)))
+  ([target value] (sh-ok pactl set-sink-volume (str target) (str "-" value "%"))))
+
+(defn mute
+  ([] (mute (get-default-sink)))
+  ([target] (sh-ok pactl set-sink-mute (str target) "toggle")))
+
+(defn mute-on
+  ([] (mute-on (get-default-sink)))
+  ([target] (sh-ok pactl set-sink-mute (str target) "1")))
+
+(defn mute-off
+  ([] (mute-off (get-default-sink)))
+  ([target] (sh-ok pactl set-sink-mute (str target) "0")))
+
+; (defn sound-input
+;   ([])
+;   ([source]))
+;
+; (defn sound-output
+;   ([])
+;   ([sink]))
+
+;; (defn play-sound [file])
+
+(comment
+  (volume-up)
+  (volume-down)
+
+  (volume 50)
+  (volume 25)
+
+  (mute)
+  (mute-on)
+  (mute-off))
+
+;; TODO: use dbus directly
+;; The Media Player Remote Interfacing Specification (MPRIS) https://specifications.freedesktop.org/mpris-spec/latest/)
+; dbus-send --session --dest=org.freedesktop.DBus --type=method_call --print-reply /org/freedesktop/DBus org.freedesktop.DBus.ListNames | grep mpr
+;
+; ;; get playback status
+; dbus-send --print-reply --dest="org.mpris.MediaPlayer2.chromium.instance6358" /org/mpris/MediaPlayer2 org.freedesktop.DBus.Properties.Get string:'org.mpris.MediaPlayer2.Player' string:'PlaybackStatus' 2>/dev/null | tail -1 | cut -d\" -f2
+;
+; ;; play
+; dbus-send --print-reply --dest="org.mpris.MediaPlayer2.chromium.instance6358" /org/mpris/MediaPlayer2 org.mpris.MediaPlayer2.Player.Play
+;
+; ;; pause
+; dbus-send --print-reply --dest="org.mpris.MediaPlayer2.chromium.instance6358" /org/mpris/MediaPlayer2 org.mpris.MediaPlayer2.Player.Pause
+
+;; nix-env -i playerctl
+(defn player-play-pause []
+  (sh-ok playerctl play-pause))
+
+(defn player-next []
+  (sh-ok playerctl next))
+
+(defn player-previous []
+  (sh-ok playerctl previous))
+
+(def menu-sound
+  [{:name "Mixer"
+    :action (fn [] (in-terminal pulsemixer))}
+   {:name "Volume Up"
+    :action volume-up}
+   {:name "Volume Down"
+    :action volume-down}
+   {:name "Mute Toggle"
+    :action mute}
+   {:name "Mute"
+    :action mute-on}
+   {:name "Unmute"
+    :action mute-off}
+   {:name "Player Play/Pause"
+    :action player-play-pause}
+   {:name "Player Next"
+    :action player-next}
+   {:name "Player Previous"
+    :action player-previous}])
+
+;; == Session
+
+(defn lock-screen
+  []
+  #_(sh xdg-screensaver lock)
+  (do
+    (future (sh i3lock -e -f -c "1d2021"))
+    ; ;; Display Power Management Signaling - Turn off screen immediately)
+    (sh xset dpms force off)))
+
+(defn logout
+  []
+  #_(sh gnome-session-quit --no-prompt)
+  (sh awesome-client "awesome.quit()"))
+
+; (defn [] switch-user)
+
+;; Configure
+
+(def menu-configure
+  [{:name "dotfiles"
+    :action (fn []
+              ; (sh atom (str (getenv "HOME") "/dotfiles"))
+              (shell/sh "gvim" :dir (str (getenv "HOME") "/dotfiles")))}
+   {:name "Window Manager - awesome"
+    :action (fn []
+              (edit-file (str (getenv "HOME") "/.config/awesome/rc.lua"))
+              (sh awesome-client "awesome.restart()"))}
+   {:name "Key Bindings - sxhkd"
+    :action (fn []
+              (edit-file (str (getenv "HOME") "/.config/sxhkd/sxhkdrc"))
+              (sh awesome-client "awesome.restart()")
+              (sh killall -USR1 sxhkd))}
+   {:name "Launcher - rofi"
+    :action (fn []
+              (edit-file (str (getenv "HOME") "/.config/rofi/config.rasi")))}
+   {:name "Scripts"
+    :action (fn [] (run-menu menu-edit-scripts))}
+   {:name "Startup Script - xprofile"
+    :action (fn []
+              (edit-file (str (getenv "HOME") "/bin/rice-xprofile")))}
+   {:name "Notifications - dunst"
+    :action (fn []
+              (edit-file (str (getenv "HOME") "/.config/dunst/dunstrc")))}])
+
+;; == Keyboard
+
+;; Dependency https://github.com/grwlf/xkb-switch
+
+(def menu-keyboard
+  (let [current (clojure.string/trim (sh-str xkb-switch))]
+    (->> (clojure.string/split-lines (sh-str xkb-switch -l))
+         (map (fn [layout]
+                {:name (str "Keyboard Layout: " layout
+                            (when (= layout current) " *"))
+                 :action (fn [] (sh xkb-switch -s (str layout)))})))))
+
+;; == System
+
+(defn open
+  [path]
+  (sh xdg-open (str path)))
+
+(defn suspend
+  "aka sleep, suspend to ram"
+  []
+  (lock-screen)
+  (sh systemctl suspend --ignore-inhibitors))
+
+(defn hibernate
+  "aka suspend to disk"
+  []
+  (sh systemctl hibernate))
+
+(defn reboot
+  "aka restart"
+  []
+  (sh systemctl reboot))
+  ;; or (sh reboot)
+
+(defn shutdown
+  "aka power off"
+  []
+  (sh systemctl poweroff))
+  ;; or (sh poweroff)
+
+(def menu-system
+  [{:name "Logout"
+    :action logout}
+   {:name "Lock Screen"
+    :action lock-screen}
+   {:name "Sleep"
+    :action suspend}
+   {:name "Reboot"
+    :action reboot}
+   {:name "Power Off"
+    :action shutdown}])
+
+;; == Virtualbox
+
+(defn virtualbox-list-vms []
+  (->> (clojure.string/split-lines (sh-str vboxmanage list vms))
+       (map #(let [[_ name id] (re-find #"\"(.*)\" \{(.*)\}" %)]
+               {:name name
+                :id id}))))
+
+(defn virtualbox-start-vm [vm]
+  (sh vboxmanage startvm (str vm)))
+
+(defn virtualbox-power-off-vm [vm]
+  (sh vboxmanage controlvm (str vm) acpipowerbutton))
+
+;; controlvm:
+; pause|resume|reset|poweroff|savestate|
+; acpipowerbutton|acpisleepbutton|
+
+(defn virtualbox-menu-action [vm]
+  [{:name "Start machine"
+    :action #(virtualbox-start-vm vm)}
+   {:name "Power-off machine"
+    :action #(virtualbox-power-off-vm vm)}])
+
+(defn virtualbox-menu []
+  (run-menu
+   (->> (virtualbox-list-vms)
+        (map (fn [{:keys [name id]}]
+               {:name name
+                :action #(run-menu (virtualbox-menu-action id) {:prompt "Select action:"})})))
+   {:prompt "Select machine:"}))
+
+;; == Open Links
+
+(defn open-in-default-browser [url]
+  (future (sh firefox -private-window (str url))))
+
+(defn extract-links
+  "Extract HTTP links from a string"
+  [s]
+  (re-seq #"https?://[^\s]+" s))
+
+(def browsers
+  [{:name "Firefox Private"
+    :action (fn [s] (future (sh firefox -private-window (str s))))}
+   {:name "Firefox"
+    :action (fn [s] (future (sh firefox (str s))))}
+   {:name "Brave Private"
+    :action (fn [s] (future (sh brave --incognito (str s))))}
+   {:name "Brave"
+    :action (fn [s] (future (sh brave (str s))))}
+   ;; TODO specify chrome profile
+   {:name "Chrome Private"
+    :action (fn [s] (future (sh google-chrome-stable --incognito (str s))))}
+   {:name "Chrome"
+    :action (fn [s] (future (sh google-chrome-stable (str s))))}])
+
+(def single-link-actions
+  [{:name "archive.org wayback machine"
+    :action (fn [s] (open-in-default-browser (str "https://web.archive.org/web/*/" s)))}
+   {:name "archive.is"
+    :action (fn [s] (open-in-default-browser (str "https://archive.is/" s)))}
+   {:name "outline.com"
+    :action (fn [s] (open-in-default-browser (str "https://outline.com/" s)))}])
+
+;; text selection return text even after it was unselected
+;; it would be great to be able to detect changes, or maybe use it only if the application that owns the selection has the active window
+(def menu-open-links
+  (let [links (->> (concat (extract-links (:selected-text *context*))
+                           (extract-links (:clipboard-text *context*)))
+                   (distinct))]
+    (concat
+     (when (seq links)
+       (for [{:keys [name action]} browsers]
+         {:name (str "Open " (count links) " link(s) in " name)
+          :action (fn []
+                    (doseq [link links]
+                      (action link)))}))
+     (when (= (count links) 1)
+       (for [{:keys [name action]} single-link-actions]
+         {:name (str "Open link using " name)
+          :action (fn [] (action (first links)))})))))
+
+(def menu-download-youtube-links
+  (let [links (->> (concat (extract-links (:selected-text *context*))
+                           (extract-links (:clipboard-text *context*)))
+                   (distinct)
+                   (filter #(re-find #"^https?://(www\.|m\.)?youtube\.com/watch|^https?://youtu.be/|^https?://vimeo.com/\d+|https?://soundcloud.com/" %)))]
+    (when (seq links)
+      (cons
+       {:name (str "Watch " (count links) " youtube link(s) with mpv")
+        :action #(apply shell/sh (cons "mpv" links))}
+       (for [[kind command] [["video" "youtube-dl --no-mtime --add-metadata"]
+                             ["audio" "youtube-dl -f m4a --no-mtime --add-metadata --embed-thumbnail --extract-audio"]]]
+         {:name (str "Download " (count links) " youtube link(s) as " kind)
+          :action (fn []
+                    (in-terminal bash -c (str "cd ~/Downloads; " command " "
+                                              (->> links (map shell-escape) (str/join " ")) ";"
+                                              wait-for-key-cmd)))})))))
+
+(defn with-cloned-repo [repo f]
+  (let [tmp-dir (str/trim (sh-str mktemp -d))]
+    (try
+      (in-terminal-wait git clone --depth=1 (str repo) (str tmp-dir))
+      (f tmp-dir)
+      (finally
+        (sh rm -rf (str tmp-dir))))))
+
+(def menu-github-links
+  (when-some [[_ repo] (re-find #"(https?://(github\.com|gitlab\.com|git\.sr\.ht)/[^\s]+)" (str (:selected-text *context*)
+                                                                                                " "
+                                                                                                (:clipboard-text *context*)))]
+    ;; Inspired by https://github.com/conwnet/github1s but better
+    [{:name "Git repo: Open with gvim"
+      :action (fn []
+                (with-cloned-repo repo
+                  (fn [dir]
+                    (sh bash -c (str "cd " (shell-escape dir) "; gvim")))))}
+     {:name "Git repo: Open with VSCode"
+      :action (fn []
+                (with-cloned-repo repo
+                  (fn [dir]
+                    (sh code --wait --new-window (str dir)))))}
+     {:name "Git repo: Open in terminal"
+      :action (fn []
+                (with-cloned-repo repo
+                  (fn [dir]
+                    (in-terminal-wait bash -c (str "cd " (shell-escape dir) "; exec bash")))))}
+     {:name "Git repo: Count LOC"
+      :action (fn []
+                (with-cloned-repo repo
+                  (fn [dir]
+                    (in-terminal-wait bash -c (str "cloc " (shell-escape dir) ";"
+                                                   wait-for-key-cmd)))))}]))
+
+;; == Main Menu
+
+(def menu-main
+  [{:name "Run >"
+    :action (fn [] (sh "rice-menu-run"))}
+   {:name "Configure >"
+    :action (fn [] (run-menu menu-configure))}
+   {:name "Shortcut Keys >"
+    :action (fn [] (run-menu menu-keys))}
+   {:name "System >"
+    :action (fn [] (run-menu menu-system))}
+   {:name "Network >"
+    :action (fn [] (run-menu menu-network))}
+   {:name "Display >"
+    :action (fn [] (run-menu menu-display))}
+   {:name "Sound >"
+    :action (fn [] (run-menu menu-sound))}
+   {:name "Keyboard >"
+    :action (fn [] (run-menu menu-keyboard))}
+   {:name "Bluetooth >"
+    :action (fn [] (run-menu menu-bluetooth))}
+   {:name "Virtualbox >"
+    :action virtualbox-menu}
+   {:name "NoteMX: myfiles"
+    :action (fn []
+              (sh notemx)
+              #_(shell/sh "gvim" :dir (str (getenv "HOME") "/Dropbox/myfiles")))}
+   {:name "bash terminal"
+    :action (fn [] (sh env "SHELL=/bin/bash" gnome-terminal))}
+   {:name "System Monitor: Overview (ytop)"
+    ;; cargo install -f --git https://github.com/cjbassi/ytop ytop
+    :action (fn [] (in-terminal ytop))}
+   {:name "System Monitor: Process List (htop)"
+    :action (fn [] (in-terminal htop))}
+   {:name "File Manager"
+    :action (fn [] (in-terminal ranger))}
+   {:name "Text editor"
+    :action (fn [] (sh gvim))}
+   ;; --insert-with-clipboard is a workaround because xdotool type does not work in Firefox
+   {:name "Emoji Picker"
+    :action (fn [] (sh rofimoji --insert-with-clipboard))}
+   ;; Toggles screen key, starts if not running or kill it
+   {:name "Screenkey - show typed keys on screen"
+    :action (fn [] (when-not (or (sh-ok killall screenkey)
+                                 (sh-ok killall .screenkey-wrapped)) ; to make it work with Nix
+                     (sh screenkey)))}
+   {:name "Decode QR code on screen"
+    ;; deps: sudo apt-get install zbar-tools scrot
+    :action (fn []
+              (let [img-file (str/trim (sh-str scrot --select --exec "echo $f"))]
+                (in-terminal bash -c (str "zbarimg " (shell-escape img-file) ";"
+                                          "rm " (shell-escape img-file) ";"
+                                          wait-for-key-cmd))))}
+   {:name "Shadow REPL"
+    :action (fn [] (typeout "(shadow.cljs.devtools.api/repl :app)"))}
+   {:name "Snippet: Github markdown detail"
+    :action (fn [] (typeout "<details>\n<summary>Details</summary>\nHidden text here...\n</details>"))}
+   {:name "Snippet: Clojure filetype meta"
+    :action (fn [] (typeout ";; -*- clojure -*-\n;; vim: set filetype=clojure:\n"))}
+   {:name "Text Upper Case"
+    :action (fn []
+              (-> (text-selection)
+                  (str/upper-case)
+                  (typeout)))}
+   {:name "Text Lower Case"
+    :action (fn []
+              (-> (text-selection)
+                  (str/lower-case)
+                  (typeout)))}
+   {:name "Text Normalize Whitespace"
+    :action (fn []
+              (-> (text-selection)
+                  (str/trim)
+                  (str/replace #"\s+" " ")
+                  (typeout)))}
+   {:name "Power Management: Settings"
+    :action (fn [] (sh xfce4-power-manager-settings))}
+   {:name "Power Management: Restart"
+    :action (fn [] (sh xfce4-power-manager --restart))}
+   {:name "Battery Status"
+    :action (fn [] (in-terminal watch upower -i "/org/freedesktop/UPower/devices/battery_BAT0"))}
+   {:name "Temperature Status"
+    :action (fn [] (in-terminal watch sensors))}])
+
+(defn run-menu
+  ([menu] (run-menu menu nil))
+  ([menu {:keys [prompt fallback] :or {prompt "Chose: " fallback (fn [])}}]
+   (let [choices (->> menu
+                      (map :name)
+                      (str/join "\n"))
+         choice (str/trim (:out (sh "rofi" "-p" (str prompt) "-i" "-dmenu" :in (identity choices))))]
+     (if-some [{:keys [action]} (some (fn [x]
+                                        (when (= (:name x) choice) x))
+                                      menu)]
+       (action)
+       (fallback choice)))))
+
+(def menu (concat (when-let [app (shortcut-apps (:app-name *context*))]
+                    [{:name (str "Show shortcuts for: " app)
+                      :action #(show-shortcuts app)}])
+                  menu-github-links
+                  menu-download-youtube-links
+                  menu-open-links
+                  menu-main menu-system menu-network menu-display menu-sound menu-keyboard menu-bluetooth
+                  (map #(update % :name (partial str "Configure: ")) menu-configure)
+                  (map #(update % :name (partial str "Edit script: ")) menu-edit-scripts)))
+                  ; (map #(update % :name (partial str "Shortcut Keys: ")) menu-configure)))
+
+(when-let [choice (first *command-line-args*)]
+  (let [f (resolve (symbol choice))]
+    (if (ifn? f)
+      (f)
+      (let [action (->> menu
+                        (filter #(= choice (:name %)))
+                        first
+                        :action)]
+        (when (ifn? action)
+          (action)))))
+  (System/exit 0))
+
+(defn run-special-commands [input]
+  (cond
+    (str/starts-with? input "t:") (in-terminal bash -c (str (subs input 2) ";"
+                                                            wait-for-key-cmd))
+    (str/starts-with? input ":") (sh bash -c (subs input 1))
+    (str/starts-with? input "=") (let [expr (str/trim (subs input 1))]
+                                   (in-terminal bash -c (str "echo " (shell-escape expr) " = ;"
+                                                             "python3 -c " (shell-escape (str "print(" expr ")")) ";"
+                                                             wait-for-key-cmd)))
+    (str/starts-with? input "b:") (let [expr (str/trim (subs input 2))]
+                                    (in-terminal bash -c (str "echo Babasha: " (shell-escape expr) " ;"
+                                                              "bb -e " (shell-escape expr) ";"
+                                                              wait-for-key-cmd)))))
+
+(run-menu menu {:fallback run-special-commands})
+
+; (println "args:" *command-line-args*)
+
+(comment
+  (defn run-menu-top []
+    (sh "rofi" "-i" "-combi-modi" "system:rice-menu-root main,system:rice-menu-root system,window,drun,run" "-show" "combi" "-modi" "combi"))
+
+  (if-let [choice (first *command-line-args*)]
+    (case choice
+      "system" (if-let [choice (second *command-line-args*)]
+                 (when-let [{:keys [action]} (some (fn [x]
+                                                     (when (= (:name x) choice) x))
+                                                   menu-system)]
+                   (action))
+                 (println (->> menu-system
+                               (map :name)
+                               (str/join "\n"))))
+      "main" (if-let [choice (second *command-line-args*)]
+               (when-let [{:keys [action]} (some (fn [x]
+                                                   (when (= (:name x) choice) x))
+                                                 menu-main)]
+                 (action))
+               (println (->> menu-main
+                             (map :name)
+                             (str/join "\n"))))
+      nil)
+    (run-menu-top)))

@@ -1,0 +1,6 @@
+/private
+.clj-kondo/.cache
+__pycache__
+.nrepl-port
+
+nvim/.config/nvim/.netrwhist

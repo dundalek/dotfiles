@@ -1,0 +1,13 @@
+[Desktop Entry]
+Name=Spotin
+GenericName=Music Player
+Comment=Terminal-based Spotify client
+TryExec=spotin-app
+Exec=spotin-app %F
+Type=Application
+Keywords=Audio;Song;Playlist
+Icon=/home/me/code/intools/modules/spotin/img/spotin-logo-256.png
+Categories=AudioVideo;Audio;Player;
+StartupNotify=false
+# StartupWMClass is important so that icon gets displayed in application switcher
+StartupWMClass=Spotin

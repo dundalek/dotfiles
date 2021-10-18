@@ -7,7 +7,7 @@
 
 # i3 config file (v4)
 #
-# Please see http://i3wm.org/docs/userguide.html for a complete reference!
+# Please see https://i3wm.org/docs/userguide.html for a complete reference!
 
 set $mod Mod4
 
@@ -17,7 +17,7 @@ set $mod Mod4
 
 # This font is widely installed, provides lots of unicode glyphs, right-to-left
 # text rendering and scalability on retina/hidpi displays (thanks to pango).
-font pango:DejaVu Sans Mono 8
+font pango:DejaVu Sans Mono 10
 
 # Before i3 v4.8, we used to recommend this one as the default:
 # font -misc-fixed-medium-r-normal--13-120-75-75-C-70-iso10646-1
@@ -29,22 +29,15 @@ font pango:DejaVu Sans Mono 8
 # Use Mouse+$mod to drag floating windows to their wanted position
 floating_modifier $mod
 
+focus_follows_mouse no
+
 # start a terminal
 bindsym $mod+Return exec i3-sensible-terminal
+# TODO: stterm has ugly fonts, need to figure out better config
+#bindsym $mod+Return exec stterm
 
 # kill focused window
-bindsym $mod+Shift+q kill
-bindsym Mod1+F4  kill
-
-# start dmenu (a program launcher)
-#bindsym $mod+d exec dmenu_run
-
-bindsym $mod+d exec "rofi -show combi -combi-modi 'window,drun,run' -modi combi"
-
-# There also is the (new) i3-dmenu-desktop which only displays applications
-# shipping a .desktop file. It is a wrapper around dmenu, so you need that
-# installed.
-# bindsym $mod+d exec --no-startup-id i3-dmenu-desktop
+bindsym $mod+q kill
 
 # change focus
 bindsym $mod+j focus left
@@ -62,7 +55,7 @@ bindsym $mod+Right focus right
 bindsym $mod+Shift+j move left
 bindsym $mod+Shift+k move down
 bindsym $mod+Shift+l move up
-bindsym $mod+Shift+semicolon move right
+bindsym $mod+Shift+colon move right
 
 # alternatively, you can use the cursor keys:
 bindsym $mod+Shift+Left move left
@@ -80,7 +73,7 @@ bindsym $mod+v split v
 bindsym $mod+f fullscreen toggle
 
 # change container layout (stacked, tabbed, toggle split)
-bindsym $mod+s layout stacking
+#bindsym $mod+s layout stacking
 bindsym $mod+w layout tabbed
 bindsym $mod+e layout toggle split
 
@@ -91,7 +84,7 @@ bindsym $mod+Shift+space floating toggle
 bindsym $mod+space focus mode_toggle
 
 # focus the parent container
-bindsym $mod+a focus parent
+#bindsym $mod+a focus parent
 
 # focus the child container
 #bindsym $mod+d focus child
@@ -121,11 +114,11 @@ bindsym $mod+Shift+9 move container to workspace 9
 bindsym $mod+Shift+0 move container to workspace 10
 
 # reload the configuration file
-bindsym $mod+Shift+c reload
+bindsym $mod+Shift+c reload; exec pkill -USR1 sxhkd
 # restart i3 inplace (preserves your layout/session, can be used to upgrade i3)
 bindsym $mod+Shift+r restart
 # exit i3 (logs you out of your X session)
-bindsym $mod+Shift+e exec "i3-nagbar -t warning -m 'You pressed the exit shortcut. Do you really want to exit i3? This will end your X session.' -b 'Yes, exit i3' 'i3-msg exit'"
+#bindsym $mod+Shift+e exec "i3-nagbar -t warning -m 'You pressed the exit shortcut. Do you really want to exit i3? This will end your X session.' -b 'Yes, exit i3' 'i3-msg exit'"
 
 # resize window (you can also use the mouse for that)
 mode "resize" {
@@ -157,107 +150,25 @@ bindsym $mod+r mode "resize"
 # finds out, if available)
 bar {
         status_command i3status
-        tray_output primary
+        position top
+        # tray_output primary
+        tray_output eDP-1-1
 }
 
-# Background
-#exec_always --no-startup-id "xsetroot -solid '#000000'"
-#exec_always --no-startup-id "feh --bg-scale background.png"
+# Disable window title for all windows
+#for_window [class="^.*"] border pixel 1
 
 # move focused workspace between monitors
-bindsym $mod+Ctrl+greater move workspace to output right
-bindsym $mod+Ctrl+less move workspace to output left
+bindsym $mod+Ctrl+Down move workspace to output right
+bindsym $mod+Ctrl+Up move workspace to output left
 
-# Alternative app launcher
-bindsym $mod+Shift+d exec xfce4-appfinder
-for_window [title="Application Finder"] floating enable
-for_window [title="Application Finder"] resize set 600 px 600 px
+# switch workspaces
+bindsym $mod+Ctrl+Right workspace next
+bindsym $mod+Ctrl+Left workspace prev
 
+# switch between the current and the previously focused one
+bindsym $mod+a workspace back_and_forth
 
+# you can use move container to workspace next and move container to workspace prev to move a container to the next/previous workspace.
 
-# Close window by clicking with mouse wheel on the title
-bindsym --release button2 kill
-
-
-
-# https://faq.i3wm.org/question/239/how-do-i-suspendlockscreen-and-logout.1.html#post-id-1927
-# system management -- quitting i3 & alike
-set $mode_system System (l) lock, (Shift+e) logout, (s) suspend, (Shift+r) reboot, (Shift+s) shutdown
-
-mode "$mode_system" {
-    bindsym l exec --no-startup-id i3exit lock, mode "default"
-    bindsym Shift+e exec --no-startup-id i3exit logout, mode "default"
-    bindsym s exec --no-startup-id i3exit suspend, mode "default"
-    bindsym Shift+r exec --no-startup-id i3exit reboot, mode "default"
-    bindsym Shift+s exec --no-startup-id i3exit shutdown, mode "default"
-
-    # back to normal: Enter or Escape
-    bindsym Return mode "default"
-    bindsym Escape mode "default"
-}
-
-bindsym $mod+Escape mode "$mode_system"
-
-# Lock screen
-bindsym $mod+Ctrl+l exec --no-startup-id i3exit lock
-
-
-# Pulse Audio controls
-# bindsym XF86AudioRaiseVolume exec --no-startup-id pactl set-sink-volume 0 +5% #increase sound volume
-# bindsym XF86AudioLowerVolume exec --no-startup-id pactl set-sink-volume 0 -5% #decrease sound volume
-# bindsym XF86AudioMute exec --no-startup-id pactl set-sink-mute 0 toggle # mute sound
-
-# Sreen brightness controls
-bindsym XF86MonBrightnessUp exec xbacklight -inc 10 # increase screen brightness
-bindsym XF86MonBrightnessDown exec xbacklight -dec 10 # decrease screen brightness
-
-# Media player controls
-bindsym XF86AudioPlay exec playerctl play
-bindsym XF86AudioPause exec playerctl pause
-bindsym XF86AudioNext exec playerctl next
-bindsym XF86AudioPrev exec playerctl previous
-
-
-# Auto lock after certain time
-# exec_always --no-startup-id xautolock -time 10 -locker "i3exit lock"
-
-# Using i3blocks for status
-# status_command i3blocks -c ~/.config/i3blocks/i3blocks.conf
-
-
-# Find out autostrat apps with `grep -r Exec ~/.config/autostart`
-# Then copy here
-exec --no-startup-id nm-applet
-exec --no-startup-id blueman-applet
-exec --no-startup-id dropbox start
-exec --no-startup-id /usr/bin/syncthing-gtk
-exec --no-startup-id xflux -l 50 -g 15
-exec --no-startup-id xfce4-power-manager
-exec --no-startup-id clipit
-
-# https://github.com/rliou92/umonitor
-# For new configuration use arandr or lxrandr
-# Then run `umonitor --save <profile_name>`
-exec --no-startup-id umonitor --listen --quiet
-
-# TODO: lighter volume control
-# Maybe pnmixer
-exec --no-startup-id kmix
-
-
-#exec "xfce4-clipman"
-
-
-# Compositor compton
-
-exec_always --no-startup-id compton
-
-
-# exec --no-startup-id /usr/lib/x86_64-linux-gnu/indicator-messages/indicator-messages-service
-# exec --no-startup-id /usr/lib/x86_64-linux-gnu/indicator-power/indicator-power-service
-# exec --no-startup-id /usr/lib/x86_64-linux-gnu/indicator-datetime/indicator-datetime-service
-# exec --no-startup-id /usr/lib/x86_64-linux-gnu/indicator-keyboard/indicator-keyboard-service --use-gtk
-# exec --no-startup-id /usr/lib/x86_64-linux-gnu/indicator-sound/indicator-sound-service
-# exec --no-startup-id /usr/lib/x86_64-linux-gnu/indicator-printers/indicator-printers-service
-# exec --no-startup-id /usr/lib/x86_64-linux-gnu/indicator-session/indicator-session-service
-# exec --no-startup-id /usr/lib/x86_64-linux-gnu/indicator-application/indicator-application-service
+exec --no-startup-id rice-xprofile

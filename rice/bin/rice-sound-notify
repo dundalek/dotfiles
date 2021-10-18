@@ -1,0 +1,3 @@
+#!/bin/sh
+
+canberra-gtk-play -f /usr/share/sounds/gnome/default/alerts/drip.ogg

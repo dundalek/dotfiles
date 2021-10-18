@@ -1,0 +1,6 @@
+#!/usr/bin/env sh
+
+. ~/code/intools/.envrc
+spotin=~/code/intools/modules/spotin/build/spotin.js
+#exec alacritty --class "Spotin,Spotin" --title "Spotin" -e "$spotin" "$@"
+exec alacritty --class "Spotin,Spotin" -e "$spotin" "$@"

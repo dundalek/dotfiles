@@ -1,0 +1,17 @@
+#!/bin/bash
+
+# Copy/symlink to as /etc/NetworkManager/dispatcher.d/vpn-up
+
+# Auto connect to VPN
+# https://askubuntu.com/questions/43465/how-to-automatically-connect-to-vpn-with-network-manager
+
+VPN_CONNECTION_NAME="your-connection-name-here"
+
+activ_vpn=$(nmcli conn show --active | grep "${VPN_CONNECTION_NAME}")
+
+# CONNECTIVITY_STATE check is there to ensure we set it up only when connection gets up.
+# Without it the VPN would be turned on even after user manually turns it off.
+if [ "${CONNECTIVITY_STATE}" = "FULL" -a ! "${activ_vpn}" ];
+then
+    nmcli conn up id "${VPN_CONNECTION_NAME}"
+fi

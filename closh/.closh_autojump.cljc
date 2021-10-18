@@ -1,14 +1,16 @@
-(require #?(:cljs 'path :clj 'clojure.java.io))
+; (require #?(:cljs 'path :clj 'clojure.java.io))
 
 (setenv "AUTOJUMP_SOURCED" 1)
 
-(defn- dirname [filename]
-  #?(:cljs (path/dirname filename)
-     :clj (.getParent (clojure.java.io/file filename))))
+(defn dirname [filename]
+  #_#?(:cljs (path/dirname filename)
+       :clj (.getParent (clojure.java.io/file filename)))
+  (str/replace filename #"/[^/]+$" ""))
 
 (def ^:private is-mac
-  #?(:cljs (= js/process.platform "darwin")
-     :clj (pos? (.indexOf (.toLowerCase (System/getProperty "os.name")) "mac"))))
+  false
+  #_ #?(:cljs (= js/process.platform "darwin")
+        :clj (pos? (.indexOf (.toLowerCase (java.lang.System/getProperty "os.name")) "mac"))))
 
 (when (sh-ok test -d (str (getenv "HOME") "/.autojump"))
   (setenv "PATH" (str (getenv "HOME") "/.autojump/bin" ":" (getenv "PATH"))))
@@ -53,7 +55,7 @@
         cmd (if is-mac "open" "xdg-open")]
     (shx cmd [output])))
 
-(defn- autojump-wrap-child [f]
+(defn autojump-wrap-child [f]
   (fn [& args]
     (if (= (ffirst args) "-")
       (apply f args)

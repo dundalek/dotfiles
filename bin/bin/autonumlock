@@ -1,0 +1,49 @@
+#!/usr/bin/env bb
+;; -*- clojure -*-
+;; vim: set filetype=clojure:
+
+;; Purpose of this script is to automatically toggle numlock on a laptop
+;; without numeric keypad.
+;; When external keyboard (most often with numeric) keypad is plugged we want
+;; to toggle numlock.
+;; When no external keyboard is plugged in, we want to turn numlock off so that
+;; it will not interfere with regular keys.
+;; By configuring udev rules below, it will detect when a keybord is plugged /
+;; unplugged and will toggle numlock automatically.
+
+; Install dependency utility:
+;
+; sudo apt-get install numlockx
+;
+; Then add udev rule:
+;
+; sudo vim /etc/udev/rules.d/85-my_usb_device_rule.rules
+;
+; And add this:
+;
+; ACTION=="add", SUBSYSTEM=="usb", RUN+="/home/me/bin/autonumlock"
+; ACTION=="remove", SUBSYSTEM=="usb", RUN+="/home/me/bin/autonumlock"
+;
+; To make sure the detection script will execute right away, run this command to reload the UDEV rules:
+;
+; sudo udevadm control --reload-rules
+
+(require '[clojure.string :as str])
+(require '[clojure.java.shell :refer [sh]])
+
+(defn sh-str [& args]
+  (:out (apply sh args)))
+
+(defn keyboard-device? [line]
+  (let [[_ bus device] (re-find #"Bus (\d+) Device (\d+)" line)]
+    (and (not (re-find #"Receiver" line))
+         (boolean (re-find #"bInterfaceProtocol      1 Keyboard"
+                           (sh-str "lsusb" "-v" "-s" (str bus ":" device)))))))
+
+(let [has-keyboard (->> (sh-str "lsusb")
+                        (str/split-lines)
+                        (some keyboard-device?))]
+  (println "numlock:" (if has-keyboard "on" "off"))
+ ;; Udev script is run inder root user. Set DISPLAY and XAUTHORITY to make sure it can access X session to toggle num lock.
+  (sh "env" "DISPLAY=:1" "XAUTHORITY=/run/user/1000/gdm/Xauthority"
+      "numlockx" (if has-keyboard "on" "off")))

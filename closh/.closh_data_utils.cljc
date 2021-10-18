@@ -117,16 +117,16 @@
     (require '[slugger.core]))
   ((resolve 'slugger.core/->slug) s))
 
-(defn string->stream [s]
-  (java.io.ByteArrayInputStream. (.getBytes s java.nio.charset.StandardCharsets/UTF_8)))
+(defn string->stream [^String s]
+  (java.io.ByteArrayInputStream. (.getBytes s "UTF-8")))
 
 (defcmd from-transit [s]
   (when-not (find-ns 'cognitect.transit)
     (add-dependencies :coordinates '[[com.cognitect/transit-clj "0.8.313"]])
     (require '[cognitect.transit]))
   (let [reader (resolve 'cognitect.transit/reader)
-        read (resolve 'cognitect.transite/read)]
-    (read (reader (string->stream s) :json {:handlers {"u" #(java.util.UUID/fromString %)}}))))
+        read (resolve 'cognitect.transit/read)]
+    (read (reader (string->stream s) :json))))
 
 ; (defcmd to-transit [s]
 ;   (when-not (find-ns 'cognitect.transit)

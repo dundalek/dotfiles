@@ -1,0 +1,15 @@
+#!/bin/sh
+
+# Stop umonitor so that it does not iterfere with settings
+killall umonitor
+rm ~/.umonitor.lock
+
+# Run arandr to create configuration
+arandr
+
+# Umonitor needs profile name, create it as hash using monitor EDID so that it stays the same for same monitors
+profile=x`xrandr --prop | grep -A2 EDID | sha1sum`
+umonitor --save $profile
+
+# Start umonitor again so that it detects monitor changes and automatically sets saved profiles
+umonitor --listen &

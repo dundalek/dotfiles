@@ -1,0 +1,45 @@
+* {
+  background-color: #FFFFFF00;
+  text-color: #fbf1c7;
+}
+
+#window {
+  width: 40%;
+  // height: 40%;
+  border: 0;
+  border-radius: 5px;
+}
+
+#mainbox {
+  border: 0px;
+  padding: 20px;
+  background-color: #282828EE;
+  /* background-color: #282828CC; */
+  /* border-color: #fbf1c7; */
+  children: [inputbar, listview];
+}
+
+#inputbar {
+  padding: 8px;
+}
+
+#listview {
+  padding: 8px;
+  background: #e9e9e900;
+}
+
+#element {
+  padding: 8px 4px;
+  background-color: #e9e9e900;
+}
+
+element.selected {
+  background-color: #E7CE57;
+  text-color: #282828;
+  border-radius: 5px;
+}
+
+element-text {
+    background-color: inherit;
+    text-color:       inherit;
+}

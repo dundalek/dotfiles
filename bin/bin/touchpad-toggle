@@ -1,0 +1,15 @@
+#!/usr/bin/env fennel
+
+(fn sh-str [cmd]
+  (let [file (io.popen cmd "r")
+        output (file:read "*a")]
+    (file:close)
+    output))
+
+(let [id (-> (sh-str "xinput list | grep TouchPad")
+             (string.match "id=(%d+)"))
+      enabled (-> (sh-str (.. "xinput list-props " id " | grep \"Device Enabled\""))
+                  (string.match ":%s*(%d+)")
+                  (= "1"))
+      action (if enabled "disable" "enable")]
+  (os.execute (.. "xinput " action " " id)))

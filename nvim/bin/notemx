@@ -1,0 +1,4 @@
+#!/usr/bin/env sh
+
+cd ~/Dropbox/myfiles
+exec alacritty --class "NoteMX,NoteMX" --title "${1:-$(basename $PWD)} - NoteMX" -e nvim "$@"

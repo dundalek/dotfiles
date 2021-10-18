@@ -3,8 +3,11 @@
 
 (defalias ls "ls --color=auto")
 (defalias ll "ls -l --color=auto")
+(defalias dd "dd status=progress")
 
 (defalias gk "gitkraken --path")
+; (defalias code "codium")
+(defalias nvm "fnm")
 
 (defalias s "browser-sync start --server --directory --index=index.html \"--files=**/*\"")
 (defalias ss "browser-sync start --server --index=index.html \"--files='**/*\"")
@@ -26,20 +29,63 @@
 (defalias pbpaste "xclip -selection clipboard -o")
 
 ; https://github.com/sharkdp/bat
-(defalias cat "bat --paging never")
+;(defalias cat "bat --paging never")
 
 ; http://denilson.sa.nom.br/prettyping/
 (defalias ping "prettyping --nolegend")
 
+(defabbr p1 "ping 1.1.1.1")
+(defabbr p8 "ping 8.8.8.8")
+
 ; https://dev.yorhel.nl/ncdu
 ;; (defalias du "ncdu --color dark -x --exclude .git --exclude node_modules")
 
+(defabbr jp "j pitch")
+(defabbr jc "j closh")
+(defabbr jl "j liz")
+
+(defabbr tp "tmux-pitch")
+
+(defabbr cm "clj -m")
+(defabbr jj "java -jar")
+(defabbr sm "smerge")
+
+(defabbr .. "cd ..")
+(defabbr ... "cd ../..")
+
+(defabbr gd "git diff")
+(defabbr gds "git diff --cached")
 (defabbr gaa "git add --all")
-(defabbr gco "git checkout")
-(defabbr gc "git clone")
+(defabbr gap "git add -p")
+(defabbr gcp "git checkout -p") ;; reset chunks from working are
+(defabbr gr "git reset")
+(defabbr grp "git reset HEAD -p") ;; unstage chunks
+(defabbr gs "git status")
+(defabbr gc "git checkout")
+(defabbr gcm "git checkout master")
+; (defabbr gcl "git clone")
+(defabbr gfo "git fetch origin")
+(defabbr gp "git pull")
+(defabbr gpp "git push")
+
+(defabbr lg "lazygit")
+
+(defabbr dl "cd ~/Downloads")
+
+(defabbr nixs "nix-shell --command closh-zero-sci")
+(defabbr nixp "nix-shell -p")
+(defabbr nixi "nix-env -i")
+(defabbr nixq "nix-env -q")
+
+(defalias unf "env NIXPKGS_ALLOW_UNFREE=1")
+
+(defcmd nixr [program]
+  (sh nix-shell -p (str program) --run (str program)))
 
 (defabbr yt "youtube-dl --no-mtime --add-metadata")
-(defabbr yta "youtube-dl --no-mtime --add-metadata --extract-audio")
+;; m4a format is used so that thumbnail can be included
+;; Needs sudo apt-get install atomicparsley
+(defabbr yta "youtube-dl -f m4a --no-mtime --add-metadata --embed-thumbnail --extract-audio")
 
 (defalias update-youtube-dl "curl -L https://yt-dl.org/downloads/latest/youtube-dl -o (sh-str which youtube-dl)")
 
@@ -86,26 +132,27 @@
   "Opens links from input in firefox. Use like `cat links.txt | (open-links)`"
   [s]
   (->> s
-    (extract-links)
-    (map ff-open)))
+       (extract-links)
+       (map ff-open)))
 
 (defcmd man
   "Displays manual page but enhances it by showing also tldr page content first. To install the `unbuffer dependency` run `sudo apt install expect`. To install tldr client one can use `npm install -g tldr`."
   [& args]
   (if (= 1 (count args))
     (let [name (first args)]
-      (sh bash -c (str "{ unbuffer tldr --theme ocean " name "; unbuffer /usr/bin/man -P cat " name "; } | less -RF")))
+      (sh bash -c (str "{ unbuffer tldr " name "; unbuffer /usr/bin/man -P cat " name " || unbuffer " name " --help; } | less -RF")))
     (closh.zero.pipeline/wait-for-pipeline (shx "man" args))))
 
-(defcmd github-user-email
-  "Get an email for a given github user."
-  [username]
-  (->>
-    (sh-str curl (str "https://api.github.com/users/" username "/events"))
-    from-json
-    (mapcat #(-> % :payload :commits))
-    (map #(-> % :author))
-    (frequencies)))
+#_(when-not (getenv "__CLOSH_USE_SCI_EVAL__")
+    (defcmd github-user-email
+      "Get an email for a given github user."
+      [username]
+      (->>
+       (sh-str curl (str "https://api.github.com/users/" username "/events"))
+       from-json
+       (mapcat #(-> % :payload :commits))
+       (map #(-> % :author))
+       (frequencies))))
 
 (defcmd git-delete-merged-branches
   "Deletes local git branches that are merged in remote master"
@@ -124,8 +171,10 @@
   - copied from browser location bar like `https://github.com/username/repo`
   - or any full git url like `git@github:..` or `git://...` etc."
   [repo]
-  (sh cd (str (getenv "HOME") "/dl/git") \;
-      git clone (resolve-repo-url repo)))
+  (let [dir (str (getenv "HOME") "/Downloads/git")]
+    (when-not (str/starts-with? (getenv "PWD") dir)
+      (sh cd (str dir)))
+    (sh git clone (resolve-repo-url repo))))
 
 (defcmd ghcloc
   "Runs cloc command to count lines of code on a remote git repo."
@@ -141,39 +190,39 @@
      (read-line)
      (println)))
 
-#?(:clj
-   (import '(java.time LocalDateTime format.DateTimeFormatter)))
-
-(defn now []
-  #?(:clj (LocalDateTime/now)
-     :cljs (js/Date.)))
-
-(defn format-today
-  ([] (format-today  (now)))
-  ([d]
-   #?(:clj (.format d (DateTimeFormatter/ofPattern "EE d.M."))
-      :cljs (let [dayname (.toLocaleDateString d "en-US" #js { "weekday" "short"})]
-              (str dayname " " (.getDate d)  "." (inc (.getMonth d)) ".")))))
-
-(defn format-year-month
-  ([] (format-year-month (now)))
-  ([d]
-   #?(:clj (.format d (DateTimeFormatter/ofPattern "yyMM"))
-      :cljs (str
-             (-> d (.getFullYear) (mod 100) (str) (.padStart 2 "0"))
-             (-> d (.getMonth) (inc) (str) (.padStart 2 "0"))))))
-
-(defn open-journal [filename]
-  (println "Opening" filename)
-  (sh vim -c (str "1 s/^/" (format-today) "\r\r\r\r/") "+3" -c startinsert (str filename)))
-
-(defcmd jn []
-  (open-journal
-   (str (getenv "HOME") "/Dropbox/myfiles/denik/denik" (format-year-month) ".txt")))
-
-(defcmd djn []
-  (open-journal (str (getenv "HOME") "/Dropbox/myfiles/denik/ADenik-dev.md")))
-
-(defcmd wjn []
-  (open-journal
-    (str (getenv "HOME") "/Dropbox/myfiles/zpitch/pitch-dev-log-" (format-year-month) ".md")))
+; #?(:clj
+;    (import '(java.time LocalDateTime format.DateTimeFormatter)))
+;
+; (defn now []
+;   #?(:clj (LocalDateTime/now)
+;      :cljs (js/Date.)))
+;
+; (defn format-today
+;   ([] (format-today  (now)))
+;   ([d]
+;    #?(:clj (.format d (DateTimeFormatter/ofPattern "EE d.M."))
+;       :cljs (let [dayname (.toLocaleDateString d "en-US" #js { "weekday" "short"})]
+;               (str dayname " " (.getDate d)  "." (inc (.getMonth d)) ".")))))
+;
+; (defn format-year-month
+;   ([] (format-year-month (now)))
+;   ([d]
+;    #?(:clj (.format d (DateTimeFormatter/ofPattern "yyMM"))
+;       :cljs (str
+;              (-> d (.getFullYear) (mod 100) (str) (.padStart 2 "0"))
+;              (-> d (.getMonth) (inc) (str) (.padStart 2 "0"))))))
+;
+; (defn open-journal [filename]
+;   (println "Opening" filename)
+;   (sh vim -c (str "1 s/^/" (format-today) "\r\r\r\r/") "+3" -c startinsert (str filename)))
+;
+; (defcmd jn []
+;   (open-journal
+;    (str (getenv "HOME") "/Dropbox/myfiles/denik/denik" (format-year-month) ".txt")))
+;
+; (defcmd djn []
+;   (open-journal (str (getenv "HOME") "/Dropbox/myfiles/denik/ADenik-dev.md")))
+;
+; (defcmd wjn []
+;   (open-journal
+;     (str (getenv "HOME") "/Dropbox/myfiles/zpitch/pitch-dev-log-" (format-year-month) ".md")))
