@@ -646,7 +646,9 @@ local on_attach = function(client, bufnr)
   -- nnoremap <space>lo :SymbolsOutline<cr>
 
   -- format on save
-  if client.resolved_capabilities.document_formatting then
+  -- don't auto format Liz sources because the formatter messes them up
+  local is_liz_source = vim.fn.bufname():find('.liz$');
+  if not is_liz_source and client.resolved_capabilities.document_formatting then
         vim.cmd [[augroup lsp_format]]
         vim.cmd [[autocmd! BufWritePre <buffer> lua vim.lsp.buf.formatting_sync(nil, 1000)]]
         vim.cmd [[augroup END]]
