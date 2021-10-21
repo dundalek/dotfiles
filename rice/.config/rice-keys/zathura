@@ -1,12 +1,108 @@
-h/j/k/l - Move left/down/up/right in document
-d/u - Down/up a half page
-gg - Top of document
-G - Bottom of document
-f - Highlight URLS to follow
-J/K - Zoom out/in
-s - Zoom to fit width
-a - Zoom to fit height
-r - Reload document if changed
-R - Rotate document
-D - Toggle dual-page mode
-p - Print document
+# Source: zathura v0.4.8 man page
+
+### General
+# Go to the next page
+{J, Page_Down}
+  -
+# Go to the previous page
+{K, Page_Up}
+  -
+# Scroll to the {left, down, up, right}
+{h, k, j, l}
+  -
+# Scroll to the {left, down, up, right}
+{Left, Down, Up, Right}
+  -
+# Scroll a half page {left, down, up, right}
+{ctrl+t, ctrl+d, ctrl+u, ctrl+y}
+  -
+# Scroll a full page {left, down, up, down, up, right}
+{t, ctrl+f, ctrl+b, space, shift+space, y}
+  -
+# Goto to the {first, the last, to the nth} page
+{g; g, G, nG}
+  -
+# Snaps to the current page
+P
+  -
+# Goto {top, bottom} of the current page
+{H, L}
+  -
+# Move {backward, forward} through the jump list
+{ctrl+o, ctrl+i}
+  -
+# Bisect {forward, backward} between the last two jump points
+{ctrl+j, ctrl+k}
+  -
+# Abort
+{ctrl+c, Escape}
+  -
+# Adjust window in {best fit, width mode}
+{a, s}
+  -
+# Search for text {forwards, backwards}
+{/, ?}
+  -
+# Search for the {next, previous} result
+{n, N}
+  -
+# Open document
+{o, O}
+  -
+# Follow links
+f
+  -
+# Display link target
+F
+  -
+# Copy link target into the clipboard
+c
+  -
+# Enter command
+:
+  -
+# Rotate by 90 degrees
+r
+  -
+# Recolor (grayscale and invert colors)
+ctrl+r
+  -
+# Reload document
+R
+  -
+# Show index and switch to Index mode
+Tab
+  -
+# Toggle dual page view
+d
+  -
+# Switch to presentation mode
+F5
+  -
+# Switch to fullscreen mode
+F11
+  -
+# Toggle inputbar
+ctrl+m
+  -
+# Toggle statusbar
+ctrl+n
+  -
+# Zoom {in, out, to the original} size
+{+, -, =}
+  -
+# Zoom {in, out, to the original} size
+{z; I, z; O, z; 0}
+  -
+# Zoom to size n
+n; =
+  -
+# Set a quickmark to a letter or number X
+mX
+  -
+# Goto quickmark saved at letter or number X
+'X
+  -
+# Quit
+q
+  -

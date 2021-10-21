@@ -131,12 +131,29 @@
 
 (def keys-path (str (getenv "HOME") "/dotfiles/rice/.config/rice-keys"))
 
+#_(defn show-shortcuts [app]
+    (run-menu (->> (str keys-path "/" app)
+                   (slurp)
+                   (str/split-lines)
+                   (map (fn [line]
+                          (let [[shortcut] (str/split line #"(\t|  )\s*")]
+                            {:name line
+                             :action #(sh xdotool key (str shortcut))}))))))
+
 (defn show-shortcuts [app]
-  (sh "rofi" "-i" "-dmenu" -p (str app " shortcuts:")
-      :in (slurp (str keys-path "/" app))))
+  ;; Dependency to parse sxhkd files: pip install --user sxhkhm
+  ;; In the future might wanna write the parser in clj
+  (run-menu (->> (sh-str hkhelper.py -f (str keys-path "/" app))
+                 (str/split-lines)
+                 (map (fn [line]
+                        (let [[description shortcut] (str/split line #"  +")
+                              keypresses (str/split shortcut #"\s*;\s*")]
+                          {:name (str shortcut "  -  " description)
+                           :action #(:out (apply shell/sh "xdotool" "key" keypresses))}))))))
 
 (def shortcut-apps
   {"\"zathura\", \"Zathura\"" "zathura"
+   "\"org.pwmt.zathura\", \"Zathura\"" "zathura"
    "\"gl\", \"mpv\"" "mpv"})
 
 (def menu-keys

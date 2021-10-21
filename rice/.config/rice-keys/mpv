@@ -1,109 +1,202 @@
-LEFT and RIGHT
-    Seek backward/forward 5 seconds. Shift+arrow does a 1 second exact seek (see --hr-seek).
-UP and DOWN
-    Seek forward/backward 1 minute. Shift+arrow does a 5 second exact seek (see --hr-seek).
-Ctrl+LEFT and Ctrl+RIGHT
-    Seek to the previous/next subtitle. Subject to some restrictions and might not always work; see sub-seek command.
-Ctrl+Shift+Left and Ctrl+Shift+Right
-    Adjust subtitle delay so that the next or previous subtitle is displayed now. This is especially useful to sync subtitles to audio.
-[ and ]
-    Decrease/increase current playback speed by 10%.
-{ and }
-    Halve/double current playback speed.
-BACKSPACE
-    Reset playback speed to normal.
-Shift+BACKSPACE
-    Undo the last seek. This works only if the playlist entry was not changed. Hitting it a second time will go back to the original position. See revert-seek command for details.
-Shift+Ctrl+BACKSPACE
-    Mark the current position. This will then be used by Shift+BACKSPACE as revert position (once you seek back, the marker will be reset). You can use this to seek around in the file and then return to the exact position where you left off.
-< and >
-    Go backward/forward in the playlist.
-ENTER
-    Go forward in the playlist.
-p / SPACE
-    Pause (pressing again unpauses).
-.
-    Step forward. Pressing once will pause, every consecutive press will play one frame and then go into pause mode again.
+# Source: mpv v0.33.1 man page
 
-,
-    Step backward. Pressing once will pause, every consecutive press will play one frame in reverse and then go into pause mode again.
-q
-    Stop playing and quit.
-Q
-    Like q, but store the current playback position. Playing the same file later will resume at the old playback position if possible.
-/ and *
-    Decrease/increase volume.
-9 and 0
-    Decrease/increase volume.
-m
-    Mute sound.
-_
-    Cycle through the available video tracks.
+# Seek backward {5 seconds, 1 second exact, 1 minute, 5 seconds exact}
+{Left, Shift+Left, Down, Shift+Down}
+  -
+# Seek forward {5 seconds, 1 second exact, 1 minute, 5 seconds exact}
+{Right, Shift+Right, Up, Shift+Up}
+  -
+# Seek to the {previous, next} subtitle
+ctrl+{Left, Right}
+  -
+# Adjust subtitle delay so that the {next, previous} subtitle is displayed now
+Ctrl+Shift+{Left, Right}
+  -
+
+# {Decrease, increase} current playback speed by 10%
+#{[, ]}
+#  -
+#{ and }
+#      Halve/double current playback speed
 #
-    Cycle through the available audio tracks.
+
+# Reset playback speed to normal
+BackSpace
+  -
+# Undo the last seek, press twice to go back to the original position
+Shift+BackSpace
+  -
+# Mark the current position to revert to it with Shift+BackSpace
+Shift+Ctrl+BackSpace
+  -
+
+# Go {backward, forward} in the playlist
+# {<,>}
+  # -
+
+# Go forward in the playlist
+Enter
+  -
+# Pause / unpause
+{p, space}
+  -
+
+# Step {forward, backward} one frame
+#{., ,}
+#  -
+
+# Stop playing and quit
+q
+  -
+# Quit storing playback position to resume later
+Q
+  -
+
+
+# {Decrease, Increase, Decrease, Increase} volume
+#{/, *, 9, 0}
+#  -
+
+
+# Mute sound
+m
+  -
+# Cycle through the available video tracks
+_
+  -
+
+
+# Cycle through the available audio tracks
+##
+#  -
+
+
+# Toggle fullscreen
 f
-    Toggle fullscreen (see also --fs).
-ESC
-    Exit fullscreen mode.
+  -
+# Exit fullscreen mode
+Escape
+  -
+# Toggle stay-on-top
 T
-    Toggle stay-on-top (see also --ontop).
-w and W
-    Decrease/increase pan-and-scan range. The e key does the same as W currently, but use is discouraged.
-o (also P)
-    Show progression bar, elapsed time and total duration on the OSD.
+  -
+# {Decrease, Increase} pan-and-scan range
+{w, W}
+  -
+# Show progression bar, elapsed time and total duration on the OSD
+{o, P}
+  -
+# Toggle OSD states between normal and playback time/duration
 O
-    Toggle OSD states between normal and playback time/duration.
+  -
+# Toggle subtitle visibility
 v
-    Toggle subtitle visibility.
-j and J
-    Cycle through the available subtitles.
-z and Z
-    Adjust subtitle delay by +/- 0.1 seconds. The x key does the same as Z currently, but use is discouraged.
+  -
+# Cycle through the available subtitles
+{j, J}
+  -
+
+
+# Adjust subtitle delay by {+,-} 0.1 seconds
+#{z, Z}
+#  -
+
+
+# Set/clear A-B loop points
 l
-    Set/clear A-B loop points. See ab-loop command for details.
+  -
+# Toggle infinite looping
 L
-    Toggle infinite looping.
-Ctrl + and Ctrl -
-    Adjust audio delay (A/V sync) by +/- 0.1 seconds.
+  -
+
+
+# Adjust audio delay (A/V sync) by {+,-} 0.1 seconds
+#Ctrl+{+, -}
+#  -
+# Adjust subtitle font size by {+,-} 10%
+#Shift+{g, f}
+#  -
+
+
+# Switch between subtitle style overrides
 u
-    Switch between applying no style overrides to SSA/ASS subtitles, and overriding them almost completely with the normal subtitle style. See --sub-ass-override for more info.
+  -
+# Toggle subtitle VSFilter aspect compatibility mode
 V
-    Toggle subtitle VSFilter aspect compatibility mode. See --sub-ass-vsfilter-aspect-compat for more info.
-r and R
-    Move subtitles up/down. The t key does the same as R currently, but use is discouraged.
+  -
+# move subtitles {up, down}
+{r, R}
+  -
+# Take a screenshot
 s
-    Take a screenshot.
+  -
+# Take a screenshot, without subtitles
 S
-    Take a screenshot, without subtitles. (Whether this works depends on VO driver support.)
-Ctrl s
-    Take a screenshot, as the window shows it (with subtitles, OSD, and scaled video).
-PGUP and PGDWN
-    Seek to the beginning of the previous/next chapter. In most cases, "previous" will actually go to the beginning of the current chapter; see --chapter-seek-threshold.
-Shift+PGUP and Shift+PGDWN
-    Seek backward or forward by 10 minutes. (This used to be mapped to PGUP/PGDWN without Shift.)
+  -
+# Take a screenshot, as the window shows it (with subtitles, OSD, and scaled video)
+Ctrl+s
+  -
+# Seek to the {next, previous} chapter
+{Page_Up, Page_Down}
+  -
+# Seek {forward, backward} by 10 minutes
+Shift+{Page_Up, Page_Down}
+  -
+# Activate/deactivate deinterlacer
 d
-    Activate/deactivate deinterlacer.
+  -
+# Cycle aspect ratio override
 A
-    Cycle aspect ratio override.
-Ctrl h
-    Toggle hardware video decoding on/off.
-Alt+LEFT, Alt+RIGHT, Alt+UP, Alt+DOWN
-    Move the video rectangle (panning).
-Alt + and Alt -
-    Combining Alt with the + or - keys changes video zoom.
-Alt+BACKSPACE
-    Reset the pan/zoom settings.
+  -
+# Toggle hardware video decoding on/off
+Ctrl+h
+  -
+# Move the video rectangle {left, right, up, down} (panning)
+{Alt+Left, Alt+Right, Alt+Up, Alt+Down}
+  -
+# Zoom {in, out} video
+Alt+{+,-}
+  -
+# Reset the pan/zoom settings
+Alt+BackSpace
+  -
+# Show the playlist and the current position in it
 F8
-    Show the playlist and the current position in it (useful only if a UI window is used, broken on the terminal).
+  -
+# Show the list of audio and subtitle streams
 F9
-    Show the list of audio and subtitle streams (useful only if a UI window is used, broken on the terminal).
-i and I
-    Show/toggle an overlay displaying statistics about the currently playing file such as codec, framerate, number of dropped frames and so on. See STATS for more information.
-1 and 2
-    Adjust contrast.
-3 and 4
-    Adjust brightness.
-5 and 6
-    Adjust gamma.
-7 and 8
-    Adjust saturation.
+  -
+# {Show, Toggle} an overlay displaying statistics
+{i, I}
+  -
+# Cycles visibility between never / auto (mouse-move) / always
+Delete
+  -
+
+
+# {Show,CLose} the console
+#{`, Escape}
+#  -
+
+
+# Adjust contrast
+{1, 2}
+  -
+# Adjust brightness
+{3, 4}
+  -
+# Adjust gamma
+{5, 6}
+  -
+# Adjust saturation
+{7, 8}
+  -
+# Resize video window to half its original size
+Alt+0
+  -
+# Resize video window to its original size
+Alt+1
+  -
+# Resize video window to double its original size
+Alt+2
+  -
