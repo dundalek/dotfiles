@@ -154,7 +154,8 @@
 (def shortcut-apps
   {"\"zathura\", \"Zathura\"" "zathura"
    "\"org.pwmt.zathura\", \"Zathura\"" "zathura"
-   "\"gl\", \"mpv\"" "mpv"})
+   "\"gl\", \"mpv\"" "mpv"
+   "\"sxiv\", \"Sxiv\"" "sxiv"})
 
 (def menu-keys
   (->> (sh-str ls (str keys-path))
