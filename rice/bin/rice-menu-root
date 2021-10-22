@@ -595,7 +595,9 @@
 ;; == Main Menu
 
 (def menu-main
-  [{:name "Run >"
+  [{:name "HUD appmenu >"
+    :action (fn [] (sh rice-hud))}
+   {:name "Run >"
     :action (fn [] (sh "rice-menu-run"))}
    {:name "Configure >"
     :action (fn [] (run-menu menu-configure))}

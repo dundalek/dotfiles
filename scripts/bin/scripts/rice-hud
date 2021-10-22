@@ -1,0 +1,19 @@
+#!/usr/bin/env python3
+
+# Dependecies: sudo apt install appmenu-gtk2-module appmenu-gtk2-module mate-hud
+# appmenu-qt is not in Ubuntu repos
+# Only works for apps installed via apt, because for apps installed via Nix the
+# appmenu-gtk-module.so cannot be found and loaded.
+
+import logging
+import runpy
+
+# print verbose logs for debugging
+logging.basicConfig(level=logging.DEBUG)
+#  logging.basicConfig(level=logging.INFO)
+
+hud = runpy.run_path("/usr/lib/mate-hud/mate-hud", run_name="hud")
+
+# mate-hud by default sets a listener for a global shortcut.
+# Here we invoke function directly to open the hud menu.
+hud["hud"](None, None, None)
