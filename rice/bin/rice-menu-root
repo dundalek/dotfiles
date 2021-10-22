@@ -564,6 +564,15 @@
                     (in-terminal-wait bash -c (str "cloc " (shell-escape dir) ";"
                                                    wait-for-key-cmd)))))}]))
 
+;; == Menu webcam
+
+(def menu-camera
+  (->> (sh-str sh -c "ls /dev/video*")
+       (str/split-lines)
+       (map (fn [device]
+              {:name (str "Preview camera " device)
+               :action #(sh mpv (str "av://v4l2:" device) --profile=low-latency --untimed -vf hflip --no-border --ontop)}))))
+
 ;; == Main Menu
 
 (def menu-main
@@ -668,6 +677,7 @@
                   menu-download-youtube-links
                   menu-open-links
                   menu-main menu-system menu-network menu-display menu-sound menu-keyboard menu-bluetooth
+                  menu-camera
                   (map #(update % :name (partial str "Configure: ")) menu-configure)
                   (map #(update % :name (partial str "Edit script: ")) menu-edit-scripts)))
                   ; (map #(update % :name (partial str "Shortcut Keys: ")) menu-configure)))
