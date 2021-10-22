@@ -19,9 +19,12 @@
 # Scroll a full page {left, down, up, down, up, right}
 {t, ctrl+f, ctrl+b, space, shift+space, y}
   -
-# Goto to the {first, the last, to the nth} page
-{g; g, G, nG}
+# Goto to the {first, last} page
+{g; g, G}
   -
+# Goto to the nth page
+nG
+  zathura-go-to-page
 # Snaps to the current page
 P
   -

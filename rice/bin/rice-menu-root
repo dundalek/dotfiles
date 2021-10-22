@@ -140,16 +140,35 @@
                             {:name line
                              :action #(sh xdotool key (str shortcut))}))))))
 
+;; TODO: likely bind these so they could be invoked as first-class actions
+(defmulti run-shortcut-action identity)
+
+(defn parse-int [string]
+  (try
+    (Integer/parseInt string)
+    (catch NumberFormatException _
+      nil)))
+
+(defmethod run-shortcut-action "zathura-go-to-page" [_]
+  ;; would there be some ipc to find out number of pages in zathura so that we could offer title like (1 - 35) ?
+  (run-menu nil
+            {:prompt "Enter page number: "
+             :fallback (fn [response]
+                         (when-some [page (-> response str/trim parse-int)]
+                           (typeout (str page "G"))))}))
+
 (defn show-shortcuts [app]
   ;; Dependency to parse sxhkd files: pip install --user sxhkhm
   ;; In the future might wanna write the parser in clj
   (run-menu (->> (sh-str hkhelper.py -f (str keys-path "/" app))
                  (str/split-lines)
                  (map (fn [line]
-                        (let [[description shortcut] (str/split line #"  +")
+                        (let [[description shortcut command] (-> line str/trim (str/split #"  +"))
                               keypresses (str/split shortcut #"\s*;\s*")]
                           {:name (str shortcut "  -  " description)
-                           :action #(:out (apply shell/sh "xdotool" "key" keypresses))}))))))
+                           :action (if (= command "-")
+                                     #(apply shell/sh "xdotool" "key" keypresses)
+                                     #(run-shortcut-action command))}))))))
 
 (def shortcut-apps
   {"\"zathura\", \"Zathura\"" "zathura"
