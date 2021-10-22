@@ -1,0 +1,16 @@
+#!/usr/bin/env sh
+
+# Maps keys so that Capslock + hjkl works as movement in all apps
+# Use shift+capslock to toggle capslock
+
+# Capslock changes mode, Shift+CapsLock switches CapsLock
+xmodmap - << END
+keycode 66 = Mode_switch Caps_Lock
+! keycode 66 = Mode_switch
+keysym h = h H Left
+keysym l = l L Right
+keysym k = k K Up
+keysym j = j J Down
+keysym i = i I Home
+keysym o = o O End
+END
