@@ -676,7 +676,10 @@
    {:name "Battery Status"
     :action (fn [] (in-terminal watch upower -i "/org/freedesktop/UPower/devices/battery_BAT0"))}
    {:name "Temperature Status"
-    :action (fn [] (in-terminal watch sensors))}])
+    :action (fn [] (in-terminal watch sensors))}
+   ;; Make top row of keyboard like Keychron K3 act like F keys instead of media keys
+   {:name "Enable keyboard media F keys"
+    :action (fn [] (in-terminal "sh" "-c" "echo 0 | sudo tee /sys/module/hid_apple/parameters/fnmode"))}])
 
 (defn run-menu
   ([menu] (run-menu menu nil))
