@@ -1,4 +1,5 @@
-;;-*- clojure -*-
+;; -*- clojure -*-
+;; vim: set filetype=clojure
 
 ; workaround for load-file in lumo
 #?(:cljs (refer-clojure :exclude '[load-file]))
@@ -27,7 +28,7 @@
 
 ;; Putting ENV variable setting in ~/.profile
 ;; There will always be some legacy setting, so we at least source external shell only once
-(source-shell ". ~/.bashrc")
+(source-shell ". ~/.profile")
 
 ; (defn args->str [args]
 ;   (->> args
@@ -61,9 +62,9 @@
      (do
        (require '[cemerick.pomegranate])
        (cemerick.pomegranate/add-dependencies
-         :coordinates '[[funcool/datoteka "1.1.0"]]
-         :repositories (merge cemerick.pomegranate.aether/maven-central
-                              {"clojars" "https://clojars.org/repo"}))
+        :coordinates '[[funcool/datoteka "1.1.0"]]
+        :repositories (merge cemerick.pomegranate.aether/maven-central
+                             {"clojars" "https://clojars.org/repo"}))
        (require '[datoteka.core :as f]))))
 
 ; (defcmd rebl [x]

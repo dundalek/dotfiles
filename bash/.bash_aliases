@@ -38,6 +38,8 @@ alias jsh="node ~/bin/node_modules/shelljs/bin/shjs --coffee"
 
 alias say='echo $@ | espeak -s 120 2>/dev/null'
 
+alias t='todo-txt'
+
 fotky() {
   p=$1
   [ -z "$p" ] && p=1280
