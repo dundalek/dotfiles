@@ -679,7 +679,13 @@
     :action (fn [] (in-terminal watch sensors))}
    ;; Make top row of keyboard like Keychron K3 act like F keys instead of media keys
    {:name "Enable keyboard media F keys"
-    :action (fn [] (in-terminal "sh" "-c" "echo 0 | sudo tee /sys/module/hid_apple/parameters/fnmode"))}])
+    :action (fn [] (in-terminal "sh" "-c" "echo 0 | sudo tee /sys/module/hid_apple/parameters/fnmode"))}
+   {:name "Take screenshot"
+    :action (fn [] (sh deepin-screenshot --save-path (str (getenv "HOME") "/Downloads")))}
+   {:name "Take screenshot 3s delayed"
+    :action (fn [] (sh deepin-screenshot --save-path (str (getenv "HOME") "/Downloads") --delay 3))}
+   {:name "Take screenshot 5s delayed"
+    :action (fn [] (sh deepin-screenshot --save-path (str (getenv "HOME") "/Downloads") --delay 5))}])
 
 (defn run-menu
   ([menu] (run-menu menu nil))
