@@ -140,6 +140,8 @@
                             {:name line
                              :action #(sh xdotool key (str shortcut))}))))))
 
+;; Hotkey menu
+
 ;; TODO: likely bind these so they could be invoked as first-class actions
 (defmulti run-shortcut-action identity)
 
@@ -157,18 +159,32 @@
                          (when-some [page (-> response str/trim parse-int)]
                            (typeout (str page "G"))))}))
 
+;; Dependency to parse sxhkd files: pip install --user sxhkhm
+;; In the future might wanna write the parser in clj
+(defn parse-sxhkd-shortcuts [filename]
+  (->> (sh-str hkhelper.py -f (str filename))
+       (str/split-lines)
+       (map (fn [line]
+              (let [[description shortcut command] (-> line str/trim (str/split #"  +"))
+                    keypresses (str/split shortcut #"\s*;\s*")]
+                {:shortcut shortcut
+                 :keypresses keypresses
+                 :command command
+                 :description description})))))
+
+(def menu-global-hotkeys
+  (->> (parse-sxhkd-shortcuts (str (getenv "HOME") "/.config/sxhkd/sxhkdrc"))
+       (map (fn [{:keys [shortcut keypresses command description]}]
+              {:name (str shortcut "  -  " description)
+               :action #(apply shell/sh (str/split command #"\s+"))}))))
+
 (defn show-shortcuts [app]
-  ;; Dependency to parse sxhkd files: pip install --user sxhkhm
-  ;; In the future might wanna write the parser in clj
-  (run-menu (->> (sh-str hkhelper.py -f (str keys-path "/" app))
-                 (str/split-lines)
-                 (map (fn [line]
-                        (let [[description shortcut command] (-> line str/trim (str/split #"  +"))
-                              keypresses (str/split shortcut #"\s*;\s*")]
-                          {:name (str shortcut "  -  " description)
-                           :action (if (= command "-")
-                                     #(apply shell/sh "xdotool" "key" keypresses)
-                                     #(run-shortcut-action command))}))))))
+  (run-menu (->> (parse-sxhkd-shortcuts (str keys-path "/" app))
+                 (map (fn [{:keys [shortcut keypresses command description]}]
+                        {:name (str shortcut "  -  " description)
+                         :action (if (= command "-")
+                                   #(apply shell/sh "xdotool" "key" keypresses)
+                                   #(run-shortcut-action command))})))))
 
 (def shortcut-apps
   {"\"zathura\", \"Zathura\"" "zathura"
@@ -708,6 +724,7 @@
                   menu-open-links
                   menu-main menu-system menu-network menu-display menu-sound menu-keyboard menu-bluetooth
                   menu-camera
+                  menu-global-hotkeys
                   (map #(update % :name (partial str "Configure: ")) menu-configure)
                   (map #(update % :name (partial str "Edit script: ")) menu-edit-scripts)))
                   ; (map #(update % :name (partial str "Shortcut Keys: ")) menu-configure)))

@@ -1,51 +1,51 @@
 
-# Reload configuration with: pkill -USR1 sxhkd
-
-
-super + i
-  $TERMINAL -e htop
-
-# Close window with Alt+F4, old habits die hard
-alt + F4
-  i3-msg kill
-
-# start dmenu (a program launcher)
-#bindsym $mod+d exec dmenu_run
-#rofi -show run
-
 #super + enter
 #  gnome-terminal
+
+# Main menu
 super + space
   rice-menu-root
+# Run menu
 super + d
   rice-menu-run
+# Lock screen
 super + control + l
   rice-menu-root lock-screen
+# Sleep (suspend)
 super + ctrl + q
   rice-menu-root suspend
+
 #alt + tab
 #  awesome-client "awful.screen.focus_relative(1)"
 
-super + shift + n
-  firefox
-super + shift + p
-  firefox --private-window
-super + semicolon
-  rice-menu-root "Emoji Picker"
+# Firefox
+# super + shift + n
+  # firefox
+# super + shift + p
+  # firefox --private-window
+# super + semicolon
+  # rice-menu-root "Emoji Picker"
 
+# Volume down
 XF86AudioLowerVolume
 	rice-menu-root volume-down
+# Volume uo
 XF86AudioRaiseVolume
 	rice-menu-root volume-up
+# Mute
 XF86AudioMute
  	rice-menu-root mute
 
+# Player play
 XF86AudioPlay
   playerctl play
+# Player pause
 XF86AudioPause
   playerctl pause
+# Player next
 XF86AudioNext
   playerctl next
+# Player prev
 XF86AudioPrev
   playerctl previous
 
@@ -54,8 +54,11 @@ XF86AudioPrev
 # using brightnessctl, but udev rules must be set
 # https://wiki.archlinux.org/index.php/backlight
 # https://cialu.net/brightness-control-not-work-i3wm/
+
+# Brightness down
 XF86MonBrightnessDown
 	brightnessctl s "15%-"
+# Brightness up
 XF86MonBrightnessUp
 	brightnessctl s "+15%"
 
@@ -204,3 +207,13 @@ XF86MonBrightnessUp
 # # Network Manager interface
 # super + F12
 # 	$TERMINAL -e sudo -A nmtui
+
+
+# Using `hyper` as a dummy placeholder that can never be pressed on normal keyboard
+
+# A
+hyper
+  echo b
+# B
+hyper
+  echo b
