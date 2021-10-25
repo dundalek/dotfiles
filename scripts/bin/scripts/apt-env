@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+
+# The idea is to have declarative list of packages ala Nix env.
+# Don't run apt install directly, instead add or remove entries in packages.txt
+# and then run this script to sync up the changes.
+
+set -euo pipefail
+
+base="$HOME/dotfiles/base-packages.txt"
+pkgs="$HOME/dotfiles/packages.txt"
+
+if [ ! -f "$base" ]
+then
+  apt-mark showmanual > "$base"
+fi
+
+# sed is to remove comments marked with #
+installed=$(cat "$base" "$pkgs" | sed 's/#.*$//')
+
+sudo apt-get install $installed
+sudo apt-mark auto $(apt-mark showmanual)
+sudo apt-mark manual $installed
+sudo apt-get autoremove --purge

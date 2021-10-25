@@ -1,0 +1,25 @@
+# Comments starting with # are supported
+
+# Base utilities needed for system and menu
+arandr
+awesome
+brightnessctl
+dunst
+# feh
+lxrandr
+mpv
+picom
+sxhkd
+sxiv
+# xfce4-power-manager
+youtube-dl
+zathura
+xdotool
+
+# Other useful programs
+fancontrol
+curl
+vim
+inkscape
+gimp
+deepin-screenshot

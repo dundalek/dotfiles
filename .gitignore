@@ -4,3 +4,6 @@ __pycache__
 .nrepl-port
 
 nvim/.config/nvim/.netrwhist
+
+# For apt-env script to keep base packages from default install
+/base-packages.txt
