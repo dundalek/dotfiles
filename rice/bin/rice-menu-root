@@ -579,9 +579,11 @@
                              ["audio" "youtube-dl -f m4a --no-mtime --add-metadata --embed-thumbnail --extract-audio"]]]
          {:name (str "Download " (count links) " youtube link(s) as " kind)
           :action (fn []
-                    (in-terminal bash -c (str "cd ~/Downloads; " command " "
-                                              (->> links (map shell-escape) (str/join " ")) ";"
-                                              wait-for-key-cmd)))})))))
+                    (let [links (->> links (map shell-escape) (str/join " "))]
+                      (in-terminal bash -c (str "echo " links "; echo; "
+                                                "cd ~/Downloads; "
+                                                command " " links "; "
+                                                wait-for-key-cmd))))})))))
 
 (defn with-cloned-repo [repo f]
   (let [tmp-dir (str/trim (sh-str mktemp -d))]
