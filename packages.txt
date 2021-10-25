@@ -12,9 +12,13 @@ picom
 sxhkd
 sxiv
 # xfce4-power-manager
-youtube-dl
+# youtube-dl
 zathura
 xdotool
+
+qrencode
+zbar-tools
+scrot
 
 # Other useful programs
 fancontrol

@@ -40,6 +40,13 @@
   ; (in-terminal vim (str f))
   (sh gvim (str f)))
 
+(defn with-tmp-file [f]
+  (let [tmp-file (str/trim (sh-str mktemp))]
+    (try
+      (f tmp-file)
+      (finally
+        (sh rm -rf (str tmp-file))))))
+
 (defn typeout [s]
   ;; Replace LF with CR to preserve new lines when typing out
   (let [s (str/replace s #"\n" "\r")]
@@ -675,6 +682,13 @@
                 (in-terminal bash -c (str "zbarimg " (shell-escape img-file) ";"
                                           "rm " (shell-escape img-file) ";"
                                           wait-for-key-cmd))))}
+   ;; deps: sudo apt-get install qrencode
+   {:name "Show QR code from clipboard contents"
+    :action (fn []
+              (with-tmp-file
+                (fn [filename]
+                  (sh qrencode -o (str filename) :in (clipboard-text))
+                  (sh xdg-open (str filename)))))}
    {:name "Shadow REPL"
     :action (fn [] (typeout "(shadow.cljs.devtools.api/repl :app)"))}
    {:name "Snippet: Github markdown detail"
