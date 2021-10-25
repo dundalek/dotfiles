@@ -1,4 +1,6 @@
-#!/bin/sh
+#!/usr/bin/env sh
+
+. ~/.profile
 
 # Num lock on
 #numlockx &
@@ -20,22 +22,23 @@ dunst &			# dunst for notifications
 #mpdupdate &
 
 #xcompmgr &		# xcompmgr for transparency
-compton --backend glx --vsync opengl-swc &
+# compton --backend glx --vsync opengl-swc &
+picom --vsync --backend glx &
 
 # Detect monitor changes
-killall umonitor
-rm ~/.umonitor.lock
-umonitor --listen &
+# killall umonitor
+# rm ~/.umonitor.lock
+# umonitor --listen &
 
 
 
-xfce4-power-manager &
+# xfce4-power-manager &
 # mate-power-manager &
-nm-applet &
+# nm-applet &
 # blueman-applet &
 #syncthing-gtk &
 # xflux -l 50 -g 15 &
-dropbox start &
+# dropbox start &
 #clipit &
 
 # Auto lock after certain time

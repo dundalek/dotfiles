@@ -254,6 +254,11 @@
 
 ;; Display / Screen
 
+;; xbacklight does not work
+;; using brightnessctl, but udev rules must be set
+;; https://wiki.archlinux.org/index.php/backlight
+;; https://cialu.net/brightness-control-not-work-i3wm/)
+
 (defn brightness [value]
   (sh brightnessctl set (str value)))
 
@@ -631,6 +636,9 @@
 
 ;; == Main Menu
 
+(defn emoji-picker []
+  (sh rofimoji --action clipboard))
+
 (def menu-main
   [{:name "HUD appmenu >"
     :action (fn [] (sh rice-hud))}
@@ -671,7 +679,7 @@
     :action (fn [] (sh gvim))}
    ;; --insert-with-clipboard is a workaround because xdotool type does not work in Firefox
    {:name "Emoji Picker"
-    :action (fn [] (sh rofimoji --insert-with-clipboard))}
+    :action emoji-picker}
    ;; Toggles screen key, starts if not running or kill it
    {:name "Screenkey - show typed keys on screen"
     :action (fn [] (when-not (or (sh-ok killall screenkey)
@@ -691,7 +699,7 @@
                 (fn [filename]
                   (sh qrencode -o (str filename) :in (clipboard-text))
                   (sh xdg-open (str filename)))))}
-   {:name "Shadow REPL"
+   {:name "Snippet: Shadow REPL"
     :action (fn [] (typeout "(shadow.cljs.devtools.api/repl :app)"))}
    {:name "Snippet: Github markdown detail"
     :action (fn [] (typeout "<details>\n<summary>Details</summary>\nHidden text here...\n</details>"))}
@@ -753,6 +761,76 @@
                   (map #(update % :name (partial str "Configure: ")) menu-configure)
                   (map #(update % :name (partial str "Edit script: ")) menu-edit-scripts)))
                   ; (map #(update % :name (partial str "Shortcut Keys: ")) menu-configure)))
+
+;; awesome
+
+(defn wm-restart []
+  (sh awesome-client "awesome.restart()"))
+
+(defn wm-quit []
+  (sh awesome-client "awesome.quit()"))
+
+;; tags
+
+(defn wm-view-prev-tag []
+  (sh awesome-client "awful.tag.viewprev()"))
+
+(defn wm-view-next-tag []
+  (sh awesome-client "awful.tag.viewnext()"))
+
+(defn wm-view-last-tag []
+  (sh awesome-client "awful.tag.history.restore()"))
+
+(defn wm-toggle-fullscreen []
+  (sh awesome-client "client.focus.fullscreen = not client.focus.fullscreen"))
+
+;; clients / windows
+
+(defn wm-focus-next-by-index []
+  (sh awesome-client "awful.client.focus.byidx(1)"))
+
+(defn wm-focus-prev-by-index []
+  (sh awesome-client "awful.client.focus.byidx(-1)"))
+
+(defn wm-swap-next-by-index []
+  (sh awesome-client "awful.client.swap.byidx(1)"))
+
+(defn wm-swap-prev-by-index []
+  (sh awesome-client "awful.client.swap.byidx(-1)"))
+
+(defn wm-jump-to-urgent []
+  (sh awesome-client "awful.client.urgent.jumpto()"))
+
+(defn wm-window-close []
+  (sh awesome-client "client.focus:kill()"))
+
+;; screens
+
+(defn wm-focus-next-screen []
+  (sh awesome-client "awful.screen.focus_relative(1)"))
+
+(defn wm-focus-prev-screen []
+  (sh awesome-client "awful.screen.focus_relative(-1)"))
+
+;; layout
+
+(defn wm-increase-master-width []
+  (sh awesome-client "awful.tag.incmwfact( 0.05)"))
+
+(defn wm-decrease-master-width []
+  (sh awesome-client "awful.tag.incmwfact(-0.05)"))
+
+(defn wm-increase-master-clients []
+  (sh awesome-client "awful.tag.incnmaster( 1, nil, true)"))
+
+(defn wm-decrease-master-clients []
+  (sh awesome-client "awful.tag.incnmaster(-1, nil, true)"))
+
+(defn wm-next-layout []
+  (sh awesome-client "awful.layout.inc( 1)"))
+
+(defn wm-prev-layout []
+  (sh awesome-client "awful.layout.inc(-1)"))
 
 (when-let [choice (first *command-line-args*)]
   (let [f (resolve (symbol choice))]

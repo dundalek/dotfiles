@@ -4,7 +4,7 @@ pcall(require, "luarocks.loader")
 
 -- Standard awesome library
 local gears = require("gears")
-local awful = require("awful")
+awful = require("awful")
 require("awful.autofocus")
 -- Widget and layout library
 local wibox = require("wibox")
@@ -62,18 +62,19 @@ modkey = "Mod4"
 -- Table of layouts to cover with awful.layout.inc, order matters.
 awful.layout.layouts = {
     awful.layout.suit.tile,
+    -- awful.layout.suit.max.fullscreen,
     awful.layout.suit.max,
     awful.layout.suit.floating,
-    awful.layout.suit.fair,
-    awful.layout.suit.tile.left,
-    awful.layout.suit.tile.bottom,
-    awful.layout.suit.tile.top,
-    awful.layout.suit.fair.horizontal,
-    awful.layout.suit.spiral,
-    awful.layout.suit.spiral.dwindle,
-    awful.layout.suit.max.fullscreen,
-    awful.layout.suit.magnifier,
-    awful.layout.suit.corner.nw,
+    -- awful.layout.suit.fair,
+    -- awful.layout.suit.tile.left,
+    -- awful.layout.suit.tile.bottom,
+    -- awful.layout.suit.tile.top,
+    -- awful.layout.suit.fair.horizontal,
+
+    -- awful.layout.suit.spiral,
+    -- awful.layout.suit.spiral.dwindle,
+    -- awful.layout.suit.magnifier,
+    -- awful.layout.suit.corner.nw,
     -- awful.layout.suit.corner.ne,
     -- awful.layout.suit.corner.sw,
     -- awful.layout.suit.corner.se,
@@ -227,7 +228,43 @@ root.buttons(gears.table.join(
 ))
 -- }}}
 
+
+rice = {
+   cycle_windows = function ()
+      if client.focus then
+        local tag = awful.tag.selected()
+        local pred = function (c)
+          -- TODO also match if client has multiple tags
+          return c.first_tag == tag
+          --and c.minimized
+          -- return awful.rules.match(c, {class = "URxvt"})
+        end
+        for x in awful.client.iterate(pred) do
+          -- local c = client.focus
+          -- if x.minimized then
+          --   c.minimized = true
+          -- end
+          client.focus = x
+          client.focus:raise()
+          -- local nxt = x
+          -- c.minimized = true
+          -- nxt.minimized = false
+          -- c:swap(nxt)
+          -- client.focus = nxt
+          -- if nxt then nxt:swap(x) else nxt = x end
+        end
+        -- c.minimized = true
+        -- nxt.minimized = false
+        -- c:swap(nxt)
+        -- client.focus = nxt
+      end
+  end,
+}
+
+
+
 -- {{{ Key bindings
+--[[
 globalkeys = gears.table.join(
     awful.key({ modkey,           }, "s",      hotkeys_popup.show_help,
               {description="show help", group="awesome"}),
@@ -250,36 +287,7 @@ globalkeys = gears.table.join(
     --         client.focus:raise()
     --     end
     -- end),
-    awful.key({ "Mod1",           }, "Tab",
-        function ()
-            if client.focus then
-              local tag = awful.tag.selected()
-              local pred = function (c)
-                -- TODO also match if client has multiple tags
-                return c.first_tag == tag
-                --and c.minimized
-                -- return awful.rules.match(c, {class = "URxvt"})
-              end
-              for x in awful.client.iterate(pred) do
-                -- local c = client.focus
-                -- if x.minimized then
-                --   c.minimized = true
-                -- end
-                client.focus = x
-                client.focus:raise()
-                -- local nxt = x
-                -- c.minimized = true
-                -- nxt.minimized = false
-                -- c:swap(nxt)
-                -- client.focus = nxt
-                -- if nxt then nxt:swap(x) else nxt = x end
-              end
-              -- c.minimized = true
-              -- nxt.minimized = false
-              -- c:swap(nxt)
-              -- client.focus = nxt
-            end
-        end,
+    awful.key({ "Mod1",           }, "Tab", rice.cycle_windows
         {description = "cycle through windows", group = "client"}
     ),
     -- cycle and put it in master stack
@@ -394,6 +402,7 @@ globalkeys = gears.table.join(
     awful.key({ modkey }, "p", function() menubar.show() end,
               {description = "show the menubar", group = "launcher"})
 )
+]]
 
 clientkeys = gears.table.join(
     awful.key({ modkey,           }, "f",
@@ -402,7 +411,7 @@ clientkeys = gears.table.join(
             c:raise()
         end,
         {description = "toggle fullscreen", group = "client"}),
-    awful.key({ modkey, }, "w",      function (c) c:kill()                         end,
+    awful.key({ modkey, }, "q",      function (c) c:kill()                         end,
               {description = "close", group = "client"}),
     -- awful.key({ modkey, "Shift"   }, "c",      function (c) c:kill()                         end,
     --           {description = "close", group = "client"}),
@@ -665,6 +674,8 @@ end)
 client.connect_signal("focus", function(c) c.border_color = beautiful.border_focus end)
 client.connect_signal("unfocus", function(c) c.border_color = beautiful.border_normal end)
 -- }}}
+
+
 
 
 awful.spawn("rice-xprofile")

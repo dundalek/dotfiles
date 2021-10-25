@@ -1,30 +1,143 @@
+# Using `hyper` as a dummy placeholder that can never be pressed on normal keyboard
 
-#super + enter
-#  gnome-terminal
+### Launch
 
 # Main menu
 super + space
   rice-menu-root
-# Run menu
-super + d
+# Run menu (execute)
+super + e
   rice-menu-run
-# Lock screen
-super + control + l
-  rice-menu-root lock-screen
-# Sleep (suspend)
-super + ctrl + q
-  rice-menu-root suspend
+# Terminal
+super + Return
+  $TERMINAL
 
-#alt + tab
-#  awesome-client "awful.screen.focus_relative(1)"
+# Emoji Picker
+super + semicolon
+  rice-menu-root emoji-picker
 
 # Firefox
 # super + shift + n
   # firefox
 # super + shift + p
   # firefox --private-window
-# super + semicolon
-  # rice-menu-root "Emoji Picker"
+
+### Session
+
+# Lock screen
+super + escape
+  rice-menu-root lock-screen
+
+# Should not be needed if the lid closed auto suspend works
+# Sleep (suspend)
+super + ctrl + q
+  rice-menu-root suspend
+
+### Window management
+
+# Close window
+super + q
+  rice-menu-root wm-window-close
+# Force close window
+super + shift + q
+  true
+
+# Switch to another app
+alt + tab
+  true
+# Switch to another window for current app
+alt + grave
+  true
+
+# Focus next by index
+super + j
+   rice-menu-root wm-focus-next-by-index
+# Focus prev by index
+super + k
+   rice-menu-root wm-focus-prev-by-index
+# Swap with next window
+super + shift + j
+   rice-menu-root wm-swap-next-by-index
+# Swap with prev window
+super + shift + k
+   rice-menu-root wm-swap-prev-by-index
+
+# or super + comma
+# Increase number of masters
+super + l
+  rice-menu-root wm-increase-master-clients
+# or super + period
+# Decrease number of masters
+super + h
+  rice-menu-root wm-decrease-master-clients
+
+# Move as master
+super + m
+  true
+
+# Increase master width
+super + shift + l
+  rice-menu-root wm-increase-master-width
+# Decrease master widrh
+super + shift + h
+  rice-menu-root wm-decrease-master-width
+
+# Focus next screen
+super + ctrl + j
+  rice-menu-root wm-focus-next-screen
+# Focus prev screen
+super + ctrl + k
+  rice-menu-root wm-focus-prev-screen
+
+# Next layout
+super + v
+  rice-menu-root wm-next-layout
+# Prev layout
+super + shift + v
+  rice-menu-root wm-prev-layout
+
+# Toggle fulscreen (monocle)
+super + f
+  rice-menu-root wm-toggle-fullscreen
+# Toggle tiling / stacking
+super + t
+  true
+
+
+# Go to tag {1-9}
+super + {1-9}
+  true
+# Move window to tag {1-9}
+super + shift + {1-9}
+  true
+# Carry window to tag {1-9}
+super + ctrl + {1-9}
+  true
+# View next tag
+super + Tab
+  rice-menu-root wm-view-next-tag
+# View previous tag
+super + shift + Tab
+  rice-menu-root wm-view-prev-tag
+# View last tag
+hyper
+  rice-menu-root wm-view-last-tag
+
+### Configure
+
+# Control center
+super + c; c
+  gnome-control-center
+
+# Reload config
+super + c; r
+  rice-menu-root wm-restart
+
+### Appearance
+# super + v (visual)
+
+
+### Sound
 
 # Volume down
 XF86AudioLowerVolume
@@ -36,6 +149,11 @@ XF86AudioRaiseVolume
 XF86AudioMute
  	rice-menu-root mute
 
+### Player
+
+# Player Play/Pause
+super + z
+  rice-menu-root player-play-pause
 # Player play
 XF86AudioPlay
   playerctl play
@@ -49,171 +167,11 @@ XF86AudioNext
 XF86AudioPrev
   playerctl previous
 
-
-# xbacklight does not work
-# using brightnessctl, but udev rules must be set
-# https://wiki.archlinux.org/index.php/backlight
-# https://cialu.net/brightness-control-not-work-i3wm/
+### Display
 
 # Brightness down
 XF86MonBrightnessDown
-	brightnessctl s "15%-"
+  rice-menu-root brightness-down
 # Brightness up
 XF86MonBrightnessUp
-	brightnessctl s "+15%"
-
-
-# # Basic binds
-# super + Return
-# 	$TERMINAL
-# super + d
-# 	dmenu_run
-# super + r
-# 	$TERMINAL -e $FILE
-# super + e
-# 	$TERMINAL -e neomutt
-# super + m
-# 	$TERMINAL -e ncmpcpp
-# super + n
-# 	$TERMINAL -e newsboat
-# super + i
-# 	$TERMINAL -e htop
-# super + y
-# 	$TERMINAL -e calcurse -D ~/.config/calcurse
-# super + shift + a
-# 	$TERMINAL -e pulsemixer; pkill -RTMIN+10 i3blocks
-# super + shift + c
-# 	camtoggle
-# super + shift + e
-# 	tutorialvids
-# super + w
-# 	webby | xargs -r $BROWSER
-# super + shift + w
-# 	$BROWSER
-# super + shift + g
-# 	gimp
-
-# # Et cetera...
-# super + grave
-# 	dmenuunicode
-# super + Scroll_Lock
-# 	killall screenkey || screenkey
-# super + Insert
-# 	showclip
-# super + shift + x
-# 	prompt "Shutdown computer?" "sudo -A shutdown -h now"
-# super + shift + BackSpace
-# 	prompt "Reboot computer?" "sudo -A shutdown -r now"
-# super + x
-# 	mpc pause; pauseallmpv; i3lock -e -f -c 1d2021; xset dpms force off
-# XF86Launch1
-# 	xset dpms force off
-# XF86AudioMute
-# 	lmc mute
-# XF86AudioLowerVolume
-# 	lmc down 5
-# shift+XF86AudioLowerVolume
-# 	lmc down 10
-# control+XF86AudioLowerVolume
-# 	lmc down 1
-# XF86AudioRaiseVolume
-# 	lmc up 5
-# shift+XF86AudioRaiseVolume
-# 	lmc up 10
-# control+XF86AudioRaiseVolume
-# 	lmc up 1
-# XF86AudioNext
-# 	lmc next
-# XF86AudioPlay
-# 	lmc toggle
-# XF86AudioPrev
-# 	lmc prev
-# XF86AudioStop
-# 	lmc toggle
-# XF86MonBrightnessDown
-# 	xbacklight -dec 15
-# XF86MonBrightnessUp
-# 	xbacklight -inc 15
-
-
-# # Recording
-# # Take screenshot
-# Print
-# 	maim pic-full-$(date '+%y%m%d-%H%M-%S').png
-# # Pick screenshot type
-# shift + Print
-# 	maimpick
-# # Record audio or video
-# super + Print
-# 	dmenurecord
-# # kill active recording
-# super + Delete
-# 	dmenurecord kill
-
-# # Pause audio
-# super + {_,shift +} p
-# 	lmc {toggle,pause}
-# # Changes to next/previous tracks
-# super + {comma,period}
-# 	lmc {prev,next}
-# # Restart track
-# super + shift + less
-# 	lmc replay
-# # Increase volume
-# super + {equal,plus}
-# 	lmc up {5,15}
-# # Decrease volume
-# super {_,shift +} + minus
-# 	lmc down {5,15}
-# # Seek foward in song
-# super + {_,shift +} bracketright
-# 	lmc forward {10,120}
-# # Seek backward in song
-# super + {_,shift +} bracketleft
-# 	lmc back {10,120}
-
-# # Function keys
-# # Show readme
-# super + F1
-# 	groff -mom $HOME/.local/share/larbs/readme.mom -Tpdf | zathura -
-# # F2 is restart in i3 right now.
-# # Change display
-# super + F3
-# 	displayselect
-# # Hibernate
-# super + F4
-# 	prompt 'Hibernate computer?' 'sudo systemctl suspend'
-# # Restart/rescan wifi/eth networks
-# super + F5
-# 	sudo -A systemctl restart NetworkManager
-# # Start torrent daemon/open interface
-# super + F6
-# 	torwrap
-# # toggle torrent daemon
-# super + F7
-# 	td-toggle
-# # sync email
-# super + F8
-# 	mailsync
-# # Mount a USB drive or Android device
-# super + F9
-# 	dmenumount
-# # Unmount a USB drive or Android device
-# super + F10
-# 	dmenuumount
-# # Search with Duckduckgo
-# super + F11
-# 	ducksearch
-# # Network Manager interface
-# super + F12
-# 	$TERMINAL -e sudo -A nmtui
-
-
-# Using `hyper` as a dummy placeholder that can never be pressed on normal keyboard
-
-# A
-hyper
-  echo b
-# B
-hyper
-  echo b
+  rice-menu-root brightness-up
