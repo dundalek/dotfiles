@@ -415,13 +415,25 @@
 
 ;; Dependency https://github.com/grwlf/xkb-switch
 
-(def menu-keyboard
+(defn make-keyboard-layout-menu []
   (let [current (clojure.string/trim (sh-str xkb-switch))]
     (->> (clojure.string/split-lines (sh-str xkb-switch -l))
          (map (fn [layout]
                 {:name (str "Keyboard Layout: " layout
                             (when (= layout current) " *"))
                  :action (fn [] (sh xkb-switch -s (str layout)))})))))
+
+(def menu-keyboard
+  (concat
+   (make-keyboard-layout-menu)
+   [;; Make top row of keyboard like Keychron K3 act like F keys instead of media keys
+    ;; You can set this persistently by creating a module options file like /etc/modprobe.d/hid_apple.conf:
+    ;; options hid_apple fnmode=0
+    ;; Reference: https://wiki.debian.org/InstallingDebianOn/Apple/PageFragmentKeyboard
+    {:name "Enable keyboard media F keys"
+     :action (fn [] (in-terminal "sh" "-c" "echo 0 | sudo tee /sys/module/hid_apple/parameters/fnmode"))}
+    {:name "Bind CapsLock + hjkl as movement"
+     :action (fn [] (sh rice-bind-hjkl))}]))
 
 ;; == System
 
@@ -693,9 +705,6 @@
     :action (fn [] (in-terminal watch upower -i "/org/freedesktop/UPower/devices/battery_BAT0"))}
    {:name "Temperature Status"
     :action (fn [] (in-terminal watch sensors))}
-   ;; Make top row of keyboard like Keychron K3 act like F keys instead of media keys
-   {:name "Enable keyboard media F keys"
-    :action (fn [] (in-terminal "sh" "-c" "echo 0 | sudo tee /sys/module/hid_apple/parameters/fnmode"))}
    {:name "Take screenshot"
     :action (fn [] (sh deepin-screenshot --save-path (str (getenv "HOME") "/Downloads")))}
    {:name "Take screenshot 3s delayed"
