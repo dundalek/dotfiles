@@ -72,9 +72,11 @@
 
 (defabbr dl "cd ~/Downloads")
 
-(defabbr nixs "nix-shell --command closh-zero-sci")
+(defabbr nixs "nix-shell")
+(defabbr nixsh "nix-shell --command closh-zero-sci")
 (defabbr nixp "nix-shell -p")
 (defabbr nixi "nix-env -i")
+(defabbr nixe "nix-env -e")
 (defabbr nixq "nix-env -q")
 
 (defalias unf "env NIXPKGS_ALLOW_UNFREE=1")
@@ -90,7 +92,7 @@
 (defalias update-youtube-dl "curl -L https://yt-dl.org/downloads/latest/youtube-dl -o (sh-str which youtube-dl)")
 
 #?(:clj
-   (defcmd uuid []
+   (defcmd random-uuid []
      (.toString (java.util.UUID/randomUUID))))
 
 (defcmd gz
