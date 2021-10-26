@@ -10,7 +10,7 @@ super + e
   rice-menu-run
 # Terminal
 super + Return
-  $TERMINAL
+  rice-menu-root launch-terminal
 
 # Emoji Picker
 super + semicolon

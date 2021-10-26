@@ -20,8 +20,13 @@
 (defmacro sh-str [& body]
   `(:out (sh ~@body)))
 
-(def TERMINAL "gnome-terminal"
-  #_"alacritty")
+(defmacro sh-lines [& body]
+  `(str/split-lines (sh-str ~@body)))
+
+(def TERMINAL
+  (or (getenv "TERMINAL")
+      "gnome-terminal"
+      #_"alacritty"))
 
 (def wait-for-key-cmd "echo -n '\nPress key to close '; read -n 1")
 
@@ -72,6 +77,9 @@
                  (last)))
        (first)))
 
+(defn process-cwd [pid]
+  (str/trim (sh-str readlink (str "/proc/" pid "/cwd"))))
+
 (defn app-info [window-id]
   (let [props (->> (sh-str xprop -id (str window-id))
                    (str/split-lines)
@@ -82,24 +90,19 @@
         {app-name "WM_CLASS"
          pid "_NET_WM_PID"
          window-title "WM_NAME"} props]
-    {:app-name app-name
-     :window-title window-title ;; TOOD: split
+    {:app-name app-name ;; TOOD: split
+     :window-title (str/replace window-title #"^\"|\"$" "")
      :pid pid
-     :cwd (str/trim (sh-str readlink (str "/proc/" pid "/cwd")))}))
+     :cwd (process-cwd pid)}))
 
-(defn child-process-info [pid]
-  (let [line (->> (sh-str pstree -lpA (str pid))
-                  (str/split-lines)
-                  (first))]
-    (when-let [[_ child-program child-pid] (re-find #"---\{([^}]+)\}\((\d+)\)$" line)]
-      {:child-program child-program
-       :child-pid child-pid})))
+(defn process-descendant [pid]
+  (some-> (sh-lines pstree -lpAT (str pid))
+          (last)
+          (str/replace #"^.*\(|\)$" "")))
 
 (def *context*
-  (let [{:keys [pid] :as app} (app-info (active-window-id))
-        child (child-process-info pid)]
+  (let [{:keys [pid] :as app} (app-info (active-window-id))]
     (merge app
-           child
            {:selected-text (text-selection)
             :clipboard-text (clipboard-text)})))
    ; :clipboard  ;; TODO iterate different mimes
@@ -747,6 +750,21 @@
     :action (fn [] (sh deepin-screenshot --save-path (str (getenv "HOME") "/Downloads") --delay 3))}
    {:name "Take screenshot 5s delayed"
     :action (fn [] (sh deepin-screenshot --save-path (str (getenv "HOME") "/Downloads") --delay 5))}])
+
+(defn launch-terminal []
+  (sh (str TERMINAL) :dir (str dir))
+  ;; Try to find cwd of active process and launch terminal with it for more convenience
+  ;; It needs more work, for shells we want to get last child, but for nvim we
+  ;; might need the child, because descendants might be some language servers.
+  ;; Also gnome-terminal seems to use the same process for multiple shells, so
+  ;; it is not easy to distinguish which process is the correct one.
+  #_(let [cwd (-> (:pid *context*)
+                  (process-descendant)
+                  (process-cwd))
+          dir (if (str/blank? cwd)
+                (getenv "HOME")
+                cwd)]
+      (sh (str TERMINAL) :dir (str dir))))
 
 (defn run-menu
   ([menu] (run-menu menu nil))
