@@ -1,0 +1,319 @@
+### Compose and Chat
+# Focus main window
+Shift + Escape
+  -
+# Focus latest chat or compose
+Escape
+  -
+# Advance to next chat or compose
+Ctrl + period
+  -
+# Advance to previous chat or compose
+Ctrl + comma
+  -
+# Send
+Ctrl + Return
+  -
+# Add Cc recipients
+Ctrl + Shift + c
+  -
+# Add Bcc recipients
+Ctrl + Shift + b
+  -
+# Access custom from
+Ctrl + Shift + f
+  -
+# Discard draft
+Ctrl + Shift + d
+  -
+# Insert a link
+Ctrl + k
+  -
+# Go to previous misspelled word
+Ctrl + semicolon
+  -
+# Go to next misspelled word
+Ctrl + '
+  -
+# Open spelling suggestions
+Ctrl + m
+  -
+
+### Google Workspace side panel
+# Focus on side panel
+Ctrl + Alt + period
+  -
+# Focus back to main window
+Ctrl + Alt + comma
+  -
+
+
+### Formatting
+# Undo
+Ctrl + z
+  -
+# Redo
+Ctrl + y
+  -
+# Previous font
+Ctrl + Shift + 5
+  -
+# Next font
+Ctrl + Shift + 6
+  -
+# Decrease text size
+Ctrl + Shift + -
+  -
+# Increase text size
+Ctrl + Shift + +
+  -
+# Bold
+Ctrl + b
+  -
+# Italics
+Ctrl + i
+  -
+# Underline
+Ctrl + u
+  -
+# Numbered list
+Ctrl + Shift + 7
+  -
+# Bulleted list
+Ctrl + Shift + 8
+  -
+# Quote
+Ctrl + Shift + 9
+  -
+# Indent less
+Ctrl + [
+  -
+# Indent more
+Ctrl + ]
+  -
+# Align left
+Ctrl + Shift + l
+  -
+# Align center
+Ctrl + Shift + e
+  -
+# Align right
+Ctrl + Shift + r
+  -
+# Set right-to-left
+Ctrl + Shift + comma
+  -
+# Set left-to-right
+Ctrl + Shift + period
+  -
+# Strikethrough
+Alt + Shift + 5
+  -
+# Remove formatting
+Ctrl + \
+  -
+
+
+### Jumping
+# Go to Inbox
+g; i
+  -
+# Go to Starred conversations
+g; s
+  -
+# Go to Snoozed conversations
+g; b
+  -
+# Go to Sent messages
+g; t
+  -
+# Go to Drafts
+g; d
+  -
+# Go to All mail
+g; a
+  -
+# Go to Contacts
+g; c
+  -
+# Go to Label
+g; l
+  -
+# Go to Tasks
+g; k
+  -
+# Go to search filters
+g; f
+  -
+### Threadlist selection
+# Select all conversations
+*; a
+  -
+# Deselect all conversations
+*; n
+  -
+# Select read conversations
+*; r
+  -
+# Select unread conversations
+*; u
+  -
+# Select starred conversations
+*; s
+  -
+# Select unstarred conversations
+*; t
+  -
+### Navigation
+# Back to threadlist
+u
+  -
+# Newer/older conversation
+k / j
+  -
+# {Open conversation, collapse/expand conversation}
+{o, Return}
+  -
+# Read previous/next message
+p / n
+  -
+# Go to next page
+g; n
+  -
+# Go to previous page
+g; p
+  -
+# Go to next inbox section
+`
+  -
+# Go to previous inbox section
+~
+  -
+### Application
+# Search mail
+/
+  -
+# Open keyboard shortcut help
+?
+  -
+# Search chat contacts
+q
+  -
+# Compose
+c
+  -
+# Compose in a tab
+d
+  -
+# Open "more actions" menu
+period
+  -
+# Open "move to" menu
+v
+  -
+# Open "label as" menu
+l
+  -
+
+
+### Actions
+# Move focus to toolbar
+comma
+  -
+# Select conversation
+x
+  -
+# Toggle star/Rotate among superstars
+s
+  -
+# Remove label
+y
+  -
+# Archive
+e
+  -
+# Mute conversation
+m
+  -
+# Report as spam
+!
+  -
+# Delete
+#
+  -
+# Reply
+r
+  -
+# Reply in a new window
+Shift + r
+  -
+# Reply all
+a
+  -
+# Reply all in a new window
+Shift + a
+  -
+# Forward
+f
+  -
+# Forward in a new window
+Shift + f
+  -
+# Update conversation
+Shift + n
+  -
+# Remove conversation from current view and go newer/older
+] / [
+  -
+# Archive conversation and go newer/older
+} / {
+  -
+# Undo last action
+z
+  -
+# Mark as read
+Shift + i
+  -
+# Mark as unread
+Shift + u
+  -
+# Mark unread from the selected message
+_
+  -
+# Mark as important
+{plus, equal}
+  -
+# Mark as not important
+-
+  -
+# Expand entire conversation
+semicolon
+  -
+# Collapse entire conversation
+:
+  -
+# Snooze
+b
+  -
+# Add conversation to Tasks
+Shift + t
+  -
+
+### Hangouts
+# Show menu
+h; m
+  -
+# Show Archived Hangouts
+h; a
+  -
+# Show Hangout requests
+h; i
+  -
+# Focus on the Conversation list
+h; c
+  -
+# Open phone
+h; p
+  -
+
+

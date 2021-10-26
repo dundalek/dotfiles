@@ -202,6 +202,14 @@
    "\"gl\", \"mpv\"" "mpv"
    "\"sxiv\", \"Sxiv\"" "sxiv"})
 
+(def menu-app-shortcuts
+  (when-let [app (or (shortcut-apps (:app-name *context*))
+                     (cond
+                       (str/ends-with? (:window-title *context*) " - Gmail") "gmail"
+                       (re-find #"^Todoist|Todoist$" (:window-title *context*)) "todoist-web"))]
+    [{:name (str "Show shortcuts for: " app)
+      :action #(show-shortcuts app)}]))
+
 (def menu-keys
   (->> (sh-str ls (str keys-path))
        (str/split-lines)
@@ -779,9 +787,7 @@
        (action)
        (fallback choice)))))
 
-(def menu (concat (when-let [app (shortcut-apps (:app-name *context*))]
-                    [{:name (str "Show shortcuts for: " app)
-                      :action #(show-shortcuts app)}])
+(def menu (concat menu-app-shortcuts
                   menu-github-links
                   menu-download-youtube-links
                   menu-open-links

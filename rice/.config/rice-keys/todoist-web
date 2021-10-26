@@ -1,0 +1,89 @@
+
+### Task Quick Add shortcuts
+# Add a label
+@
+  -
+# Pick a project (#)
+numbersign
+  -
+# Add an assignee
++
+  -
+# Set a priority level
+p{1, 2, 3, 4}
+  -
+
+### Used anywhere
+# Select and change multiple tasks at once
+{ctrl + click, shift + click}
+  -
+# Add task
+q
+  -
+# Add new task at the bottom of the list
+a
+  -
+# Add new task at the top of the list
+A
+  -
+# Edit task
+alt + click
+  -
+# Open search
+{/, f}
+  -
+# Show or hide the navigation menu
+m
+  -
+# Go to Home view
+h
+  -
+
+### Adding or editing tasks
+# Cancel current changes
+Escape
+  -
+# Save a newly created task and create a new one below it
+Return
+  -
+# Save changes to an existing task and create a new task below it
+shift + Return
+  -
+# Save a new task or save changes to an existing one and create a new task above it
+ctrl + Return
+  -
+# Move to the task above the task currently being edited
+ctrl + Up
+  -
+# Move to the task below the task currently being edited
+ctrl + Down
+  -
+
+### Creating and completing sub-tasks
+# Increase task indent (Works only inside projects)
+ctrl + Right
+  -
+# Decrease task indent (Works only inside projects)
+ctrl + Left
+  -
+# Complete a sub-task or recurring task and archive it
+shift + click (hold down shift)
+  -
+### Sorting tasks inside a project
+# Sort by due date
+d
+  -
+# Sort by priority
+p
+  -
+# Sort alphabetically
+n
+  -
+# Sort by assignee
+r
+  -
+
+### Changing project view options
+# Toggle between list and board view
+shift + v
+  -
