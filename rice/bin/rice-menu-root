@@ -811,9 +811,6 @@
 (defn wm-view-last-tag []
   (sh awesome-client "awful.tag.history.restore()"))
 
-(defn wm-toggle-fullscreen []
-  (sh awesome-client "client.focus.fullscreen = not client.focus.fullscreen"))
-
 ;; clients / windows
 
 (defn wm-focus-next-by-index []
@@ -836,6 +833,34 @@
 
 (defn wm-window-move-to-screen []
   (sh awesome-client "awful.client.movetoscreen()"))
+
+(defn wm-window-toggle-fullscreen []
+  (sh awesome-client "client.focus.fullscreen = not client.focus.fullscreen"))
+  ;; maybe also client.focus:raise()
+
+(defn wm-window-toggle-floating []
+  (sh awesome-client "awful.client.floating.toggle()"))
+
+(defn wm-window-move-to-master []
+  (sh awesome-client "client.focus:swap(awful.client.getmaster())"))
+
+(defn wm-minimize-others []
+  (sh awesome-client "rice.minimize_others()"))
+
+(defn wm-window-toggle-keep-on-top []
+  (sh awesome-client "client.focus.ontop = not client.focus.ontop"))
+
+(defn wm-window-minimize []
+  (sh awesome-client "client.focus.minimized = true"))
+
+(defn wm-window-toggle-maximized []
+  (sh awesome-client "client.focus.maximized = not client.focus.maximized\n client.focus:raise()"))
+
+(defn wm-window-toggle-maximized-vertical []
+  (sh awesome-client "client.focus.maximized_vertical = not client.focus.maximized_vertical\n client.focus:raise()"))
+
+(defn wm-window-toggle-maximized-horizontal []
+  (sh awesome-client "client.focus.maximized_horizontal = not client.focus.maximized_horizontal\n client.focus:raise()"))
 
 ;; screens
 

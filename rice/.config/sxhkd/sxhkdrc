@@ -69,6 +69,36 @@ super + shift + j
 # Swap with prev window
 super + shift + k
    rice-menu-root wm-swap-prev-by-index
+# Move to master
+super + m
+  rice-menu-root wm-window-move-to-master
+
+# Toggle fulscreen
+super + w; f
+  rice-menu-root wm-window-toggle-fullscreen
+# Toggle floating / stacking
+super + w; s
+  rice-menu-root wm-window-toggle-floating
+# Toggle keep on top
+super + w; k
+  rice-menu-root wm-window-toggle-keep-on-top
+# Minimize
+super + w; n
+  rice-menu-root wm-window-minimize
+# (Un)maximize
+super + w; m
+  rice-menu-root wm-window-toggle-maximized
+# (Un)maximize vertically
+super + w; v
+  rice-menu-root wm-window-toggle-maximized-vertical
+# (Un)maximize horizontally
+super + w; h
+  rice-menu-root wm-window-toggle-maximized-horizontal
+
+
+# Minimize others
+hyper
+  rice-menu-root wm-minimize-others
 
 # Increase number of masters
 super + period
@@ -77,9 +107,6 @@ super + period
 super + comma
   rice-menu-root wm-decrease-master-clients
 
-# Move as master
-super + m
-  true
 
 # Increase master width
 super + shift + period
@@ -105,14 +132,6 @@ super + v
 # Prev layout
 super + shift + v
   rice-menu-root wm-prev-layout
-
-# Toggle fulscreen (monocle)
-super + f
-  rice-menu-root wm-toggle-fullscreen
-# Toggle tiling / stacking
-super + t
-  true
-
 
 # Go to tag {1-9}
 super + {1-9}
