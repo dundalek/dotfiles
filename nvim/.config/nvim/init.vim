@@ -198,10 +198,11 @@ set inccommand=nosplit
 
 
 " paste with ctrl+v - clashes with visual block mode
-" map <C-V> "+gP
+" nnoremap <C-V> "+gP
 " <C-G>u is to break undo sequence when pasting so that undo will undo the
 " paste but keeps previously typed text (:help i_CTRL-G_u)
-imap <C-V> <C-G>u<esc>"+pa
+" `] is to jump to mark after pasted text, then switch back to insert mode
+inoremap <C-V> <C-G>u<esc>"+p`]a
 " copy with ctrl+c
 vnoremap <C-C> "+y
 " cut with ctrl x
