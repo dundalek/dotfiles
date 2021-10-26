@@ -90,6 +90,10 @@ super + shift + l
 super + shift + h
   rice-menu-root wm-decrease-master-width
 
+# Move window to screen
+super + ctrl + shift + {j,k}
+  rice-menu-root wm-window-move-to-screen
+
 # Focus next screen
 super + ctrl + j
   rice-menu-root wm-focus-next-screen

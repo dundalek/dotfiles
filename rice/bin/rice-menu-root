@@ -834,6 +834,9 @@
 (defn wm-window-close []
   (sh awesome-client "client.focus:kill()"))
 
+(defn wm-window-move-to-screen []
+  (sh awesome-client "awful.client.movetoscreen()"))
+
 ;; screens
 
 (defn wm-focus-next-screen []
