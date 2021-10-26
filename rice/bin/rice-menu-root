@@ -91,7 +91,7 @@
          pid "_NET_WM_PID"
          window-title "WM_NAME"} props]
     {:app-name app-name ;; TOOD: split
-     :window-title (str/replace window-title #"^\"|\"$" "")
+     :window-title (str/replace (or window-title "") #"^\"|\"$" "")
      :pid pid
      :cwd (process-cwd pid)}))
 
