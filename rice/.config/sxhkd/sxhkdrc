@@ -70,13 +70,11 @@ super + shift + j
 super + shift + k
    rice-menu-root wm-swap-prev-by-index
 
-# or super + comma
 # Increase number of masters
-super + l
+super + period
   rice-menu-root wm-increase-master-clients
-# or super + period
 # Decrease number of masters
-super + h
+super + comma
   rice-menu-root wm-decrease-master-clients
 
 # Move as master
@@ -84,21 +82,21 @@ super + m
   true
 
 # Increase master width
-super + shift + l
+super + shift + period
   rice-menu-root wm-increase-master-width
 # Decrease master widrh
-super + shift + h
+super + shift + comma
   rice-menu-root wm-decrease-master-width
 
 # Move window to screen
-super + ctrl + shift + {j,k}
+super + shift + {l,h}
   rice-menu-root wm-window-move-to-screen
 
 # Focus next screen
-super + ctrl + j
+super + l
   rice-menu-root wm-focus-next-screen
 # Focus prev screen
-super + ctrl + k
+super + h
   rice-menu-root wm-focus-prev-screen
 
 # Next layout
