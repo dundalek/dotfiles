@@ -423,6 +423,18 @@
     :action (fn []
               (edit-file (str (getenv "HOME") "/.config/dunst/dunstrc")))}])
 
+(defn configure-displays []
+  (sh gnome-control-center displays))
+
+(defn configure-network []
+  (sh gnome-control-center network))
+
+(defn configure-sound []
+  (sh gnome-control-center sound))
+
+(defn configure-wifi []
+  (sh gnome-control-center wifi))
+
 ;; == Keyboard
 
 ;; Dependency https://github.com/grwlf/xkb-switch

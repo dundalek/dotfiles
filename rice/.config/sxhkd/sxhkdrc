@@ -16,6 +16,10 @@ super + Return
 super + semicolon
   rice-menu-root emoji-picker
 
+# File manager
+super + r; f
+  nautilus
+
 # Firefox
 # super + shift + n
   # firefox
@@ -42,9 +46,13 @@ super + q
 super + shift + q
   true
 
-# Switch to another app
-alt + tab
-  true
+# TODO: try to re-bind as global per-app switcher
+# Switch to next window
+alt + Tab
+  rice-menu-root wm-focus-next-by-index
+# Switch to prev window
+alt + shift + Tab
+  rice-menu-root wm-focus-prev-by-index
 # Switch to another window for current app
 alt + grave
   true
@@ -132,6 +140,22 @@ super + c; c
 # Reload config
 super + c; r
   rice-menu-root wm-restart
+
+# Wifi settings
+super + c; w
+  rice-menu-root configure-wifi
+# Network settings
+super + c; n
+  rice-menu-root configure-network
+# Sound settings
+super + c; s
+  rice-menu-root configure-sound
+# Displays settings
+super + c; d
+  rice-menu-root configure-displays
+# Bluetooth settings
+super + c; b
+  rice-menu-root configure-bluetooth
 
 ### Appearance
 # super + v (visual)
