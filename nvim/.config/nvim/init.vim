@@ -664,64 +664,219 @@ local nvim_lsp = require('lspconfig')
 local util = require 'lspconfig/util'
 local capabilities = require('cmp_nvim_lsp').update_capabilities(vim.lsp.protocol.make_client_capabilities())
 
-nvim_lsp.clojure_lsp.setup{
-  -- Override the defaut config to set root in the top-level of a monorepo
-  root_dir = util.root_pattern(".git"),
+local default_opts = {
   on_attach = on_attach,
   flags = {
     debounce_text_changes = 150,
   },
-  capabilities = capabilities
+  capabilities = capabilities,
 }
-
-
-local on_efm_attach = function(client, bufnr)
-  local function buf_set_keymap(...) vim.api.nvim_buf_set_keymap(bufnr, ...) end
-  local function buf_set_option(...) vim.api.nvim_buf_set_option(bufnr, ...) end
-
-  -- Mappings.
-  local opts = { noremap=true, silent=true }
-
-  buf_set_keymap('n', '<localleader>o', '<cmd>SymbolsOutline<CR>', opts)
-
-end
-
-
--- https://github.com/bash-lsp/bash-language-server/issues/104#issuecomment-848052436
-nvim_lsp.efm.setup{
-  on_attach = on_efm_attach,
-  flags = {
-    debounce_text_changes = 150,
-  },
-  init_options = {documentFormatting = true, documentSymbol = true},
-  filetypes = {"sh", "markdown"},
-  settings = {
-      rootMarkers = {".git/"},
-      languages = {
-          sh = {
-            {lintCommand = 'shellcheck -f gcc -x',
-             lintSource = 'shellcheck',
-             lintFormats= {'%f:%l:%c: %trror: %m', '%f:%l:%c: %tarning: %m', '%f:%l:%c: %tote: %m'}}
-          },
-          markdown = {
-            {symbolCommand = 'markdown-symbols'}
-          }
-      }
-  }
-}
-
-
-local servers = { 'tsserver' }
-for _, lsp in ipairs(servers) do
-  nvim_lsp[lsp].setup {
+local servers = {
+  clojure_lsp = {
+    -- Override the defaut config to set root in the top-level of a monorepo
+    root_dir = util.root_pattern(".git"),
     on_attach = on_attach,
     flags = {
       debounce_text_changes = 150,
     },
     capabilities = capabilities,
-  }
+  },
+  -- https://github.com/bash-lsp/bash-language-server/issues/104#issuecomment-848052436
+  efm = {
+    filetypes = {"sh", "markdown"},
+    on_attach = function(client, bufnr)
+      local function buf_set_keymap(...) vim.api.nvim_buf_set_keymap(bufnr, ...) end
+      local function buf_set_option(...) vim.api.nvim_buf_set_option(bufnr, ...) end
+
+      -- Mappings.
+      local opts = { noremap=true, silent=true }
+
+      buf_set_keymap('n', '<localleader>o', '<cmd>SymbolsOutline<CR>', opts)
+    end,
+    flags = {
+      debounce_text_changes = 150,
+    },
+    init_options = {documentFormatting = true, documentSymbol = true},
+    settings = {
+        rootMarkers = {".git/"},
+        languages = {
+            sh = {
+              {lintCommand = 'shellcheck -f gcc -x',
+               lintSource = 'shellcheck',
+               lintFormats= {'%f:%l:%c: %trror: %m', '%f:%l:%c: %tarning: %m', '%f:%l:%c: %tote: %m'}}
+            },
+            markdown = {
+              {symbolCommand = 'markdown-symbols'}
+            }
+        }
+    },
+    capabilities = capabilities,
+  },
+  sumneko_lua = {
+    cmd = {"lua-language-server"},
+    on_attach = on_attach,
+    flags = {
+      debounce_text_changes = 150,
+    },
+    capabilities = capabilities,
+  },
+  tsserver = default_opts,
+  clangd = default_opts,
+}
+
+-- List extracted with:
+-- cd ~/.vim/plugged/nvim-lspconfig/lua/lspconfig
+-- ls *.lua | sed '/^\(configs\|health\|util\)\.lua$/d;s/^\(.*\)\.lua$/-- \1 = "",/'
+local lsps = {
+  als = "",
+  angularls = "",
+  ansiblels = "",
+  arduino_language_server = "",
+  bashls = "nodePackages.bash-language-server",
+  beancount = "nodePackages.beancount-langserver",
+  bicep = "",
+  ccls = "ccls",
+  clangd = "clang-tools",
+  clojure_lsp = "clojure-lsp",
+  cmake = "cmake-language-server",
+  codeqlls = "codeql",
+  -- https://github.com/NixOS/nixpkgs/issues/129002
+  crystalline = "",
+  csharp_ls = "",
+  cssls = "nodePackages.vscode-langservers-extracted",
+  cucumber_language_server = "",
+  dartls = "dart",
+  denols = "deno",
+  dhall_lsp_server = "dhall-lsp-server",
+  diagnosticls = "nodePackages.diagnostic-languageserver",
+  dockerls = "nodePackages.dockerfile-language-server-nodejs",
+  dotls = "",
+  efm = "efm-langserver",
+  elixirls = "elixir_ls",
+  elmls = "elmPackages.elm-language-server",
+  ember = "",
+  emmet_ls = "",
+  erlangls = "erlang-ls",
+  eslint = "nodePackages.eslint",
+  flow = "flow",
+  ["flux-lsp"] = "",
+  fortls = "",
+  fsautocomplete = "",
+  fstar = "fstar",
+  gdscript = "godot",
+  ghcide = "",
+  gopls = {"go", "gopls"},
+  graphql = "",
+  groovyls = "",
+  haxe_language_server = "",
+  hie = "",
+  hls = "haskell-language-server",
+  html = "nodePackages.vscode-langservers-extracted",
+  idris2_lsp = "",
+  intelephense = "nodePackages.intelephense",
+  java_language_server = "java-language-server",
+  -- https://github.com/NixOS/nixpkgs/pull/99330
+  jdtls = "",
+  jedi_language_server = "",
+  jsonls = "nodePackages.vscode-langservers-extracted",
+  julials = "",
+  kotlin_language_server = "",
+  lean3ls = "",
+  leanls = "",
+  lemminx = "",
+  metals = "metals",
+  mint = "mint",
+  nickel_ls = "",
+  nimls = "nimlsp",
+  ocamlls = "nodePackages.ocaml-language-server",
+  ocamllsp = "ocamlPackages.ocaml-lsp",
+  omnisharp = "omnisharp-roslyn",
+  pasls = "",
+  perlls = "",
+  perlpls = "",
+  phpactor = "",
+  powershell_es = "",
+  prismals = "",
+  psalm = "php80Packages.psalm",
+  puppet = "",
+  purescriptls = "nodePackages.purescript-language-server",
+  pylsp = "python39Packages.python-lsp-server",
+  pyright = "pyright",
+  racket_langserver = "",
+  rescriptls = "",
+  r_language_server = "rPackages.languageserver",
+  racket_langserver = "",
+  rescriptls = "",
+  rls = "rls",
+  rnix = "rnix-lsp",
+  rome = "",
+  rust_analyzer = "rust-analyzer",
+  scry = "scry",
+  serve_d = "",
+  solang = "",
+  solargraph = "rubyPackages.solargraph",
+  sorbet = "",
+  sourcekit = "",
+  sqlls = "",
+  sqls = "sqls",
+  stylelint_lsp = "nodePackages.stylelint",
+  sumneko_lua = "sumneko-lua-language-server",
+  svelte = "nodePackages.svelte-language-server",
+  svls = "svls",
+  tailwindcss = "",
+  taplo = "taplo-lsp",
+  terraformls = "terraform-ls",
+  texlab = "texlab",
+  tflint = "tflint",
+  theme_check = "",
+  tsserver = "nodePackages.typescript-language-server",
+  vala_ls = "vala-language-server",
+  vimls = "nodePackages.vim-language-server",
+  vls = "vlang",
+  volar = "",
+  vuels = "nodePackages.vue-language-server",
+  yamlls = "nodePackages.yaml-language-server",
+  zeta_note = "",
+  zk = "zk",
+  zls = "zls",
+}
+
+function escape_shell_arg(arg)
+  return "'" .. string.gsub(arg, "'", "'\"'\"'") .. "'"
 end
 
+function escape_shell_args(args)
+  local ret = {}
+  for _, arg in ipairs(args) do
+    table.insert(ret, escape_shell_arg(arg))
+  end
+  return table.concat(ret, " ")
+end
+
+local disabled_lsps = {
+  -- following produce noise when servers not installed:
+  "tailwindcss", "vimls",
+  "rome", "ember",
+  -- ghcide and hie seem to be deprecated in favor of haskell-language-server (hls)
+  "ghcide", "hie",
+}
+
+-- setting up all servers adds ~5ms to startup time, which is acceptable
+for lsp, nix_pkg in pairs(lsps) do
+  if nvim_lsp[lsp] and not vim.tbl_contains(disabled_lsps, lsp) then
+    local opts = servers[lsp] or default_opts
+    local cmd = (servers[lsp] and servers[lsp].cmd) or nvim_lsp[lsp].document_config.default_config.cmd
+    if nix_pkg ~= "" and cmd then
+      local nix_pkgs = type(nix_pkg) == "string" and {nix_pkg} or nix_pkg
+      local nix_cmd = {"nix-shell", "-p"}
+      vim.list_extend(nix_cmd, nix_pkgs)
+      table.insert(nix_cmd, "--run")
+      table.insert(nix_cmd, escape_shell_args(cmd))
+      opts = vim.tbl_extend("keep", { cmd = nix_cmd }, opts)
+    end
+    nvim_lsp[lsp].setup(opts)
+  end
+end
 
 --[[
 vim.lsp.set_log_level("debug")
