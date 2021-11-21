@@ -1,0 +1,107 @@
+### General Keybindings
+
+# Activate the {previous, next} window
+super + {period, comma}
+  -
+# Activate the window to the {left, right}
+{super + Left, super + Right}
+  -
+# Activate the window {above, below}
+{super + Up, super + Down}
+  -
+# Activate the {first, last} window
+{super + Home, super + End}
+  -
+# Move the current window to the {left, right}
+{super + ctrl + comma, super + ctrl + period}
+  -
+# Move the current window to the {left, right}
+{super + ctrl + Left, super + ctrl + Right}
+  -
+# Move the current window {up, down}
+{super + ctrl + Up, super + ctrl + Down}
+  -
+# Take the window, placing it when finished navigating
+super + t
+  -
+# Cycle through the most recently used windows
+super + {Tab, alt + Tab}
+  -
+# Cycle backwards through the most recently used windows
+super + {shift + Tab, alt + shift + Tab}
+  -
+# Center the active window horizontally
+super + C
+  -
+# Resize the window (cycles through useful widths)
+super + R
+  -
+# Resize the window (cycles through useful heights)
+super + shift + R
+  -
+# Maximize the width of a window
+super + F
+  -
+# Toggle fullscreen
+super + shift + F
+  -
+# Create a new window from the active application
+{super + Return, super + N}
+  -
+# Close the active window
+super + BackSpace
+  -
+# Absorb the window to the right into the active column
+super + I
+  -
+# Expel the bottom window out to the right
+super + O
+  -
+
+### Workspace Keybindings
+
+# Cycle through the most recently used workspaces
+super + grave
+  -
+# Cycle backwards through the most recently used workspaces
+super + shift + grave
+  -
+# Cycle through the most recently used, taking the active window with you
+super + ctrl + grave
+  -
+# Cycle backwards through the most recently used, taking the active window with you
+super + ctrl + shift + grave
+  -
+# Cycle sequentially through workspaces
+super + {Page_Down, Page_Up}
+  -
+# Cycle sequentially through workspaces, taking the active window with you
+super + ctrl + {Page_Down, Page_Up}
+  -
+
+### Monitor Keybindings
+
+# Select neighbouring monitor
+super + shift + {Left, Right, Up, Down}
+  -
+# Move active window to neighbouring monitor
+super + shift + ctrl + {Left, Right, Up, Down}
+  -
+
+### Scratch Layer Keybindings
+
+# Toggle between showing and hiding the most recent scratch window
+super + Escape
+  -
+# Toggle between showing and hiding the scratch windows
+super + shift + Escape
+  -
+# Toggle between floating and tiling the current window
+super + ctrl + Escape
+  -
+# Cycle through the most recently used scratch windows
+super + Tab
+  -
+# Minimize the current window
+super + H
+  -

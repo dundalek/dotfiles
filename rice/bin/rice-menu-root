@@ -183,7 +183,9 @@
                  :description description})))))
 
 (def menu-global-hotkeys
-  (->> (parse-sxhkd-shortcuts (str (getenv "HOME") "/.config/sxhkd/sxhkdrc"))
+  (->> (concat (parse-sxhkd-shortcuts (str (getenv "HOME") "/.config/sxhkd/sxhkdrc"))
+               (->> (parse-sxhkd-shortcuts (str keys-path "/paperwm"))
+                    (map #(update % :description (partial str "PaperWM: ")))))
        (map (fn [{:keys [shortcut keypresses command description]}]
               {:name (str shortcut "  -  " description)
                :action #(apply shell/sh (str/split command #"\s+"))}))))
