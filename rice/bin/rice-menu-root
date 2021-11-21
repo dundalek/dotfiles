@@ -2,7 +2,8 @@
 ;; -*- clojure -*-
 ;; vim: set filetype=clojure:
 
-(require '[clojure.java.shell :as shell]
+(require '[babashka.fs :as fs]
+         '[clojure.java.shell :as shell]
          '[clojure.string :as str])
 
 (defn getenv [name]
@@ -789,12 +790,18 @@
        (action)
        (fallback choice)))))
 
+(def private-menu-filename (str (getenv "HOME") "/.rice_menu_private.clj"))
+(if (fs/regular-file? private-menu-filename)
+  (load-file private-menu-filename)
+  (def private-menu nil))
+
 (def menu (concat menu-app-shortcuts
                   menu-github-links
                   menu-download-youtube-links
                   menu-open-links
                   menu-main menu-system menu-network menu-display menu-sound menu-keyboard menu-bluetooth
                   menu-camera
+                  private-menu
                   menu-global-hotkeys
                   (map #(update % :name (partial str "Configure: ")) menu-configure)
                   (map #(update % :name (partial str "Edit script: ")) menu-edit-scripts)))
