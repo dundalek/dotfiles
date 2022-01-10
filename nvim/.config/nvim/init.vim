@@ -1,4 +1,6 @@
 " vim: foldmethod=marker
+" Press zM to close all folds to navigate the strcuture, zR to open all.
+" Global {{{1
 " Set our leader key to space. This needs to be set first before all plugins
 " are loaded.
 let g:mapleader = "\<space>"
@@ -31,13 +33,9 @@ call plug#begin("~/.vim/plugged")
   " Defaults everyone can agree on
   Plug 'https://github.com/tpope/vim-sensible.git'
 
-  " Plug 'https://github.com/adelarsq/vim-matchit.git'
-
-  Plug 'https://github.com/xolox/vim-misc.git'
-  Plug 'https://github.com/xolox/vim-colorscheme-switcher.git' " F8 / Shiftt-F8 next/previous theme
   " Syntax highlighting theme
   Plug 'https://github.com/ghifarit53/tokyonight-vim.git'
-  Plug 'https://github.com/dracula/vim.git'
+  Plug 'https://github.com/dracula/vim.git', { 'name': 'dracula' }
   " Plug 'https://github.com/haishanh/night-owl.vim.git'
   " Plug 'https://github.com/ntk148v/vim-horizon.git'
   " Plug 'https://github.com/arcticicestudio/nord-vim.git'
@@ -120,11 +118,14 @@ call plug#begin("~/.vim/plugged")
   Plug 'mg979/vim-visual-multi', {'branch': 'master'}
 
   " Toggling comments
-  Plug 'https://github.com/preservim/nerdcommenter.git'
+  " Plug 'https://github.com/preservim/nerdcommenter.git'
+  Plug 'numToStr/Comment.nvim'
 
   " Git show changes in gutter
   Plug 'https://github.com/mhinz/vim-signify.git'
 
+  " Floating terminal, using it to run lazygit
+  Plug 'numtostr/FTerm.nvim'
   " Git utilities, mostly using :GBrowse
   Plug 'https://github.com/tpope/vim-fugitive'
   " Add support for :GBrowse command from fugitive to work with github
@@ -135,10 +136,6 @@ call plug#begin("~/.vim/plugged")
   Plug 'folke/which-key.nvim'
 
   " Language client
-  " Plug 'https://github.com/neoclide/coc.nvim.git', {'branch': 'release'}
-  " let g:coc_global_extensions = ['coc-css', 'coc-html', 'coc-json', 'coc-prettier', 'coc-tsserver', 'coc-conjure']
-
-  " Plug 'https://github.com/tpope/vim-fireplace.git', { 'for': 'clojure' }
   Plug 'https://github.com/Olical/conjure.git', { 'for': 'clojure' }
   Plug 'https://github.com/eraserhd/parinfer-rust.git', { 'for': 'clojure', 'do': 'nix-shell --run \"cargo build --release \"' }
 
@@ -154,6 +151,8 @@ call plug#begin("~/.vim/plugged")
   " Syntax highlighting based on treesitter
   Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}  " We recommend updating the parsers on update
 
+  " Display treesitter parser tree, open with :TSPlaygroundToggle
+  " Plug 'nvim-treesitter/playground'
 
   " A tree like view for symbols in Neovim using the Language Server Protocol
   Plug 'https://github.com/simrat39/symbols-outline.nvim.git'
@@ -170,11 +169,7 @@ call plug#begin("~/.vim/plugged")
   Plug 'https://github.com/junegunn/goyo.vim.git', { 'for': 'markdown' }
   " Markdown preview
   Plug 'https://github.com/iamcco/markdown-preview.nvim.git', { 'for': 'markdown', 'do': 'cd app && npm install' }
-  " Plug 'https://github.com/tpope/vim-markdown.git'
 call plug#end()
-
-
-
 
 
 " General settings {{{1
@@ -266,6 +261,9 @@ augroup autoread
 augroup END
 set title
 
+" Source the nvim config file after saving it
+autocmd! BufWritePost init.vim source $MYVIMRC
+
 " Movement {{{1
 
 " Save on need to hold shift for commands for convenience (conflicts with
@@ -297,11 +295,6 @@ vmap <S-Tab> <gv
 " nnoremap <S-Tab> <<
 vmap <Tab> >gv
 
-" Add spaces after comment delimiters by default (nerdcommenter)
-let g:NERDSpaceDelims = 1
-" Toggle comments with ctrl+/
-nmap <C-_>   <Plug>NERDCommenterToggle
-vmap <C-_>   <Plug>NERDCommenterToggle<CR>gv
 
 " Clear search highlighting on escape in normal mode (press esc twice to make
 " it disappear faster)
@@ -312,6 +305,23 @@ nnoremap S :%s//g<Left><Left>
 " Search visually selected text with // https://vim.fandom.com/wiki/Search_for_visually_selected_text
 vnoremap // y/\V<C-R>=escape(@",'/\')<CR><CR>
 
+" Make gf create a new file if it not exists
+:map gf :e <cfile><CR>
+
+" -- Comment.nvim {{{1
+" Add spaces after comment delimiters by default (nerdcommenter)
+" let g:NERDSpaceDelims = 1
+" Toggle comments with ctrl+/
+"nmap <C-_>   <Plug>NERDCommenterToggle
+"vmap <C-_>   <Plug>NERDCommenterToggle<CR>gv
+
+lua require('Comment').setup()
+" nnoremap <silent> <C-_>  :lua require('Comment').toggle()<CR>
+" vnoremap <silent> <C-_>  <cmd>:lua require('Comment').toggle()<CR>gv
+nmap <silent> <C-_>  gcc
+vmap <silent> <C-_>  gcgv
+
+" ====
 " Window and buffer management {{{1
 
 " TAB in general mode will move to next window
@@ -329,10 +339,12 @@ nnoremap <leader>d :Sayonara<CR>
 " Quit window
 nnoremap <leader>q :quit<CR>
 
+" -- bufferline {{{1
 " Experimental: Show list of buffers as tabs
 lua << EOF
 require("bufferline").setup{}
 EOF
+
 
 " Theme {{{1
 if has("termguicolors")
@@ -340,6 +352,8 @@ if has("termguicolors")
 endif
 syntax enable
 
+
+" Browse through available themes with :Telescope colorscheme
 set background=dark " for the dark version
 colorscheme tokyonight
 
@@ -381,11 +395,14 @@ highlight link LspCodeLens Comment
   " " autocmd! FileType * colorscheme tokyonight
 " augroup END
 
+" -- colorizer {{{1
 " Show colors for hex values
 " names=false to not highlight color names like Green
 lua require'colorizer'.setup(nil, {names=false})
 
 " File Explorer {{{1
+
+" -- NERDTree {{{1
 let g:NERDTreeShowHidden = 1
 let g:NERDTreeMinimalUI = 1
 let g:NERDTreeIgnore = []
@@ -400,7 +417,7 @@ augroup END
 nnoremap <silent> <leader>b :NERDTreeToggle<CR>
 nnoremap <silent> <C-bslash> :NERDTreeFind<CR>
 
-
+" -- nvimtree {{{1
 let g:nvim_tree_side = 'right'
 " Automatically close if the tree is the last window
 " let g:nvim_tree_auto_close = 1
@@ -425,6 +442,8 @@ let g:nvim_tree_icons = {
 
 
 " Fuzzy file search {{{1
+
+" -- fzf {{{1
 if executable('rg')
   " .gitignore is applied automatically, --hidden is to search in files
   " starting with a dot, but then we need the --glob parameter to exclude contents of .git
@@ -465,6 +484,7 @@ let g:fzf_action = {
   \ 'ctrl-v': 'vsplit'
   \}
 
+" -- Telescope {{{1
 lua << END
 require('telescope').setup({
   defaults = {
@@ -476,7 +496,11 @@ require('telescope').setup({
     --},
     -- other defaults configuration here
   },
-  -- other configuration values here
+  pickers = {
+    colorscheme = {
+      enable_preview = true,
+    },
+  },
 })
 END
 
@@ -518,12 +542,11 @@ inoremap <C-l> <C-\><C-N><C-w>l
 " tnoremap <C-l> <C-\><C-n><C-w>l
 " tnoremap <Esc> <C-\><C-n>
 
-" Source the nvim config file after saving it
-autocmd! BufWritePost init.vim source $MYVIMRC
 
 
 " Auto completion {{{1
 
+" -- nvim-cmp {{{1
 " nvim-cmp needs this
 set completeopt=menu,menuone,noselect
 
@@ -544,22 +567,26 @@ lua <<EOF
     sources = {
       { name = 'nvim_lsp' },
       { name = 'nvim_lua' },
-      { name = 'buffer' },
       { name = 'path' },
+      { name = 'buffer', keyword_length = 5 },
     },
     formatting = {
       -- Show icons for completion items
-      format = require("lspkind").cmp_format({with_text = true, menu = ({
-          buffer = "[Buffer]",
+      format = require("lspkind").cmp_format {
+        with_text = true,
+        menu = {
+          buffer = "[Buf]",
           nvim_lsp = "[LSP]",
           nvim_lua = "[Lua]",
-        })}),
+        },
+      },
     },
   })
 EOF
 
 " Language configs {{{1
 
+" -- treesitter {{{1
 
 lua <<EOF
 require'nvim-treesitter.configs'.setup {
@@ -585,6 +612,7 @@ set foldexpr=nvim_treesitter#foldexpr()
 " Have folds opened by default
 set nofoldenable
 
+" -- conjure {{{1
 " Clojure
 
 augroup lang_clojure
@@ -597,9 +625,14 @@ augroup lang_clojure
     \| set nolinebreak
 augroup END
 
+" -- lspconfig {{{1
+
 " bind it outside of on_attach to use for debugging
 nnoremap <space>ll :LspInfo<cr>
 nnoremap <space>lL :e ~/.cache/nvim/lsp.log<cr>
+
+" Useful for the efm-markdown wrapper
+nnoremap <space>ls :Telescope lsp_document_symbols<cr>
 
 lua << EOF
 
@@ -655,7 +688,20 @@ local on_attach = function(client, bufnr)
     vim.cmd [[
       augroup lsp_codelens
         autocmd! * <buffer>
-        autocmd BufWritePost,CursorHold,InsertLeave <buffer> lua vim.lsp.codelens.refresh()
+        autocmd BufWritePost,CursorHold,CursorHoldI <buffer> lua vim.lsp.codelens.refresh()
+      augroup END
+    ]]
+  end
+
+  -- Maybe change lower the value (default 4s) like set updatetime=1000
+  -- Auto highlight symbols under cursor and its references
+  if client.resolved_capabilities.document_highlight then
+    vim.cmd [[
+      augroup lsp_highlight
+        autocmd!
+        autocmd CursorHold  <buffer> lua vim.lsp.buf.document_highlight()
+        autocmd CursorHoldI <buffer> lua vim.lsp.buf.document_highlight()
+        autocmd CursorMoved <buffer> lua vim.lsp.buf.clear_references()
       augroup END
     ]]
   end
@@ -677,6 +723,8 @@ local nvim_lsp = require('lspconfig')
 local util = require 'lspconfig/util'
 local capabilities = require('cmp_nvim_lsp').update_capabilities(vim.lsp.protocol.make_client_capabilities())
 
+-- auto-lsp {{{1
+
 vim.opt.runtimepath:append("~/code/nvim-auto-lsp")
 require("plenary.reload").reload_module("auto-lsp")
 local auto_lsp = require "auto-lsp"
@@ -693,6 +741,8 @@ require "auto-lsp".setup{
     "rust_analyzer",
     -- to avoid interference with markdown files
     "zeta_note", "zk",
+    -- prefer clangd
+    "ccls",
   },
   default_config = {
     on_attach = on_attach,
@@ -768,7 +818,7 @@ EOF
 
 " autocmd! QuickFixCmdPost * wincmd p
 
-" Markdown
+" -- Markdown {{{1
 
 
 " Turn spellcheck on for markdown files
@@ -815,7 +865,7 @@ require("which-key").register({
 EOF
 
 
-" Liz
+" -- Liz {{{1
 augroup lang_liz
   autocmd! BufNewFile,BufRead *.liz
     \  setlocal syntax=clojure
@@ -823,12 +873,12 @@ augroup lang_liz
 augroup END
 
 " Space menu {{{1
-" Using which-key plugin
 
+" -- Git {{{1
 
 " Open current line on Github
 " V is to select current line otherwise only the file is opened without location
-nnoremap <space>gg V :GBrowse<cr><esc>
+nnoremap <leader>gh V :GBrowse<cr><esc>
 " Make :GBrowse command from fugitive work
 " By default it depends in netrw, which is disabled in neovim
 augroup ft_fugitive
@@ -836,6 +886,23 @@ augroup ft_fugitive
     au User Fugitive command! -bar -nargs=1 Browse silent! exe '!xdg-open' shellescape(<q-args>, 1)
 augroup END
 
+lua << EOF
+
+local lazygit = require('FTerm'):new({ cmd = 'lazygit', dimensions  = { height = 1, width = 1 } })
+
+function _G.__fterm_lazygit()
+    lazygit:toggle()
+end
+
+EOF
+
+" Open lazygit in a floating window
+" nnoremap <silent> <leader>gg :lua require('FTerm'):new({ cmd = 'lazygit', dimensions  = { height = 1, width = 1 } }):open()<cr>
+nnoremap <silent> <leader>gg :lua __fterm_lazygit()<cr>
+
+nnoremap <silent> <leader>gb = :Telescope git_branches<cr>
+
+" -- which-key.nvim {{{1
 
 lua << EOF
 
@@ -845,6 +912,8 @@ wk.register({
   ["<leader>."] = { "<cmd>e $MYVIMRC<cr>", "open init" },
   ["<leader>l"] = { "+lsp" },
   ["gq"] = { "wrap text" },
+  ["<leader>f"] = { "find" },
+  ["<leader>g"] = { "git" },
   -- ["<leader>f"] = { name = "+file" },
   -- ["<leader>ff"] = { "<cmd>Telescope find_files<cr>", "Find File" },
   -- ["<leader>fr"] = { "<cmd>Telescope oldfiles<cr>", "Open Recent File" },
@@ -852,34 +921,3 @@ wk.register({
 })
 
 EOF
-
-
-" nnoremap <silent> <leader>      :<c-u>WhichKey '<Space>'<CR>
-" nnoremap <silent> <localleader> :<c-u>WhichKey  ','<CR>
-
-" " Hide status line while space menu is open
-" autocmd! FileType which_key
-" autocmd  FileType which_key set laststatus=0 noshowmode noruler
-  " \| autocmd BufLeave <buffer> set laststatus=2 showmode ruler
-
-" let g:which_key_timeout = 100
-
-" let g:which_key_map =  {}
-
-" let g:which_key_map['.'] = [ ':e $MYVIMRC', 'open init' ]
-
-
-
-" " let g:which_key_map.l = {
-  " " \ 'name' : '+lsp' ,
-  " " \ 'r' : ['<cmd>lua vim.lsp.buf.references()<cr>', 'references'],
-  " " \ 'g' : [':lua vim.lsp.buf.definition()', 'defition'],
-  " " \ 'n' : [':lua vim.lsp.buf.rename()', 'rename'],
-  " " \ 'i' : [':LspInfo<CR>', 'info'],
-  " " \ }
-
-" " Register which key map
-" call which_key#register('<Space>', "g:which_key_map")
-
-
-
