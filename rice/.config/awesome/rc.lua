@@ -18,6 +18,19 @@ local hotkeys_popup = require("awful.hotkeys_popup")
 -- when client with a matching name is opened:
 require("awful.hotkeys_popup.keys")
 
+-- https://github.com/berlam/awesome-switcher
+-- local switcher = require("awesome-switcher")
+
+-- https://github.com/guotsuan/awesome-revelation
+-- local revelation = require("awesome-revelation")
+
+-- https://github.com/blueyed/awesome-cyclefocus
+-- local cyclefocus = require('awesome-cyclefocus')
+
+-- https://github.com/mut-ex/awesome-wm-nice
+-- local nice = require("nice")
+
+
 -- {{{ Error handling
 -- Check if awesome encountered an error during startup and fell back to
 -- another config (This code will only ever execute for the fallback config)
@@ -47,6 +60,10 @@ end
 -- Themes define colours, icons, font and wallpapers.
 beautiful.init(gears.filesystem.get_themes_dir() .. "default/theme.lua")
 
+-- revelation.init()
+
+-- nice()
+
 -- This is used later as the default terminal and editor to run.
 terminal = os.getenv("TERMINAL") or "xterm"
 editor = os.getenv("EDITOR") or "nano"
@@ -64,9 +81,9 @@ awful.layout.layouts = {
     awful.layout.suit.tile,
     -- awful.layout.suit.max.fullscreen,
     awful.layout.suit.max,
+    awful.layout.suit.tile.left,
     awful.layout.suit.floating,
     -- awful.layout.suit.fair,
-    -- awful.layout.suit.tile.left,
     -- awful.layout.suit.tile.bottom,
     -- awful.layout.suit.tile.top,
     -- awful.layout.suit.fair.horizontal,
@@ -271,8 +288,24 @@ rice = {
 
 
 -- {{{ Key bindings
---[[
 globalkeys = gears.table.join(
+    
+
+--[[
+    awful.key({ "Mod1",           }, "Tab",
+      function ()
+          switcher.switch( 1, "Mod1", "Alt_L", "Shift", "Tab")
+      end),
+    
+    awful.key({ "Mod1", "Shift"   }, "Tab",
+      function ()
+          switcher.switch(-1, "Mod1", "Alt_L", "Shift", "Tab")
+      end),
+    awful.key({ modkey,           }, "a",      revelation)
+    ]]
+
+
+--[[
     awful.key({ modkey,           }, "s",      hotkeys_popup.show_help,
               {description="show help", group="awesome"}),
     awful.key({ modkey,           }, "Left",   awful.tag.viewprev,
@@ -408,10 +441,33 @@ globalkeys = gears.table.join(
     -- Menubar
     awful.key({ modkey }, "p", function() menubar.show() end,
               {description = "show the menubar", group = "launcher"})
-)
 ]]
+)
 
 clientkeys = gears.table.join(
+--[[
+    cyclefocus.key({ "Mod1", }, "#49", 1, {
+            cycle_filter = function (c, source_c) return c.class == source_c.class end,
+            keys = { "`", "~" },  -- the keys to be handled, wouldn't be required if the keycode was available in keygrabber.
+    }),
+    cyclefocus.key({ "Mod1", "Shift", }, "#49", -1, {  -- keycode #49 => ^/° on german keyboard, upper left below Escape and next to 1.
+            cycle_filter = function (c, source_c) return c.class == source_c.class end,
+            keys = { "`", "~" },  -- the keys to be handled, wouldn't be required if the keycode was available in keygrabber.
+    }),
+
+    -- modkey+Tab: cycle through all clients.
+    awful.key({ modkey }, "Tab", function(c)
+        cyclefocus.cycle({modifier="Super_L"})
+    end),
+    -- modkey+Shift+Tab: backwards
+    awful.key({ modkey, "Shift" }, "Tab", function(c)
+        cyclefocus.cycle({modifier="Super_L"})
+    end)
+    ]]
+
+
+
+
     -- awful.key({ modkey,           }, "f",
         -- function (c)
             -- c.fullscreen = not c.fullscreen
@@ -626,6 +682,9 @@ end)
 
 -- Add a titlebar if titlebars_enabled is set to true in the rules.
 client.connect_signal("request::titlebars", function(c)
+
+    -- comment out because it is provided by nice plugin
+    --[[
     -- buttons for the titlebar
     local buttons = gears.table.join(
         awful.button({ }, 1, function()
@@ -662,6 +721,7 @@ client.connect_signal("request::titlebars", function(c)
         },
         layout = wibox.layout.align.horizontal
     }
+    ]]
 
     -- Hide title bar if the window is not floating
     if not c.floating then

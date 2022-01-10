@@ -177,27 +177,33 @@
        (str/split-lines)
        (map (fn [line]
               (let [[description shortcut command] (-> line str/trim (str/split #"  +"))
-                    keypresses (str/split shortcut #"\s*;\s*")]
+                    keypresses (-> shortcut
+                                   (str/replace #"\s*\+\s*" "+")
+                                   (str/split #"\s*;\s*"))]
                 {:shortcut shortcut
                  :keypresses keypresses
                  :command command
                  :description description})))))
 
+(defn shortcut->action [{:keys [shortcut keypresses command description]}]
+  {:name (str shortcut "  -  " description)
+   :action (if (= command "-")
+             #(apply shell/sh "xdotool" "key" keypresses)
+             #(run-shortcut-action command))})
+
 (def menu-global-hotkeys
-  (->> (concat (parse-sxhkd-shortcuts (str (getenv "HOME") "/.config/sxhkd/sxhkdrc"))
-               (->> (parse-sxhkd-shortcuts (str keys-path "/paperwm"))
-                    (map #(update % :description (partial str "PaperWM: ")))))
-       (map (fn [{:keys [shortcut keypresses command description]}]
-              {:name (str shortcut "  -  " description)
-               :action #(apply shell/sh (str/split command #"\s+"))}))))
+  (concat
+   (->> (parse-sxhkd-shortcuts (str (getenv "HOME") "/.config/sxhkd/sxhkdrc"))
+        (map (fn [{:keys [shortcut keypresses command description]}]
+               {:name (str shortcut "  -  " description)
+                :action #(apply shell/sh (str/split command #"\s+"))})))
+   (->> (parse-sxhkd-shortcuts (str keys-path "/paperwm"))
+        (map #(update % :description (partial str "PaperWM: ")))
+        (map shortcut->action))))
 
 (defn show-shortcuts [app]
   (run-menu (->> (parse-sxhkd-shortcuts (str keys-path "/" app))
-                 (map (fn [{:keys [shortcut keypresses command description]}]
-                        {:name (str shortcut "  -  " description)
-                         :action (if (= command "-")
-                                   #(apply shell/sh "xdotool" "key" keypresses)
-                                   #(run-shortcut-action command))})))))
+                 (map shortcut->action))))
 
 (def shortcut-apps
   {"\"zathura\", \"Zathura\"" "zathura"

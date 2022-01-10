@@ -2,6 +2,11 @@
 
 ### Launch
 
+# In Gnome Tweaks -> "Keyboard & Mouse" switch "Overview Shortcut" to "Right Super" so that left super is left to work with key grabbing. Then adding this extra shortcut to show the activity overview.
+# Gnome activities overview
+super + @f
+  rice-activities
+
 # Main menu
 super + space
   rice-menu-root
@@ -10,7 +15,8 @@ super + e
   rice-menu-run
 # Terminal
 super + Return
-  rice-menu-root launch-terminal
+  $TERMINAL
+  #rice-menu-root launch-terminal
 
 # Emoji Picker
 super + semicolon
@@ -29,7 +35,7 @@ super + r; f
 ### Session
 
 # Lock screen
-super + escape
+super + Escape
   rice-menu-root lock-screen
 
 # Should not be needed if the lid closed auto suspend works
@@ -48,14 +54,14 @@ super + shift + q
 
 # TODO: try to re-bind as global per-app switcher
 # Switch to next window
-alt + Tab
-  rice-menu-root wm-focus-next-by-index
+# alt + Tab
+  # rice-menu-root wm-focus-next-by-index
 # Switch to prev window
-alt + shift + Tab
-  rice-menu-root wm-focus-prev-by-index
+# alt + shift + Tab
+  # rice-menu-root wm-focus-prev-by-index
 # Switch to another window for current app
-alt + grave
-  true
+# alt + grave
+  # true
 
 # Focus next by index
 super + j
@@ -77,7 +83,7 @@ super + m
 super + w; f
   rice-menu-root wm-window-toggle-fullscreen
 # Toggle floating / stacking
-super + w; s
+{super + w; s, super + g}
   rice-menu-root wm-window-toggle-floating
 # Toggle keep on top
 super + w; k
@@ -101,18 +107,18 @@ hyper
   rice-menu-root wm-minimize-others
 
 # Increase number of masters
-super + period
+super + shift + period
   rice-menu-root wm-increase-master-clients
 # Decrease number of masters
-super + comma
+super + shift + comma
   rice-menu-root wm-decrease-master-clients
 
 
 # Increase master width
-super + shift + period
+super + period
   rice-menu-root wm-increase-master-width
 # Decrease master widrh
-super + shift + comma
+super + comma
   rice-menu-root wm-decrease-master-width
 
 # Move window to screen
@@ -134,20 +140,22 @@ super + shift + v
   rice-menu-root wm-prev-layout
 
 # Go to tag {1-9}
-super + {1-9}
-  true
+# super + {1-9}
+  # true
 # Move window to tag {1-9}
-super + shift + {1-9}
-  true
+# super + shift + {1-9}
+  # true
 # Carry window to tag {1-9}
-super + ctrl + {1-9}
-  true
+# super + ctrl + {1-9}
+  # true
+
 # View next tag
-super + Tab
-  rice-menu-root wm-view-next-tag
+# super + Tab
+  # rice-menu-root wm-view-next-tag
 # View previous tag
-super + shift + Tab
-  rice-menu-root wm-view-prev-tag
+# super + shift + Tab
+  # rice-menu-root wm-view-prev-tag
+
 # View last tag
 hyper
   rice-menu-root wm-view-last-tag
@@ -206,10 +214,10 @@ XF86AudioPlay
 XF86AudioPause
   playerctl pause
 # Player next
-XF86AudioNext
+{XF86AudioNext, super + n}
   playerctl next
 # Player prev
-XF86AudioPrev
+{XF86AudioPrev, super + b}
   playerctl previous
 
 ### Display

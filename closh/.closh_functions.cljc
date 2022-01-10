@@ -78,6 +78,7 @@
 (defabbr nixi "nix-env -i")
 (defabbr nixe "nix-env -e")
 (defabbr nixq "nix-env -q")
+(defabbr nixd "nix develop")
 
 (defalias unf "env NIXPKGS_ALLOW_UNFREE=1")
 

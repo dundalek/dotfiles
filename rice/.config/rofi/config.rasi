@@ -1,3 +1,4 @@
+@theme "rice"
 configuration {
   modi: "window,drun";
   font: "San Francisco Display 13";
@@ -6,6 +7,4 @@ configuration {
   display-drun: "Apps:";
   display-window: "Windows: ";
   lines: 10;
-
-  theme: "rice";
 }
