@@ -39,7 +39,11 @@ set -g __fish_git_prompt_color_cleanstate green --bold
 # set __fish_git_prompt_char_upstream_ahead '+'
 # set __fish_git_prompt_char_upstream_behind '-'
 
-function fish_prompt --description 'Write out the prompt'
+function fish_prompt
+  command powerline-go -shell bare -mode compatible -modules "time,nix-shell,venv,ssh,cwd,perms,git,hg,jobs,exit,root" -git-disable-stats stashed
+end
+
+function fish_prompt_old --description 'Write out the prompt'
   #Save the return status of the previous command
   set stat $status
 
@@ -88,9 +92,9 @@ function fish_prompt --description 'Write out the prompt'
       end
 
       #printf '[%s] %s%s@%s %s%s %s(%s)%s \f\r> ' (date "+%H:%M:%S") "$__fish_color_blue" $USER $__fish_prompt_hostname "$__fish_prompt_cwd" "$PWD" "$__fish_color_status" "$stat" "$__fish_prompt_normal"
-      
+
       # %s%s@%s
-      # "$__fish_color_green" $USER $__fish_prompt_hostname 
+      # "$__fish_color_green" $USER $__fish_prompt_hostname
       printf '%s%s %s%s%s%s $ ' "$__fish_color_grey" (date "+%H:%M") "$__fish_color_blue" "$PWD" "$__fish_prompt_normal" (__fish_git_prompt)
 
       # alternative

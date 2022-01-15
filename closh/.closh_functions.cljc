@@ -10,7 +10,7 @@
 (defalias nvm "fnm")
 
 (defalias s "browser-sync start --server --directory --index=index.html \"--files=**/*\"")
-(defalias ss "browser-sync start --server --index=index.html \"--files='**/*\"")
+(defalias ss "browser-sync start --server --index=index.html \"--files=**/*\"")
 
 (setenv "TODOTXT_AUTO_ARCHIVE" "1")
 (setenv "TODOTXT_DATE_ON_ADD" "1")
