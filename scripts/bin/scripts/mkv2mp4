@@ -1,0 +1,16 @@
+#!/usr/bin/env bb
+;; -*- clojure -*-
+;; vim: set filetype=clojure:
+
+;; When recording video it is better to use MKV because MP4 cannot be recovered
+;; in case of an interruption like crash etc.
+;; However, Github only supports uploading MP4, this little script helps to
+;; convert it.
+
+(require '[babashka.process :refer [process check]])
+(require '[clojure.string :as str])
+
+(doseq [file-in *command-line-args*]
+  (let [file-out (str/replace file-in #".mkv$" ".mp4")]
+    (check (process ["ffmpeg" "-i" file-in "-c" "copy" file-out]
+                    {:inherit true}))))
