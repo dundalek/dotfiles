@@ -1,5 +1,7 @@
 " vim: foldmethod=marker
-" Press zM to close all folds to navigate the strcuture, zR to open all.
+" Press zM to close all folds to navigate the structure, zR to open all.
+" Press zj / zk to jump to next / previous section.
+
 " Global {{{1
 " Set our leader key to space. This needs to be set first before all plugins
 " are loaded.
@@ -16,19 +18,6 @@ let $SHELL = '/bin/bash'
 call plug#begin("~/.vim/plugged")
   " I like to specify full url of the plugin, because one can then press `gx` to open
   " the plugin home page in a web browser.
-
-
-  " Experimental area
-
-  " Lists open buffers in a top bar
-  Plug 'akinsho/nvim-bufferline.lua'
-
-  " Utilitity to surround text, alternative to vim-surround
-  " Add sa{motion/textobject}{addition}
-  " Delete sd{deletion} sdb searches a set of surrounding automatically.
-  " Replace sr{deletion}{addition}
-  Plug 'machakann/vim-sandwich'
-
 
   " Defaults everyone can agree on
   Plug 'https://github.com/tpope/vim-sensible.git'
@@ -50,6 +39,10 @@ call plug#begin("~/.vim/plugged")
   " Light themes
   Plug 'https://github.com/sonph/onehalf.git', { 'rtp': 'vim' }
   Plug 'https://github.com/sainnhe/edge.git' " could use a bit more contrast otherwise pretty good
+  Plug 'chiendo97/intellij.vim'
+  Plug 'mvpopuk/inspired-github.vim'
+  Plug 'Mofiqul/adwaita.nvim'
+  Plug 'https://github.com/projekt0n/github-nvim-theme.git'
   " Plug 'https://github.com/NLKNguyen/papercolor-theme.git'
   " Plug 'Mofiqul/vscode.nvim'
   " Plug 'liuchengxu/space-vim-theme'
@@ -61,16 +54,13 @@ call plug#begin("~/.vim/plugged")
   " Plug 'https://github.com/axvr/photon.vim.git'
   " Plug 'https://github.com/jsit/toast.vim.git'
   " Plug 'https://github.com/kkga/vim-envy.git'
-  " Plug 'chiendo97/intellij.vim'
   " Plug 'chriskempson/tomorrow-theme'
-  "
-  Plug 'https://github.com/projekt0n/github-nvim-theme.git'
+
 
   " Treesitter based - Dark and light themes
   " Plug 'Th3Whit3Wolf/one-nvim'
   " Plug 'lourenci/github-colors'
   " Plug 'marko-cerovac/material.nvim'
-
   Plug 'https://github.com/RRethy/nvim-base16.git'
 
   " Show colors for hex values
@@ -82,8 +72,14 @@ call plug#begin("~/.vim/plugged")
   Plug 'https://github.com/tiagofumo/vim-nerdtree-syntax-highlight.git', { 'on': ['NERDTreeToggle', 'NERDTreeFind'] }
 
   " Alternative tree plugin in lua
-  Plug 'kyazdani42/nvim-web-devicons' " for file icons
-  Plug 'kyazdani42/nvim-tree.lua'
+  " Plug 'kyazdani42/nvim-web-devicons' " for file icons
+  " Plug 'kyazdani42/nvim-tree.lua'
+
+  " Another tree plugin
+  Plug 'nvim-lua/plenary.nvim'
+  Plug 'kyazdani42/nvim-web-devicons'
+  Plug 'MunifTanjim/nui.nvim'
+  Plug 'nvim-neo-tree/neo-tree.nvim'
 
   " Close buffers inteligently
   Plug 'https://github.com/mhinz/vim-sayonara.git', { 'on': 'Sayonara' }
@@ -114,6 +110,12 @@ call plug#begin("~/.vim/plugged")
   " Faster horizontal screen navigation with f, t, F, T
   Plug 'https://github.com/unblevable/quick-scope.git'
 
+  " Utilitity to surround text, alternative to vim-surround
+  " Add sa{motion/textobject}{addition}
+  " Delete sd{deletion} sdb searches a set of surrounding automatically.
+  " Replace sr{deletion}{addition}
+  Plug 'machakann/vim-sandwich'
+
   " Multiple cursors
   Plug 'mg979/vim-visual-multi', {'branch': 'master'}
 
@@ -134,6 +136,10 @@ call plug#begin("~/.vim/plugged")
 
   " Spacemacs-like menu
   Plug 'folke/which-key.nvim'
+
+  " Dressing for improved selection UI that uses telescope
+  Plug 'stevearc/dressing.nvim'
+  Plug 'mrjones2014/legendary.nvim'
 
   " Language client
   Plug 'https://github.com/Olical/conjure.git', { 'for': 'clojure' }
@@ -169,7 +175,96 @@ call plug#begin("~/.vim/plugged")
   Plug 'https://github.com/junegunn/goyo.vim.git', { 'for': 'markdown' }
   " Markdown preview
   Plug 'https://github.com/iamcco/markdown-preview.nvim.git', { 'for': 'markdown', 'do': 'cd app && npm install' }
+
+  " -- Experimental {{{1
+
+  " Scrollbar with useful information like error/warning diagnostics
+  Plug 'petertriho/nvim-scrollbar'
+
+  " Better quickfix window - good for lsp references list with preview
+  Plug 'kevinhwang91/nvim-bqf'
+
+  " Lists open buffers in a top bar
+  Plug 'akinsho/nvim-bufferline.lua'
+
+  " Plug 'kyazdani42/nvim-web-devicons'
+  " Plug 'romgrk/barbar.nvim'
+
+  " Show list of issues from lsp for fixing
+  Plug 'kyazdani42/nvim-web-devicons'
+  Plug 'folke/trouble.nvim'
+
+  " Show floating parts of a buffer
+  Plug 'hoschi/yode-nvim'
+
+  " Smooth scrolling for window movement commands
+  " like <C-u>, <C-d>, <C-b>, <C-f>, <C-y>, <C-e>, zt, zz, zb.
+  " Plug 'karb94/neoscroll.nvim'
+
+  " List projects and jump to them via Telescope
+  Plug 'ahmedkhalf/project.nvim'
+
+
 call plug#end()
+
+
+" Experimental {{{1
+
+lua << EOF
+
+require("trouble").setup {}
+
+-- legendary.nvim {{{1
+-- `setup()` must be called before `require('which-key).register()`
+require('legendary').setup()
+
+require('legendary').bind_commands({
+  { ':g/^\\s*$/d', description = 'Delete blank lines' },
+  { ':! chmod +x %', description = 'Make current file executable' },
+  { ':%bd|e#', description = 'Close other buffers' },
+  { ':ConjureShadowSelect app', description = 'Conjure shadow select app' },
+  { ':ConjureConnect 48888', description = 'Conjure: Pitch Backend REPL' },
+  { ':ConjureConnect 7888', description = 'Conjure: Pitch Frontend REPL' },
+  { ':ConjureConnect 1667', description = 'Conjure: Babashka REPL' },
+  { ':ConjureShadowSelect {name}', description = 'Conjure shadow select', unfinished = true },
+  -- Evaling alert to verify REPL is working and locate which browser provides runtime
+  { ':ConjureEval (js/alert "Hello!")', description = 'Conjure eval alert' },
+
+})
+
+EOF
+
+map <leader><leader> :Legendary<CR>
+" :Legendary " search keymaps, commands, and autocmds
+" :Legendary keymaps " search keymaps
+" :Legendary commands " search commands
+" :Legendary autocmds " search autocmds
+
+
+" -- nvim-scrollbar {{{1
+lua require('scrollbar').setup()
+
+" -- neoscroll.nvim {{{1
+" lua require('neoscroll').setup()
+
+" -- nvim-bqf {{{1
+
+" Better quickfix window - good for lsp references list with preview
+lua require('bqf').setup()
+
+" -- yode-nvim {{{1
+lua require('yode-nvim').setup({})
+map <Leader>yc :YodeCreateSeditorFloating<CR>
+map <Leader>yr :YodeCreateSeditorReplace<CR>
+" these commands fall back to overwritten keys when cursor is in split window
+map <C-W>r :YodeLayoutShiftWinDown<CR>
+map <C-W>R :YodeLayoutShiftWinUp<CR>
+map <C-W>J :YodeLayoutShiftWinBottom<CR>
+map <C-W>K :YodeLayoutShiftWinTop<CR>
+" at the moment this is needed to have no gap for floating windows
+set showtabline=2
+
+
 
 
 " General settings {{{1
@@ -190,18 +285,30 @@ set inccommand=nosplit
 " set clipboard+=unnamedplus
 
 
-
-
 " paste with ctrl+v - clashes with visual block mode
 " nnoremap <C-V> "+gP
 " <C-G>u is to break undo sequence when pasting so that undo will undo the
 " paste but keeps previously typed text (:help i_CTRL-G_u)
 " `] is to jump to mark after pasted text, then switch back to insert mode
-inoremap <C-V> <C-G>u<esc>"+p`]a
+" Buggy : When pasting at the beginning of line it pastes after first
+" character.
+" inoremap <C-V> <C-G>u<esc>"+p`]a
+"inoremap <C-V> <C-G>u<esc>"+gpa
+" <c-o> let to do one normal command and then goes back to insert mode
+" I guess make it work properly we would need to check if we are the the
+" begging and do P otherwise p
+inoremap <C-V> <C-G>u<c-o>"+p
 " copy with ctrl+c
 vnoremap <C-C> "+y
 " cut with ctrl x
 vnoremap <C-X> "+x
+
+" highlight yanked area, useful as a feedback what text got yanked
+augroup highlight_yank
+    autocmd!
+    au TextYankPost * silent! lua vim.highlight.on_yank { higroup="IncSearch", timeout=500 }
+augroup END
+
 
 " Save file with ctrl+s out of habit
 nnoremap <C-s> :w<CR>
@@ -254,15 +361,41 @@ augroup autoread
   " consider hooking it also to BufEnter for inter-vim navigation
 augroup END
 
-" Automatically set terminal title
-augroup autoread
+" Automatically set terminal title: directory - file.ext - NVIM
+augroup autotitle
   autocmd!
   autocmd BufEnter * let &titlestring = fnamemodify(getcwd(), ':t') . " - " . expand("%:t") . " - NVIM"
 augroup END
 set title
 
 " Source the nvim config file after saving it
-autocmd! BufWritePost init.vim source $MYVIMRC
+" After reloading folds are reset to expr for treesitter, so change it back to marker.
+autocmd! BufWritePost init.vim
+  \ source $MYVIMRC
+  \| setlocal foldmethod=marker
+
+" Window and buffer management {{{1
+
+" TAB in general mode will move to next window
+nnoremap <silent> <TAB> :wincmd w<CR>
+" SHIFT-TAB will go back
+nnoremap <silent> <S-TAB> :wincmd W<CR>
+
+" TAB in general mode will move to next buffer
+"nnoremap <silent> <TAB> :bnext<CR>
+" SHIFT-TAB will go back
+"nnoremap <silent> <S-TAB> :bprevious<CR>
+
+" Delete (close) buffer, keep window, saner :bdelete
+nnoremap <leader>d :Sayonara!<CR>
+" Quit window, saner :quit
+nnoremap <leader>q :Sayonara<CR>
+
+" -- bufferline {{{1
+" Experimental: Show list of buffers as tabs
+lua << EOF
+require("bufferline").setup{}
+EOF
 
 " Movement {{{1
 
@@ -279,6 +412,23 @@ inoremap <Up> <C-o>gk
 inoremap <Down> <C-o>gj
 " nnoremap <silent> ^ g^
 " nnoremap <silent> $ g$
+
+" Convenient movements back and forth
+" https://ddrscott.github.io/blog/2016/vim-toggle-movement/
+function! ToggleMovement(firstOp, thenOp)
+  let pos = getpos('.')
+  let c = v:count > 0 ? v:count : ''
+  execute "normal! " . c . a:firstOp
+  if pos == getpos('.')
+    execute "normal! " . c . a:thenOp
+  endif
+endfunction
+" 0 is more reachable, make it behave like ^ to go to first non-whitespace on
+" the line. Pres 0 again to go to the beginning.
+nnoremap <silent> 0 :call ToggleMovement('^', '0')<CR>
+" G goes to beginning, pressing G again goes to the end
+nnoremap <silent> G :call ToggleMovement('G', 'gg')<CR>
+" nnoremap <silent> gg :call ToggleMovement('gg', 'G')<CR>
 
 " Trigger a highlight with quuick scope in the appropriate direction when pressing these keys:
 let g:qs_highlight_on_keys = ['f', 'F', 't', 'T']
@@ -322,28 +472,6 @@ nmap <silent> <C-_>  gcc
 vmap <silent> <C-_>  gcgv
 
 " ====
-" Window and buffer management {{{1
-
-" TAB in general mode will move to next window
-nnoremap <silent> <TAB> :wincmd w<CR>
-" SHIFT-TAB will go back
-nnoremap <silent> <S-TAB> :wincmd W<CR>
-
-" TAB in general mode will move to next buffer
-"nnoremap <silent> <TAB> :bnext<CR>
-" SHIFT-TAB will go back
-"nnoremap <silent> <S-TAB> :bprevious<CR>
-
-" Delete (close) buffer
-nnoremap <leader>d :Sayonara<CR>
-" Quit window
-nnoremap <leader>q :quit<CR>
-
-" -- bufferline {{{1
-" Experimental: Show list of buffers as tabs
-lua << EOF
-require("bufferline").setup{}
-EOF
 
 
 " Theme {{{1
@@ -357,12 +485,16 @@ syntax enable
 set background=dark " for the dark version
 colorscheme tokyonight
 
-highlight link LspCodeLens Comment
-" highlight link LspCodeLensSeparator Comment
+" set background=light
+" let g:adwaita_mode = "light"
+" colorscheme adwaita
 
-" set background=light " for the light version
+" set background=light
+" colorscheme intellij
 " colorscheme onehalflight
 
+" colorscheme inspired-github
+" colorscheme github_light
 
 " colorscheme one-nvim
 " colorscheme edge
@@ -377,15 +509,18 @@ highlight link LspCodeLens Comment
 
 " colorscheme base16-zenburn
 
+" Code lens is an information line from LSP like number of references or tests
+highlight link LspCodeLens Comment
+" highlight link LspCodeLensSeparator Comment
 
-
-" lua <<EOF
-" require("github-theme").setup({
-  " themeStyle = "light",
-  " -- ... your github-theme config
-" })
-" EOF
-
+" Provides :SyntaxQuery command to print syntax group for a location under
+" cursor to debug syntax highlighting
+function! s:syntax_query() abort
+  for id in synstack(line("."), col("."))
+    echo synIDattr(id, "name")
+  endfor
+endfunction
+command! SyntaxQuery call s:syntax_query()
 
 " Because colorscheme can be only set globally, there is autocmd to set
 " default theme back in when using override for specific lang (e.g. markdown)
@@ -399,6 +534,27 @@ highlight link LspCodeLens Comment
 " Show colors for hex values
 " names=false to not highlight color names like Green
 lua require'colorizer'.setup(nil, {names=false})
+
+
+" Project management {{{1
+
+lua << EOF
+  require("project_nvim").setup {
+    -- defaults seem to be overall pretty good
+
+    -- don't manually change directory - it seems to get clojure-lsp confused and makes it spinning
+    manual_mode = true,
+
+    -- Don't calculate root dir on specific directories
+    exclude_dirs = { "~/Dropbox/*" },
+
+    -- show a message when project.nvim changes directory
+    silent_chdir = false,
+  }
+
+  -- TODO bind :Telescope projects to some shortcut
+  require('telescope').load_extension('projects')
+EOF
 
 " File Explorer {{{1
 
@@ -416,6 +572,41 @@ augroup END
 " Toggle
 nnoremap <silent> <leader>b :NERDTreeToggle<CR>
 nnoremap <silent> <C-bslash> :NERDTreeFind<CR>
+
+" -- neo-tree {{{1
+
+" Shows opened buffers in a tree, maybe bind it to some shortcut
+" :Neotree source=buffers
+
+lua << END
+
+vim.cmd([[ let g:neo_tree_remove_legacy_commands = 1 ]])
+
+require("neo-tree").setup({
+  default_component_configs = {
+    indent = {
+      indent_size = 1,
+      padding = 0, -- extra padding on left hand side
+      -- indent guides
+      with_markers = false,
+    },
+  },
+  window = {
+    position = "right",
+    width = 30,
+  },
+  filesystem = {
+    filtered_items = {
+      -- show hidden files like dotfiles and git ignored
+      visible = true,
+    },
+  },
+})
+END
+
+nnoremap <silent> <leader>b :Neotree toggle=true<CR>
+nnoremap <silent> <C-bslash> :Neotree reveal=true<CR>
+
 
 " -- nvimtree {{{1
 let g:nvim_tree_side = 'right'
@@ -562,6 +753,7 @@ lua <<EOF
       ['<C-e>'] = cmp.mapping.close(),
       -- Changed default for enter to behave as newline if no item is selected
       ['<CR>'] = cmp.mapping.confirm({ select = false }),
+      -- Read :help ins-completion but stayed a lowly tab-completer
       ['<Tab>'] = cmp.mapping(cmp.mapping.select_next_item(), { 'i', 's' }),
     },
     sources = {
@@ -636,6 +828,14 @@ nnoremap <space>ls :Telescope lsp_document_symbols<cr>
 
 lua << EOF
 
+-- symbols-outline.nvim
+vim.g.symbols_outline = {
+  keymaps = {
+    -- besides enter also mouse double-click to go to location
+    goto_location = { "<Cr>", "<2-LeftMouse>" },
+  },
+}
+
 -- Use an on_attach function to only map the following keys
 -- after the language server attaches to the current buffer
 local on_attach = function(client, bufnr)
@@ -684,6 +884,7 @@ local on_attach = function(client, bufnr)
   -- nnoremap <space>lo :SymbolsOutline<cr>
 
   -- Display code lenses which show for example number of references and tests of a funtion
+
   if client.resolved_capabilities.code_lens then
     vim.cmd [[
       augroup lsp_codelens
@@ -698,7 +899,7 @@ local on_attach = function(client, bufnr)
   if client.resolved_capabilities.document_highlight then
     vim.cmd [[
       augroup lsp_highlight
-        autocmd!
+        autocmd! * <buffer>
         autocmd CursorHold  <buffer> lua vim.lsp.buf.document_highlight()
         autocmd CursorHoldI <buffer> lua vim.lsp.buf.document_highlight()
         autocmd CursorMoved <buffer> lua vim.lsp.buf.clear_references()
@@ -743,6 +944,13 @@ require "auto-lsp".setup{
     "zeta_note", "zk",
     -- prefer clangd
     "ccls",
+
+    "flux-lsp",
+
+    "ngserver",
+
+    -- configured manually due to having issues installing it via nix
+    "clojure_lsp" ,
   },
   default_config = {
     on_attach = on_attach,
@@ -752,18 +960,10 @@ require "auto-lsp".setup{
     capabilities = capabilities,
   },
   configs = {
-    clojure_lsp = {
-      -- Override the defaut config to set root in the top-level of a monorepo
-      root_dir = util.root_pattern(".git"),
-      on_attach = on_attach,
-      flags = {
-        debounce_text_changes = 150,
-      },
-      capabilities = capabilities,
-    },
+    -- clojure_lsp = { }
     -- https://github.com/bash-lsp/bash-language-server/issues/104#issuecomment-848052436
     efm = {
-      filetypes = {"sh", "markdown"},
+      filetypes = { "markdown", "sh",  "vim" },
       on_attach = function(client, bufnr)
         local function buf_set_keymap(...) vim.api.nvim_buf_set_keymap(bufnr, ...) end
         local function buf_set_option(...) vim.api.nvim_buf_set_option(bufnr, ...) end
@@ -776,19 +976,30 @@ require "auto-lsp".setup{
       flags = {
         debounce_text_changes = 150,
       },
-      init_options = {documentFormatting = true, documentSymbol = true},
+      init_options = {
+        documentFormatting = true,
+        documentSymbol = true,
+        hover = true,
+      },
       settings = {
           rootMarkers = {".git/"},
           languages = {
+              markdown = {
+                { symbolCommand = 'markdown-symbols' },
+                -- add dummy hover command which symbols-outline plugin expects
+                { hoverCommand = 'echo' },
+              },
               sh = {
                 {lintCommand = 'shellcheck -f gcc -x',
                  lintSource = 'shellcheck',
                  lintFormats= {'%f:%l:%c: %trror: %m', '%f:%l:%c: %tarning: %m', '%f:%l:%c: %tote: %m'}}
               },
-              markdown = {
-                {symbolCommand = 'markdown-symbols'}
-              }
-          }
+              vim = {
+                { symbolCommand = 'vim-marker-symbols' },
+                -- add dummy hover command which symbols-outline plugin expects
+                { hoverCommand = 'echo' },
+              },
+          },
       },
       capabilities = capabilities,
     },
@@ -806,6 +1017,17 @@ require "auto-lsp".setup{
   },
 }
 
+
+nvim_lsp.clojure_lsp.setup {
+  -- Override the defaut config to set root in the top-level of a monorepo
+  root_dir = util.root_pattern(".git"),
+  on_attach = on_attach,
+  flags = {
+    debounce_text_changes = 150,
+  },
+  capabilities = capabilities,
+}
+
 --[[
 vim.lsp.set_log_level("debug")
 ]]
@@ -820,6 +1042,8 @@ EOF
 
 " -- Markdown {{{1
 
+" Plugin with markdown folding is built-in, just enable folding support
+let g:markdown_folding = 1
 
 " Turn spellcheck on for markdown files
 " Look how to do it better with :help ftplugin
@@ -835,16 +1059,12 @@ augroup lang_markdown
 
   " Have all folds expanded by default
   " Don't open autocomplete buffer by default
-  " Table of contents, for now o shortcut for Outline
   autocmd FileType markdown
     \  setlocal linebreak
     \| lua require('cmp').setup.buffer { enabled = false }
-    " \| nnoremap <LocalLeader>o <Cmd>:Toc<CR>
     " \| setlocal foldmethod=expr
     " \| setlocal foldexpr=StackedMarkdownFolds()
     " \| normal zR
-
-    " let g:markdown_folding = 1
 
     " \ setlocal nonumber
     " \|  setlocal spell " spelling error highlights are too distracting, it
@@ -870,6 +1090,16 @@ augroup lang_liz
   autocmd! BufNewFile,BufRead *.liz
     \  setlocal syntax=clojure
     \| setlocal filetype=clojure
+augroup END
+
+" -- TypeScript {{{1
+
+augroup lang_typescript
+  autocmd!
+  " Dim type annotations as comments for better code readability
+  " TSParameter - but that also dims parameters for regular functions
+  autocmd FileType typescript
+    \ highlight! link TSType Comment
 augroup END
 
 " Space menu {{{1
@@ -901,6 +1131,7 @@ EOF
 nnoremap <silent> <leader>gg :lua __fterm_lazygit()<cr>
 
 nnoremap <silent> <leader>gb = :Telescope git_branches<cr>
+nnoremap <silent> <leader>gl = :Git blame<cr>
 
 " -- which-key.nvim {{{1
 
@@ -919,5 +1150,14 @@ wk.register({
   -- ["<leader>fr"] = { "<cmd>Telescope oldfiles<cr>", "Open Recent File" },
   -- ["<leader>fn"] = { "<cmd>enew<cr>", "New File" },
 })
+
+wk.register({
+  j = {
+    name = "Jump",
+    j = { "<cmd>:Buffers<cr>", "Buffers" },
+    k = { "<cmd>:Neotree toggle=true<cr>", "File Tree: Toggle" },
+    l = { "<cmd>:Neotree reveal=true<cr>", "File Tree: Reveal current" },
+  },
+}, { prefix = "<leader>" })
 
 EOF

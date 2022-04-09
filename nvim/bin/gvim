@@ -1,3 +1,4 @@
 #!/usr/bin/env sh
 
 exec alacritty --class "NVIM,NVIM" -e nvim "$@"
+#exec gnome-terminal  --class "NVIM" -e nvim "$@"

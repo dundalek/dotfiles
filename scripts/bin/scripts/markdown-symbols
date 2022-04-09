@@ -19,12 +19,16 @@
   (when-some [[_ level title] (re-matches heading-pattern line)]
     (str "interface!" (pad (dec (count level))) title)))
 
+(defn parse-lines-xform [fname]
+  (keep-indexed
+   (fn [idx line]
+     (when-some [heading (match-heading line)]
+       (str fname ":" (inc idx) ":" heading)))))
+
 (let [fname (first *command-line-args*)]
   (with-open [rdr (io/reader fname)]
     (let [lines (->> (line-seq rdr)
-                     (keep-indexed (fn [idx line]
-                                     (when-some [heading (match-heading line)]
-                                       (str fname ":" (inc idx) ":" heading)))))]
+                     (sequence (parse-lines-xform fname)))]
       (doseq [line lines]
         (println line)))))
 

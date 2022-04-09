@@ -1,0 +1,37 @@
+#!/usr/bin/env bb
+;; -*- clojure -*-
+;; vim: set filetype=clojure:
+
+;; improvements:
+;; - flatten
+
+
+(require '[clojure.java.io :as io])
+(require '[clojure.string :as str])
+
+(def marker-pattern #"^(.*)s*\{\{\{(\d+)s*(.*)$")
+(def comment-pattern #"^\s*\" ?")
+
+(defn pad [n]
+  (->> (repeat n "  ")
+       (str/join "")))
+
+(defn match-heading [line]
+  (when-some [[_ before level after] (re-matches marker-pattern line)]
+    (let [title (->> [before after]
+                     (remove str/blank?)
+                     (str/join " "))
+          title (str/replace title comment-pattern "")]
+      (str "interface!" (pad (dec (count level))) title))))
+
+(defn parse-lines-xform [fname]
+  (keep-indexed (fn [idx line]
+                  (when-some [heading (match-heading line)]
+                    (str fname ":" (inc idx) ":" heading)))))
+
+(let [fname (first *command-line-args*)]
+  (with-open [rdr (io/reader fname)]
+    (let [lines (->> (line-seq rdr)
+                     (sequence (parse-lines-xform fname)))]
+      (doseq [line lines]
+        (println line)))))
