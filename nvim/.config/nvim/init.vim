@@ -12,7 +12,123 @@ let g:maplocalleader = ","
 set shell=/usr/bin/env\ bash
 let $SHELL = '/bin/bash'
 
-" let g:polyglot_disabled = ['markdown']
+" let g:sexp_filetypes = ''
+
+let g:sexp_enable_insert_mode_mappings = 0
+
+" Disable vim-sexp mappings that use localleader
+let g:sexp_mappings = {
+  \ 'sexp_round_head_wrap_list':      '',
+  \ 'sexp_round_tail_wrap_list':      '',
+  \ 'sexp_square_head_wrap_list':     '',
+  \ 'sexp_square_tail_wrap_list':     '',
+  \ 'sexp_curly_head_wrap_list':      '',
+  \ 'sexp_curly_tail_wrap_list':      '',
+  \ 'sexp_round_head_wrap_element':   '',
+  \ 'sexp_round_tail_wrap_element':   '',
+  \ 'sexp_square_head_wrap_element':  '',
+  \ 'sexp_square_tail_wrap_element':  '',
+  \ 'sexp_curly_head_wrap_element':   '',
+  \ 'sexp_curly_tail_wrap_element':   '',
+  \ 'sexp_insert_at_list_head':       '',
+  \ 'sexp_insert_at_list_tail':       '',
+  \ 'sexp_splice_list':               '',
+  \ 'sexp_convolute':                 '',
+  \ 'sexp_raise_list':                '',
+  \ 'sexp_raise_element':             '',
+  \
+  \ 'sexp_swap_list_backward':        '',
+  \ 'sexp_swap_list_forward':         '',
+  \ 'sexp_swap_element_backward':     '',
+  \ 'sexp_swap_element_forward':      '',
+  \ 'sexp_emit_head_element':         '',
+  \ 'sexp_emit_tail_element':         '',
+  \ 'sexp_capture_prev_element':      '',
+  \ 'sexp_capture_next_element':      '',
+  \ }
+
+" Disable word movement overrides for vim-sexp-mappings-for-regular-people
+" let g:sexp_no_word_maps = 1
+
+function! WithParinfer(op)
+  " turn on parinfer to not interfere with sexp manipulation
+  let g:parinfer_enabled = 0
+
+  " run sexp command
+  " maybe add <silent>
+  execute "normal \<Plug>(" . a:op . ")"
+
+  " switching back parinfer in paren mode will make it correct indentation
+  let g:parinfer_mode = 'paren'
+  let g:parinfer_enabled = 1
+
+endfunction
+
+function! s:map_parinfer_sexp(binding, op)
+  " switching back parinfer to smart mode after indentation gets corrected
+  execute 'nmap <buffer>' a:binding ':call WithParinfer("'.a:op.'")<cr>:let g:parinfer_mode="smart"<cr>'
+endfunction
+
+function! ToggleMovementX(firstOp, thenOp)
+  let pos = getpos('.')
+  let c = v:count > 0 ? v:count : ''
+  execute "normal " . c . a:firstOp
+  if pos == getpos('.')
+    execute "normal! " . c . a:thenOp
+  endif
+endfunction
+
+function! s:sexp_mappings() abort
+  nmap <buffer> B   :call ToggleMovementX("\<Plug>(sexp_move_to_prev_element_head)", 'h')<cr>
+  nmap <buffer> W   :call ToggleMovementX("\<Plug>(sexp_move_to_next_element_head)", 'l')<cr>
+  nmap <buffer> gE  :call ToggleMovementX("\<Plug>(sexp_move_to_prev_element_tail)", 'h')<cr>
+  nmap <buffer> E   :call ToggleMovementX("\<Plug>(sexp_move_to_next_element_tail)", 'l')<cr>
+
+  " nmap <buffer> B   <Plug>(sexp_move_to_prev_element_head)
+  " nmap <buffer> W   <Plug>(sexp_move_to_next_element_head)
+  " nmap <buffer> gE  <Plug>(sexp_move_to_prev_element_tail)
+  " nmap <buffer> E   <Plug>(sexp_move_to_next_element_tail)
+  xmap <buffer> B   <Plug>(sexp_move_to_prev_element_head)
+  xmap <buffer> W   <Plug>(sexp_move_to_next_element_head)
+  xmap <buffer> gE  <Plug>(sexp_move_to_prev_element_tail)
+  xmap <buffer> E   <Plug>(sexp_move_to_next_element_tail)
+  omap <buffer> B   <Plug>(sexp_move_to_prev_element_head)
+  omap <buffer> W   <Plug>(sexp_move_to_next_element_head)
+  omap <buffer> gE  <Plug>(sexp_move_to_prev_element_tail)
+  omap <buffer> E   <Plug>(sexp_move_to_next_element_tail)
+
+  nmap <buffer> <I  <Plug>(sexp_insert_at_list_head)
+  nmap <buffer> >I  <Plug>(sexp_insert_at_list_tail)
+  call s:map_parinfer_sexp('<f', 'sexp_swap_list_backward')
+  call s:map_parinfer_sexp('>f', 'sexp_swap_list_forward')
+  call s:map_parinfer_sexp('<e', 'sexp_swap_element_backward')
+  call s:map_parinfer_sexp('>e', 'sexp_swap_element_forward')
+  call s:map_parinfer_sexp('>(', 'sexp_emit_head_element')
+  call s:map_parinfer_sexp('<)', 'sexp_emit_tail_element')
+  call s:map_parinfer_sexp('<(', 'sexp_capture_prev_element')
+  call s:map_parinfer_sexp('>)', 'sexp_capture_next_element')
+
+  call s:map_parinfer_sexp('<M-k>', 'sexp_swap_list_backward')
+  call s:map_parinfer_sexp('<M-j>', 'sexp_swap_list_forward')
+  call s:map_parinfer_sexp('<M-h>', 'sexp_swap_element_backward')
+  call s:map_parinfer_sexp('<M-l>', 'sexp_swap_element_forward')
+  call s:map_parinfer_sexp('<M-S-j>', 'sexp_emit_head_element')
+  call s:map_parinfer_sexp('<M-S-k>', 'sexp_emit_tail_element')
+  call s:map_parinfer_sexp('<M-S-h>', 'sexp_capture_prev_element')
+  call s:map_parinfer_sexp('<M-S-l>', 'sexp_capture_next_element')
+
+
+  call s:map_parinfer_sexp('<O', 'sexp_raise_list')
+  call s:map_parinfer_sexp('<o', 'sexp_raise_element')
+  call s:map_parinfer_sexp('>O', 'sexp_splice_list')
+  call s:map_parinfer_sexp('>o', 'sexp_convolute')
+endfunction
+
+augroup parinfer_sexp
+  autocmd!
+  execute 'autocmd FileType' get(g:, 'sexp_filetypes', 'lisp,scheme,clojure') 'call s:sexp_mappings()'
+  augroup END
+augroup END
 
 " Plugins {{{1
 call plug#begin("~/.vim/plugged")
@@ -84,6 +200,9 @@ call plug#begin("~/.vim/plugged")
   " Close buffers inteligently
   Plug 'https://github.com/mhinz/vim-sayonara.git', { 'on': 'Sayonara' }
 
+  " Open file under cursor with gf relative to current file path
+  Plug 'https://github.com/kkoomen/gfi.vim.git'
+
   " Fuzzy file serch
   Plug 'https://github.com/junegunn/fzf.git', { 'dir': '~/.fzf', 'do': './install --all' }
   Plug 'https://github.com/junegunn/fzf.vim.git'
@@ -119,6 +238,8 @@ call plug#begin("~/.vim/plugged")
   " Multiple cursors
   Plug 'mg979/vim-visual-multi', {'branch': 'master'}
 
+  Plug 'terryma/vim-expand-region'
+
   " Toggling comments
   " Plug 'https://github.com/preservim/nerdcommenter.git'
   Plug 'numToStr/Comment.nvim'
@@ -143,7 +264,13 @@ call plug#begin("~/.vim/plugged")
 
   " Language client
   Plug 'https://github.com/Olical/conjure.git', { 'for': 'clojure' }
+
   Plug 'https://github.com/eraserhd/parinfer-rust.git', { 'for': 'clojure', 'do': 'nix-shell --run \"cargo build --release \"' }
+
+  " Structural editing of s-expressions ala paredit - barfing, slurping, etc.
+  Plug 'guns/vim-sexp'
+  Plug 'tpope/vim-repeat'
+  " Plug 'tpope/vim-sexp-mappings-for-regular-people'
 
   Plug 'neovim/nvim-lspconfig'
 
@@ -291,17 +418,14 @@ set inccommand=nosplit
 " paste but keeps previously typed text (:help i_CTRL-G_u)
 " `] is to jump to mark after pasted text, then switch back to insert mode
 " Buggy : When pasting at the beginning of line it pastes after first
-" character.
-" inoremap <C-V> <C-G>u<esc>"+p`]a
-"inoremap <C-V> <C-G>u<esc>"+gpa
-" <c-o> let to do one normal command and then goes back to insert mode
-" I guess make it work properly we would need to check if we are the the
-" begging and do P otherwise p
-inoremap <C-V> <C-G>u<c-o>"+p
-" copy with ctrl+c
-vnoremap <C-C> "+y
+" character. I guess make it work properly we would need to check if we are
+" at the begging and do P otherwise p.
+inoremap <C-v> <C-g>u<esc>"+p`]a
+" copy with ctrl+c, make primary selection and clipboard content the same
+" by coping first to primary selection, then set clipboard to that.
+vnoremap <C-c> "*y :let @+=@*<cr>
 " cut with ctrl x
-vnoremap <C-X> "+x
+vnoremap <C-x> "*x :let @+=@*<cr>
 
 " highlight yanked area, useful as a feedback what text got yanked
 augroup highlight_yank
@@ -1159,5 +1283,9 @@ wk.register({
     l = { "<cmd>:Neotree reveal=true<cr>", "File Tree: Reveal current" },
   },
 }, { prefix = "<leader>" })
+
+wk.register({
+  r = { "<cmd>:set relativenumber!<cr>", "Toggle relative line numbers" },
+}, { prefix = "<localleader>" })
 
 EOF
