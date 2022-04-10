@@ -575,40 +575,46 @@ vmap <silent> <C-_>  gcgv
 " ====
 
 
-" Theme {{{1
+" Theme / Colorscheme {{{1
 if has("termguicolors")
   set termguicolors
 endif
 syntax enable
 
+" Set colorscheme only once so that manually switch colorscheme does not get
+" overwritten after config hot-reload.
+if !get(g:, 'initial_colorcheme_selected')
+  " Browse through available themes with :Telescope colorscheme
+  let g:initial_colorcheme_selected = 1
 
-" Browse through available themes with :Telescope colorscheme
-set background=dark " for the dark version
-colorscheme tokyonight
+  set background=dark " for the dark version
+  colorscheme tokyonight
+  " colorscheme base16-zenburn
 
-" set background=light
-" let g:adwaita_mode = "light"
-" colorscheme adwaita
+  " === light themes
 
-" set background=light
-" colorscheme intellij
-" colorscheme onehalflight
+  " set background=light
+  " colorscheme adwaita
+  let g:adwaita_mode = "light"
 
-" colorscheme inspired-github
-" colorscheme github_light
+  " colorscheme intellij
+  " colorscheme onehalflight
 
-" colorscheme one-nvim
-" colorscheme edge
-" colorscheme github-colors
-" `
-" colorscheme base16-cupertino
-" colorscheme base16-edge-light
-" colorscheme base16-github
-" colorscheme base16-google-light
-" colorscheme base16-one-light
-" colorscheme base16-unikitty-light
+  " colorscheme inspired-github
+  " colorscheme github_light
 
-" colorscheme base16-zenburn
+  " colorscheme one-nvim
+  " colorscheme edge
+  " colorscheme github-colors
+
+  " colorscheme base16-cupertino
+  " colorscheme base16-edge-light
+  " colorscheme base16-github
+  " colorscheme base16-google-light
+  " colorscheme base16-one-light
+  " colorscheme base16-unikitty-light
+endif
+
 
 " Code lens is an information line from LSP like number of references or tests
 highlight link LspCodeLens Comment
