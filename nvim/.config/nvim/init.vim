@@ -13,6 +13,7 @@ set shell=/usr/bin/env\ bash
 let $SHELL = '/bin/bash'
 
 " let g:sexp_filetypes = ''
+" let g:parinfer_enabled = 0
 
 let g:sexp_enable_insert_mode_mappings = 0
 
@@ -268,7 +269,11 @@ call plug#begin("~/.vim/plugged")
   Plug 'https://github.com/eraserhd/parinfer-rust.git', { 'for': 'clojure', 'do': 'nix-shell --run \"cargo build --release \"' }
 
   " Structural editing of s-expressions ala paredit - barfing, slurping, etc.
-  Plug 'guns/vim-sexp'
+  " Plug 'guns/vim-sexp'
+  " Use snoe's fork which includes improvements to preserve cursor position and recursive capture.
+  " https://github.com/guns/vim-sexp/pull/12
+  " https://github.com/guns/vim-sexp/pull/15
+  Plug 'snoe/vim-sexp', { 'commit': '4161f5c01504b77ab63f2957b943fca0c6e12e83' }
   Plug 'tpope/vim-repeat'
   " Plug 'tpope/vim-sexp-mappings-for-regular-people'
 
@@ -285,7 +290,7 @@ call plug#begin("~/.vim/plugged")
   Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}  " We recommend updating the parsers on update
 
   " Display treesitter parser tree, open with :TSPlaygroundToggle
-  " Plug 'nvim-treesitter/playground'
+  Plug 'nvim-treesitter/playground', { 'on': 'TSPlaygroundToggle' }
 
   " A tree like view for symbols in Neovim using the Language Server Protocol
   Plug 'https://github.com/simrat39/symbols-outline.nvim.git'
