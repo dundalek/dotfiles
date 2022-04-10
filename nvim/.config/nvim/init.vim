@@ -341,31 +341,8 @@ lua << EOF
 
 require("trouble").setup {}
 
--- legendary.nvim {{{1
--- `setup()` must be called before `require('which-key).register()`
-require('legendary').setup()
-
-require('legendary').bind_commands({
-  { ':g/^\\s*$/d', description = 'Delete blank lines' },
-  { ':! chmod +x %', description = 'Make current file executable' },
-  { ':%bd|e#', description = 'Close other buffers' },
-  { ':ConjureShadowSelect app', description = 'Conjure shadow select app' },
-  { ':ConjureConnect 48888', description = 'Conjure: Pitch Backend REPL' },
-  { ':ConjureConnect 7888', description = 'Conjure: Pitch Frontend REPL' },
-  { ':ConjureConnect 1667', description = 'Conjure: Babashka REPL' },
-  { ':ConjureShadowSelect {name}', description = 'Conjure shadow select', unfinished = true },
-  -- Evaling alert to verify REPL is working and locate which browser provides runtime
-  { ':ConjureEval (js/alert "Hello!")', description = 'Conjure eval alert' },
-
-})
 
 EOF
-
-map <leader><leader> :Legendary<CR>
-" :Legendary " search keymaps, commands, and autocmds
-" :Legendary keymaps " search keymaps
-" :Legendary commands " search commands
-" :Legendary autocmds " search autocmds
 
 
 " -- nvim-scrollbar {{{1
@@ -433,11 +410,11 @@ augroup highlight_yank
     au TextYankPost * silent! lua vim.highlight.on_yank { higroup="IncSearch", timeout=500 }
 augroup END
 
-
 " Save file with ctrl+s out of habit
 nnoremap <C-s> :w<CR>
 " <C-G>u to break undo sequence with save point
-inoremap <C-s> <C-G>u<Cmd>:w<CR>
+" experiment - also go to normal mode after save with <esc>
+inoremap <C-s> <C-G>u<Cmd>:w<CR><esc>
 vnoremap <C-s> <Cmd>:w<CR>
 
 " Split to right and bottom
@@ -803,17 +780,32 @@ let g:fzf_action = {
 lua << END
 require('telescope').setup({
   defaults = {
+    -- Using vertical strategy because not having cut-off list entries is more
+    -- important for narrower window size. TODO: explore flex sizing to switch to
+    -- horizontal layout for wider window size.
     layout_strategy = "vertical",
-
+    -- Default cycle scroll strategy is confusing, don't wraparound at the end.
+    -- One can also use gg and G to jump to the other end.
+    scroll_strategy = "limit",
     --layout_config = {
       -- vertical = { width = 0.5 }
       -- other layout configuration here
     --},
-    -- other defaults configuration here
   },
   pickers = {
     colorscheme = {
       enable_preview = true,
+    },
+    lsp_document_symbols = {
+      -- For document symbols (which is used also for markdown heading jumping)
+      -- have the ascending sorting so that entries matcher order in the file
+      sorting_strategy = "ascending",
+      layout_strategy = "vertical",
+      layout_config = {
+        prompt_position = "top",
+        mirror = true,
+        preview_height = 0.3,
+      },
     },
   },
 })
@@ -1257,9 +1249,35 @@ nnoremap <silent> <leader>gg :lua __fterm_lazygit()<cr>
 nnoremap <silent> <leader>gb = :Telescope git_branches<cr>
 nnoremap <silent> <leader>gl = :Git blame<cr>
 
-" -- which-key.nvim {{{1
+" -- legendary.nvim {{{1
 
+map <leader><leader> :Legendary<CR>
+" :Legendary " search keymaps, commands, and autocmds
+" :Legendary keymaps " search keymaps
+" :Legendary commands " search commands
+" :Legendary autocmds " search autocmds
+"
 lua << EOF
+
+-- `setup()` must be called before `require('which-key).register()`
+require('legendary').setup()
+
+require('legendary').bind_commands({
+  { ':g/^\\s*$/d', description = 'Delete blank lines' },
+  { ':! chmod +x %', description = 'Make current file executable' },
+  { ':%bd|e#', description = 'Close other buffers' },
+  { ':ConjureShadowSelect app', description = 'Conjure shadow select app' },
+  { ':ConjureShadowSelect {name}', description = 'Conjure shadow select', unfinished = true },
+  { ':ConjureConnect 48888', description = 'Conjure: Pitch Backend REPL' },
+  { ':ConjureConnect 7888', description = 'Conjure: Pitch Frontend REPL' },
+  { ':ConjureConnect 1667', description = 'Conjure: Babashka REPL' },
+  -- Evaling alert to verify REPL is working and locate which browser provides runtime
+  { ':ConjureEval (js/alert "Hello!")', description = 'Conjure eval alert' },
+  { ':Telescope builtin', description = 'Telescope bultins' },
+
+})
+
+-- which-key.nvim {{{1
 
 local wk = require("which-key")
 
