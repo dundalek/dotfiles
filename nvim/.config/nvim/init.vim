@@ -344,22 +344,25 @@ call plug#end()
 
 lua << EOF
 
+-- `setup()` must be called before `require('which-key).register()`
+require('legendary').setup()
+
+
 require("trouble").setup {}
 
+-- nvim-scrollbar {{{1
+require('scrollbar').setup()
+
+-- neoscroll.nvim {{{1
+-- require('neoscroll').setup()
+
+-- nvim-bqf {{{1
+
+
+-- Better quickfix window - good for lsp references list with preview
+require('bqf').setup()
 
 EOF
-
-
-" -- nvim-scrollbar {{{1
-lua require('scrollbar').setup()
-
-" -- neoscroll.nvim {{{1
-" lua require('neoscroll').setup()
-
-" -- nvim-bqf {{{1
-
-" Better quickfix window - good for lsp references list with preview
-lua require('bqf').setup()
 
 " -- yode-nvim {{{1
 lua require('yode-nvim').setup({})
@@ -562,7 +565,7 @@ nnoremap S :%s//g<Left><Left>
 vnoremap // y/\V<C-R>=escape(@",'/\')<CR><CR>
 
 " Make gf create a new file if it not exists
-:map gf :e <cfile><CR>
+map gf :e <cfile><CR>
 
 " -- Comment.nvim {{{1
 " Add spaces after comment delimiters by default (nerdcommenter)
@@ -576,9 +579,6 @@ lua require('Comment').setup()
 " vnoremap <silent> <C-_>  <cmd>:lua require('Comment').toggle()<CR>gv
 nmap <silent> <C-_>  gcc
 vmap <silent> <C-_>  gcgv
-
-" ====
-
 
 " Theme / Colorscheme {{{1
 if has("termguicolors")
@@ -690,34 +690,36 @@ nnoremap <silent> <C-bslash> :NERDTreeFind<CR>
 " Shows opened buffers in a tree, maybe bind it to some shortcut
 " :Neotree source=buffers
 
-lua << END
+" Neotree seems to lag and block UI in larger projects
 
-vim.cmd([[ let g:neo_tree_remove_legacy_commands = 1 ]])
+" lua << END
+"
+" vim.cmd([[ let g:neo_tree_remove_legacy_commands = 1 ]])
+"
+" require("neo-tree").setup({
+"   default_component_configs = {
+"     indent = {
+"       indent_size = 1,
+"       padding = 0, -- extra padding on left hand side
+"       -- indent guides
+"       with_markers = false,
+"     },
+"   },
+"   window = {
+"     position = "right",
+"     width = 30,
+"   },
+"   filesystem = {
+"     filtered_items = {
+"       -- show hidden files like dotfiles and git ignored
+"       visible = true,
+"     },
+"   },
+" })
+" END
 
-require("neo-tree").setup({
-  default_component_configs = {
-    indent = {
-      indent_size = 1,
-      padding = 0, -- extra padding on left hand side
-      -- indent guides
-      with_markers = false,
-    },
-  },
-  window = {
-    position = "right",
-    width = 30,
-  },
-  filesystem = {
-    filtered_items = {
-      -- show hidden files like dotfiles and git ignored
-      visible = true,
-    },
-  },
-})
-END
-
-nnoremap <silent> <leader>b :Neotree toggle=true<CR>
-nnoremap <silent> <C-bslash> :Neotree reveal=true<CR>
+" nnoremap <silent> <leader>b :Neotree toggle=true<CR>
+" nnoremap <silent> <C-bslash> :Neotree reveal=true<CR>
 
 
 " -- nvimtree {{{1
@@ -868,7 +870,7 @@ inoremap <C-l> <C-\><C-N><C-w>l
 " nvim-cmp needs this
 set completeopt=menu,menuone,noselect
 
-lua <<EOF
+lua << EOF
   -- Setup nvim-cmp.
   local cmp = require'cmp'
 
@@ -901,15 +903,13 @@ lua <<EOF
       },
     },
   })
-EOF
 
-" Language configs {{{1
+-- Language configs {{{1
 
-" -- treesitter {{{1
+-- -- treesitter {{{1
 
-lua <<EOF
 require'nvim-treesitter.configs'.setup {
-  ensure_installed = "maintained", -- one of "all", "maintained" (parsers with maintainers), or a list of languages
+  ensure_installed = "all", -- one of "all", "maintained" (parsers with maintainers), or a list of languages
   -- ignore_install = { "javascript" }, -- List of parsers to ignore installing
   highlight = {
     enable = true,              -- false will disable the whole extension
@@ -1164,9 +1164,6 @@ vim.lsp.set_log_level("debug")
 
 EOF
 
-
-" autocmd! QuickFixCmdPost * wincmd p
-
 " -- Markdown {{{1
 
 " Plugin with markdown folding is built-in, just enable folding support
@@ -1188,6 +1185,7 @@ augroup lang_markdown
   " Don't open autocomplete buffer by default
   autocmd FileType markdown
     \  setlocal linebreak
+    \| setlocal relativenumber
     \| lua require('cmp').setup.buffer { enabled = false }
     " \| setlocal foldmethod=expr
     " \| setlocal foldexpr=StackedMarkdownFolds()
@@ -1199,11 +1197,13 @@ augroup lang_markdown
     " automatically again
 augroup END
 
-" Don't close current markdown preview window when switching away from buffer
-let g:mkdp_auto_close = 0
-
 " TODO: Figure out how to bind these via autocmd
 lua << EOF
+
+-- Don't close current markdown preview window when switching away from buffer
+-- let g:mkdp_auto_close = 0
+vim.g.mkdp_auto_close = 0
+
 require("which-key").register({
   ["<leader>m"] = { "+markdown" },
   ["<leader>mp"] = { "<cmd>MarkdownPreview<cr>", "preview" },
@@ -1215,6 +1215,13 @@ EOF
 " -- Liz {{{1
 augroup lang_liz
   autocmd! BufNewFile,BufRead *.liz
+    \  setlocal syntax=clojure
+    \| setlocal filetype=clojure
+augroup END
+
+" -- ClojureDart {{{1
+augroup lang_clojuredart
+  autocmd! BufNewFile,BufRead *.cljd
     \  setlocal syntax=clojure
     \| setlocal filetype=clojure
 augroup END
@@ -1245,33 +1252,25 @@ augroup END
 
 lua << EOF
 
+-- Open lazygit in a floating window
 local lazygit = require('FTerm'):new({ cmd = 'lazygit', dimensions  = { height = 1, width = 1 } })
 
-function _G.__fterm_lazygit()
-    lazygit:toggle()
-end
+require('which-key').register({
+  g = {
+    name = "Git",
+    l = {"<cmd>Git blame<cr>", "Git: Blame" },
+    b = {"<cmd>Telescope git_branches<cr>", "Git: Branches" },
+    g = {function() lazygit:toggle() end, "Git: Lazygit" },
+  },
+}, { prefix = "<leader>" })
 
-EOF
+-- legendary.nvim {{{1
 
-" Open lazygit in a floating window
-" nnoremap <silent> <leader>gg :lua require('FTerm'):new({ cmd = 'lazygit', dimensions  = { height = 1, width = 1 } }):open()<cr>
-nnoremap <silent> <leader>gg :lua __fterm_lazygit()<cr>
-
-nnoremap <silent> <leader>gb = :Telescope git_branches<cr>
-nnoremap <silent> <leader>gl = :Git blame<cr>
-
-" -- legendary.nvim {{{1
-
-map <leader><leader> :Legendary<CR>
-" :Legendary " search keymaps, commands, and autocmds
-" :Legendary keymaps " search keymaps
-" :Legendary commands " search commands
-" :Legendary autocmds " search autocmds
-"
-lua << EOF
-
--- `setup()` must be called before `require('which-key).register()`
-require('legendary').setup()
+vim.api.nvim_set_keymap("n", "<leader><leader>", ":Legendary<cr>", {
+    noremap = true,
+    silent = true,
+    desc = "Command Palette (Legendary)",
+})
 
 require('legendary').bind_commands({
   { ':g/^\\s*$/d', description = 'Delete blank lines' },
@@ -1285,8 +1284,23 @@ require('legendary').bind_commands({
   -- Evaling alert to verify REPL is working and locate which browser provides runtime
   { ':ConjureEval (js/alert "Hello!")', description = 'Conjure eval alert' },
   { ':Telescope builtin', description = 'Telescope bultins' },
-
 })
+
+
+-- Add Telescope builtin to Command Pallete
+for k, v in pairs(require "telescope.builtin") do
+  require('legendary').bind_command({ ':Telescope ' .. k, description = 'Telescope: ' .. k})
+end
+
+-- Add Telescope extensions to Command Pallete
+for ext, funcs in pairs(require("telescope").extensions) do
+  for func_name, func_obj in pairs(funcs) do
+    -- Only include exported functions whose name doesn't begin with an underscore
+    if type(func_obj) == "function" and string.sub(func_name, 0, 1) ~= "_" then
+      require('legendary').bind_command({ ':Telescope ' .. ext .. " " .. func_name, description = 'Telescope: ' .. ext .. " : " .. func_name})
+    end
+  end
+end
 
 -- which-key.nvim {{{1
 
@@ -1297,7 +1311,6 @@ wk.register({
   ["<leader>l"] = { "+lsp" },
   ["gq"] = { "wrap text" },
   ["<leader>f"] = { "find" },
-  ["<leader>g"] = { "git" },
   -- ["<leader>f"] = { name = "+file" },
   -- ["<leader>ff"] = { "<cmd>Telescope find_files<cr>", "Find File" },
   -- ["<leader>fr"] = { "<cmd>Telescope oldfiles<cr>", "Open Recent File" },
