@@ -2,7 +2,7 @@
 " Press zM to close all folds to navigate the structure, zR to open all.
 " Press zj / zk to jump to next / previous section.
 
-" Global {{{1
+"-- Global {{{1
 " Set our leader key to space. This needs to be set first before all plugins
 " are loaded.
 let g:mapleader = "\<space>"
@@ -131,7 +131,7 @@ augroup parinfer_sexp
   augroup END
 augroup END
 
-" Plugins {{{1
+"-- Plugins {{{1
 call plug#begin("~/.vim/plugged")
   " I like to specify full url of the plugin, because one can then press `gx` to open
   " the plugin home page in a web browser.
@@ -308,7 +308,7 @@ call plug#begin("~/.vim/plugged")
   " Markdown preview
   Plug 'https://github.com/iamcco/markdown-preview.nvim.git', { 'for': 'markdown', 'do': 'cd app && npm install' }
 
-  " -- Experimental {{{1
+  "---- Experimental {{{1
 
   " Scrollbar with useful information like error/warning diagnostics
   Plug 'petertriho/nvim-scrollbar'
@@ -340,7 +340,7 @@ call plug#begin("~/.vim/plugged")
 call plug#end()
 
 
-" Experimental {{{1
+"-- Experimental {{{1
 
 lua << EOF
 
@@ -350,21 +350,16 @@ require('legendary').setup()
 
 require("trouble").setup {}
 
--- nvim-scrollbar {{{1
+---- nvim-scrollbar {{{1
 require('scrollbar').setup()
 
--- neoscroll.nvim {{{1
+---- neoscroll.nvim {{{1
 -- require('neoscroll').setup()
 
--- nvim-bqf {{{1
-
-
--- Better quickfix window - good for lsp references list with preview
-require('bqf').setup()
 
 EOF
 
-" -- yode-nvim {{{1
+"---- yode-nvim {{{1
 lua require('yode-nvim').setup({})
 map <Leader>yc :YodeCreateSeditorFloating<CR>
 map <Leader>yr :YodeCreateSeditorReplace<CR>
@@ -379,7 +374,7 @@ set showtabline=2
 
 
 
-" General settings {{{1
+"-- General settings {{{1
 if has('mouse')
   set mouse=a
 endif
@@ -483,7 +478,7 @@ autocmd! BufWritePost init.vim
   \ source $MYVIMRC
   \| setlocal foldmethod=marker
 
-" Window and buffer management {{{1
+"-- Window and buffer management {{{1
 
 " TAB in general mode will move to next window
 nnoremap <silent> <TAB> :wincmd w<CR>
@@ -500,13 +495,32 @@ nnoremap <leader>d :Sayonara!<CR>
 " Quit window, saner :quit
 nnoremap <leader>q :Sayonara<CR>
 
-" -- bufferline {{{1
+"" Split
+noremap <Leader>h :<C-u>split<CR>
+noremap <Leader>v :<C-u>vsplit<CR>
+
+" use ctrl  +hjkl to move between split/vsplit panels
+nnoremap <C-h> <C-w>h
+nnoremap <C-j> <C-w>j
+nnoremap <C-k> <C-w>k
+nnoremap <C-l> <C-w>l
+inoremap <C-h> <C-\><C-N><C-w>h
+inoremap <C-j> <C-\><C-N><C-w>j
+inoremap <C-k> <C-\><C-N><C-w>k
+inoremap <C-l> <C-\><C-N><C-w>l
+" tnoremap <C-h> <C-\><C-n><C-w>h
+" tnoremap <C-j> <C-\><C-n><C-w>j
+" tnoremap <C-k> <C-\><C-n><C-w>k
+" tnoremap <C-l> <C-\><C-n><C-w>l
+" tnoremap <Esc> <C-\><C-n>
+
+"---- bufferline {{{1
 " Experimental: Show list of buffers as tabs
 lua << EOF
 require("bufferline").setup{}
 EOF
 
-" Movement {{{1
+"-- Movement {{{1
 
 " Save on need to hold shift for commands for convenience (conflicts with
 " motion repeat)
@@ -542,7 +556,7 @@ nnoremap <silent> G :call ToggleMovement('G', 'gg')<CR>
 " Trigger a highlight with quuick scope in the appropriate direction when pressing these keys:
 let g:qs_highlight_on_keys = ['f', 'F', 't', 'T']
 
-" Editing {{{1
+"-- Editing {{{1
 
 " maintain visual selection after un/indenting with > and <
 vmap < <gv
@@ -567,7 +581,7 @@ vnoremap // y/\V<C-R>=escape(@",'/\')<CR><CR>
 " Make gf create a new file if it not exists
 map gf :e <cfile><CR>
 
-" -- Comment.nvim {{{1
+"---- Comment.nvim {{{1
 " Add spaces after comment delimiters by default (nerdcommenter)
 " let g:NERDSpaceDelims = 1
 " Toggle comments with ctrl+/
@@ -580,7 +594,7 @@ lua require('Comment').setup()
 nmap <silent> <C-_>  gcc
 vmap <silent> <C-_>  gcgv
 
-" Theme / Colorscheme {{{1
+"-- Theme / Colorscheme {{{1
 if has("termguicolors")
   set termguicolors
 endif
@@ -642,13 +656,13 @@ command! SyntaxQuery call s:syntax_query()
   " " autocmd! FileType * colorscheme tokyonight
 " augroup END
 
-" -- colorizer {{{1
+"---- colorizer {{{1
 " Show colors for hex values
 " names=false to not highlight color names like Green
 lua require'colorizer'.setup(nil, {names=false})
 
 
-" Project management {{{1
+"-- Project management {{{1
 
 lua << EOF
   require("project_nvim").setup {
@@ -668,9 +682,9 @@ lua << EOF
   require('telescope').load_extension('projects')
 EOF
 
-" File Explorer {{{1
+"-- File Explorer {{{1
 
-" -- NERDTree {{{1
+"---- NERDTree {{{1
 let g:NERDTreeShowHidden = 1
 let g:NERDTreeMinimalUI = 1
 let g:NERDTreeIgnore = []
@@ -685,7 +699,7 @@ augroup END
 nnoremap <silent> <leader>b :NERDTreeToggle<CR>
 nnoremap <silent> <C-bslash> :NERDTreeFind<CR>
 
-" -- neo-tree {{{1
+"---- neo-tree {{{1
 
 " Shows opened buffers in a tree, maybe bind it to some shortcut
 " :Neotree source=buffers
@@ -722,7 +736,7 @@ nnoremap <silent> <C-bslash> :NERDTreeFind<CR>
 " nnoremap <silent> <C-bslash> :Neotree reveal=true<CR>
 
 
-" -- nvimtree {{{1
+"---- nvimtree {{{1
 let g:nvim_tree_side = 'right'
 " Automatically close if the tree is the last window
 " let g:nvim_tree_auto_close = 1
@@ -746,9 +760,9 @@ let g:nvim_tree_icons = {
 
 
 
-" Fuzzy file search {{{1
+"-- Fuzzy file search {{{1
 
-" -- fzf {{{1
+"---- fzf {{{1
 if executable('rg')
   " .gitignore is applied automatically, --hidden is to search in files
   " starting with a dot, but then we need the --glob parameter to exclude contents of .git
@@ -789,7 +803,7 @@ let g:fzf_action = {
   \ 'ctrl-v': 'vsplit'
   \}
 
-" -- Telescope {{{1
+"---- Telescope {{{1
 lua << END
 require('telescope').setup({
   defaults = {
@@ -822,6 +836,13 @@ require('telescope').setup({
     },
   },
 })
+
+
+---- nvim-bqf {{{1
+
+-- Better quickfix window - good for lsp references list with preview
+require('bqf').setup()
+
 END
 
 nnoremap <C-p> :FZF<CR>
@@ -843,30 +864,12 @@ nnoremap <leader>fc :Commands<cr>
 nnoremap <leader>fs :Telescope lsp_workspace_symbols<cr>
 nnoremap <leader>fo :Telescope lsp_document_symbols<cr>
 
-"" Split
-noremap <Leader>h :<C-u>split<CR>
-noremap <Leader>v :<C-u>vsplit<CR>
-
-" use ctrl  +hjkl to move between split/vsplit panels
-nnoremap <C-h> <C-w>h
-nnoremap <C-j> <C-w>j
-nnoremap <C-k> <C-w>k
-nnoremap <C-l> <C-w>l
-inoremap <C-h> <C-\><C-N><C-w>h
-inoremap <C-j> <C-\><C-N><C-w>j
-inoremap <C-k> <C-\><C-N><C-w>k
-inoremap <C-l> <C-\><C-N><C-w>l
-" tnoremap <C-h> <C-\><C-n><C-w>h
-" tnoremap <C-j> <C-\><C-n><C-w>j
-" tnoremap <C-k> <C-\><C-n><C-w>k
-" tnoremap <C-l> <C-\><C-n><C-w>l
-" tnoremap <Esc> <C-\><C-n>
 
 
 
-" Auto completion {{{1
+"-- Auto completion {{{1
 
-" -- nvim-cmp {{{1
+"---- nvim-cmp {{{1
 " nvim-cmp needs this
 set completeopt=menu,menuone,noselect
 
@@ -906,7 +909,7 @@ lua << EOF
 
 -- Language configs {{{1
 
--- -- treesitter {{{1
+---- treesitter {{{1
 
 require'nvim-treesitter.configs'.setup {
   ensure_installed = "all", -- one of "all", "maintained" (parsers with maintainers), or a list of languages
@@ -931,7 +934,7 @@ set foldexpr=nvim_treesitter#foldexpr()
 " Have folds opened by default
 set nofoldenable
 
-" -- conjure {{{1
+"---- conjure {{{1
 " Clojure
 
 augroup lang_clojure
@@ -944,7 +947,7 @@ augroup lang_clojure
     \| set nolinebreak
 augroup END
 
-" -- lspconfig {{{1
+"---- lspconfig {{{1
 
 " bind it outside of on_attach to use for debugging
 nnoremap <space>ll :LspInfo<cr>
@@ -1051,7 +1054,7 @@ local nvim_lsp = require('lspconfig')
 local util = require 'lspconfig/util'
 local capabilities = require('cmp_nvim_lsp').update_capabilities(vim.lsp.protocol.make_client_capabilities())
 
--- auto-lsp {{{1
+---- auto-lsp {{{1
 
 vim.opt.runtimepath:append("~/code/nvim-auto-lsp")
 require("plenary.reload").reload_module("auto-lsp")
@@ -1164,7 +1167,7 @@ vim.lsp.set_log_level("debug")
 
 EOF
 
-" -- Markdown {{{1
+"---- Markdown {{{1
 
 " Plugin with markdown folding is built-in, just enable folding support
 let g:markdown_folding = 1
@@ -1212,21 +1215,21 @@ require("which-key").register({
 EOF
 
 
-" -- Liz {{{1
+"---- Liz {{{1
 augroup lang_liz
   autocmd! BufNewFile,BufRead *.liz
     \  setlocal syntax=clojure
     \| setlocal filetype=clojure
 augroup END
 
-" -- ClojureDart {{{1
+"---- ClojureDart {{{1
 augroup lang_clojuredart
   autocmd! BufNewFile,BufRead *.cljd
     \  setlocal syntax=clojure
     \| setlocal filetype=clojure
 augroup END
 
-" -- TypeScript {{{1
+"---- TypeScript {{{1
 
 augroup lang_typescript
   autocmd!
@@ -1236,9 +1239,9 @@ augroup lang_typescript
     \ highlight! link TSType Comment
 augroup END
 
-" Space menu {{{1
+"-- Space menu {{{1
 
-" -- Git {{{1
+"---- Git {{{1
 
 " Open current line on Github
 " V is to select current line otherwise only the file is opened without location
@@ -1264,7 +1267,7 @@ require('which-key').register({
   },
 }, { prefix = "<leader>" })
 
--- legendary.nvim {{{1
+---- legendary.nvim {{{1
 
 vim.api.nvim_set_keymap("n", "<leader><leader>", ":Legendary<cr>", {
     noremap = true,
@@ -1302,7 +1305,7 @@ for ext, funcs in pairs(require("telescope").extensions) do
   end
 end
 
--- which-key.nvim {{{1
+---- which-key.nvim {{{1
 
 local wk = require("which-key")
 
