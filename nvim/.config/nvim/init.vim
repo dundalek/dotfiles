@@ -351,7 +351,13 @@ require('legendary').setup()
 require("trouble").setup {}
 
 ---- nvim-scrollbar {{{1
-require('scrollbar').setup()
+require('scrollbar').setup {
+  excluded_buftypes = {
+    "terminal",
+    -- nerdtree sets nofile buftype, scrollbar for nerdtree seems to cause lagging
+    "nofile",
+  },
+}
 
 ---- neoscroll.nvim {{{1
 -- require('neoscroll').setup()
@@ -656,30 +662,31 @@ command! SyntaxQuery call s:syntax_query()
   " " autocmd! FileType * colorscheme tokyonight
 " augroup END
 
-"---- colorizer {{{1
-" Show colors for hex values
-" names=false to not highlight color names like Green
-lua require'colorizer'.setup(nil, {names=false})
-
-
-"-- Project management {{{1
-
 lua << EOF
-  require("project_nvim").setup {
-    -- defaults seem to be overall pretty good
 
-    -- don't manually change directory - it seems to get clojure-lsp confused and makes it spinning
-    manual_mode = true,
+---- colorizer {{{1
+-- Show colors for hex values
+-- names=false to not highlight color names like Green
+require('colorizer').setup(nil, { names=false })
 
-    -- Don't calculate root dir on specific directories
-    exclude_dirs = { "~/Dropbox/*" },
+-- Project management {{{1
 
-    -- show a message when project.nvim changes directory
-    silent_chdir = false,
-  }
+require("project_nvim").setup {
+  -- defaults seem to be overall pretty good
 
-  -- TODO bind :Telescope projects to some shortcut
-  require('telescope').load_extension('projects')
+  -- don't manually change directory - it seems to get clojure-lsp confused and makes it spinning
+  manual_mode = true,
+
+  -- Don't calculate root dir on specific directories
+  exclude_dirs = { "~/Dropbox/*" },
+
+  -- show a message when project.nvim changes directory
+  silent_chdir = false,
+}
+
+-- TODO bind :Telescope projects to some shortcut
+require('telescope').load_extension('projects')
+
 EOF
 
 "-- File Explorer {{{1
@@ -701,36 +708,44 @@ nnoremap <silent> <C-bslash> :NERDTreeFind<CR>
 
 "---- neo-tree {{{1
 
-" Shows opened buffers in a tree, maybe bind it to some shortcut
-" :Neotree source=buffers
 
 " Neotree seems to lag and block UI in larger projects
 
-" lua << END
-"
-" vim.cmd([[ let g:neo_tree_remove_legacy_commands = 1 ]])
-"
-" require("neo-tree").setup({
-"   default_component_configs = {
-"     indent = {
-"       indent_size = 1,
-"       padding = 0, -- extra padding on left hand side
-"       -- indent guides
-"       with_markers = false,
-"     },
-"   },
-"   window = {
-"     position = "right",
-"     width = 30,
-"   },
-"   filesystem = {
-"     filtered_items = {
-"       -- show hidden files like dotfiles and git ignored
-"       visible = true,
-"     },
-"   },
-" })
-" END
+lua << END
+
+vim.cmd([[ let g:neo_tree_remove_legacy_commands = 1 ]])
+
+require("neo-tree").setup({
+  default_component_configs = {
+    indent = {
+      indent_size = 1,
+      padding = 0, -- extra padding on left hand side
+      -- indent guides
+      with_markers = false,
+    },
+  },
+  window = {
+    position = "right",
+    width = 30,
+  },
+  filesystem = {
+    filtered_items = {
+      -- show hidden files like dotfiles and git ignored
+      visible = true,
+    },
+  },
+  -- disable lsp diagnostics as they seem to cause lagging/freezing
+  enable_diagnostics = false,
+})
+
+
+require('legendary').bind_commands({
+  { ':Neotree toggle=true', description = 'NeoTree: Toggle file panel' },
+  { ':Neotree reveal=true', description = 'NeoTree: Revel current file' },
+  { ':Neotree source=buffers', description = 'NeoTree: Opened buffers' },
+})
+
+END
 
 " nnoremap <silent> <leader>b :Neotree toggle=true<CR>
 " nnoremap <silent> <C-bslash> :Neotree reveal=true<CR>
@@ -845,6 +860,7 @@ require('bqf').setup()
 
 END
 
+" TODO: rewrite using which-key
 nnoremap <C-p> :FZF<CR>
 nnoremap <C-b> :Buffers<cr>
 nnoremap <leader>fb :Buffers<cr>
@@ -1200,13 +1216,13 @@ augroup lang_markdown
     " automatically again
 augroup END
 
-" TODO: Figure out how to bind these via autocmd
 lua << EOF
 
 -- Don't close current markdown preview window when switching away from buffer
 -- let g:mkdp_auto_close = 0
 vim.g.mkdp_auto_close = 0
 
+-- TODO: Figure out how to bind these via autocmd
 require("which-key").register({
   ["<leader>m"] = { "+markdown" },
   ["<leader>mp"] = { "<cmd>MarkdownPreview<cr>", "preview" },
