@@ -131,218 +131,229 @@ augroup parinfer_sexp
   augroup END
 augroup END
 
-"-- Plugins {{{1
-call plug#begin("~/.vim/plugged")
-  " I like to specify full url of the plugin, because one can then press `gx` to open
-  " the plugin home page in a web browser.
-
-  " Defaults everyone can agree on
-  Plug 'https://github.com/tpope/vim-sensible.git'
-
-  " Syntax highlighting theme
-  Plug 'https://github.com/ghifarit53/tokyonight-vim.git'
-  Plug 'https://github.com/dracula/vim.git', { 'name': 'dracula' }
-  " Plug 'https://github.com/haishanh/night-owl.vim.git'
-  " Plug 'https://github.com/ntk148v/vim-horizon.git'
-  " Plug 'https://github.com/arcticicestudio/nord-vim.git'
-  " Plug 'https://github.com/drewtempelmeyer/palenight.vim.git'
-  " Plug 'https://github.com/joshdick/onedark.vim.git'
-  " Plug 'https://github.com/mhartington/oceanic-next.git'
-  " Plug 'https://github.com/jacoborus/tender.vim.git'
-  " Plug 'https://github.com/challenger-deep-theme/vim.git', { 'as': 'challenger-deep' }
-  " Plug 'https://github.com/tomasiser/vim-code-dark.git'
-  " Plug 'https://github.com/tomasr/molokai.git'
-
-  " Light themes
-  Plug 'https://github.com/sonph/onehalf.git', { 'rtp': 'vim' }
-  Plug 'https://github.com/sainnhe/edge.git' " could use a bit more contrast otherwise pretty good
-  Plug 'chiendo97/intellij.vim'
-  Plug 'mvpopuk/inspired-github.vim'
-  Plug 'Mofiqul/adwaita.nvim'
-  Plug 'https://github.com/projekt0n/github-nvim-theme.git'
-  " Plug 'https://github.com/NLKNguyen/papercolor-theme.git'
-  " Plug 'Mofiqul/vscode.nvim'
-  " Plug 'liuchengxu/space-vim-theme'
-  " Plug 'https://github.com/cormacrelf/vim-colors-github.git'
-  " Plug 'https://github.com/rakr/vim-one.git'
-  " Plug 'https://github.com/ayu-theme/ayu-vim.git'
-  " Plug 'https://github.com/reedes/vim-colors-pencil.git'
-  " Plug 'https://github.com/arzg/vim-colors-xcode.git'
-  " Plug 'https://github.com/axvr/photon.vim.git'
-  " Plug 'https://github.com/jsit/toast.vim.git'
-  " Plug 'https://github.com/kkga/vim-envy.git'
-  " Plug 'chriskempson/tomorrow-theme'
-
-
-  " Treesitter based - Dark and light themes
-  " Plug 'Th3Whit3Wolf/one-nvim'
-  " Plug 'lourenci/github-colors'
-  " Plug 'marko-cerovac/material.nvim'
-  Plug 'https://github.com/RRethy/nvim-base16.git'
-
-  " Show colors for hex values
-  Plug 'norcalli/nvim-colorizer.lua'
-
-  " File tree sidebar with icons
-  Plug 'https://github.com/scrooloose/nerdtree.git', { 'on': ['NERDTreeToggle', 'NERDTreeFind'] }
-  Plug 'https://github.com/ryanoasis/vim-devicons.git', { 'on': ['NERDTreeToggle', 'NERDTreeFind'] }
-  Plug 'https://github.com/tiagofumo/vim-nerdtree-syntax-highlight.git', { 'on': ['NERDTreeToggle', 'NERDTreeFind'] }
-
-  " Alternative tree plugin in lua
-  " Plug 'kyazdani42/nvim-web-devicons' " for file icons
-  " Plug 'kyazdani42/nvim-tree.lua'
-
-  " Another tree plugin
-  Plug 'nvim-lua/plenary.nvim'
-  Plug 'kyazdani42/nvim-web-devicons'
-  Plug 'MunifTanjim/nui.nvim'
-  Plug 'nvim-neo-tree/neo-tree.nvim'
-
-  " Close buffers inteligently
-  Plug 'https://github.com/mhinz/vim-sayonara.git', { 'on': 'Sayonara' }
-
-  " Open file under cursor with gf relative to current file path
-  Plug 'https://github.com/kkoomen/gfi.vim.git'
-
-  " Fuzzy file serch
-  Plug 'https://github.com/junegunn/fzf.git', { 'dir': '~/.fzf', 'do': './install --all' }
-  Plug 'https://github.com/junegunn/fzf.vim.git'
-
-  " Lua-based fuzzy finder
-  Plug 'nvim-lua/popup.nvim'
-  Plug 'nvim-lua/plenary.nvim'
-  Plug 'nvim-telescope/telescope.nvim'
-
-  " Auto completion
-  Plug 'hrsh7th/cmp-nvim-lsp'
-  Plug 'hrsh7th/cmp-buffer'
-  Plug 'hrsh7th/cmp-path'
-  Plug 'hrsh7th/cmp-nvim-lua'
-  Plug 'hrsh7th/nvim-cmp'
-  " adds vscode-like pictograms to neovim built-in lsp
-  Plug 'https://github.com/onsails/lspkind-nvim.git'
-
-  " .editorconfig support
-  Plug 'https://github.com/editorconfig/editorconfig-vim.git'
-  " Heuristically set buffer options
-  Plug 'https://github.com/tpope/vim-sleuth.git'
-
-  " Faster horizontal screen navigation with f, t, F, T
-  Plug 'https://github.com/unblevable/quick-scope.git'
-
-  " Utilitity to surround text, alternative to vim-surround
-  " Add sa{motion/textobject}{addition}
-  " Delete sd{deletion} sdb searches a set of surrounding automatically.
-  " Replace sr{deletion}{addition}
-  Plug 'machakann/vim-sandwich'
-
-  " Multiple cursors
-  Plug 'mg979/vim-visual-multi', {'branch': 'master'}
-
-  Plug 'terryma/vim-expand-region'
-
-  " Toggling comments
-  " Plug 'https://github.com/preservim/nerdcommenter.git'
-  Plug 'numToStr/Comment.nvim'
-
-  " Git show changes in gutter
-  Plug 'https://github.com/mhinz/vim-signify.git'
-
-  " Floating terminal, using it to run lazygit
-  Plug 'numtostr/FTerm.nvim'
-  " Git utilities, mostly using :GBrowse
-  Plug 'https://github.com/tpope/vim-fugitive'
-  " Add support for :GBrowse command from fugitive to work with github
-  Plug 'https://github.com/tpope/vim-rhubarb.git'
-
-
-  " Spacemacs-like menu
-  Plug 'folke/which-key.nvim'
-
-  " Dressing for improved selection UI that uses telescope
-  Plug 'stevearc/dressing.nvim'
-  Plug 'mrjones2014/legendary.nvim'
-
-  " Language client
-  Plug 'https://github.com/Olical/conjure.git', { 'for': 'clojure' }
-
-  Plug 'https://github.com/eraserhd/parinfer-rust.git', { 'for': 'clojure', 'do': 'nix-shell --run \"cargo build --release \"' }
-
-  " Structural editing of s-expressions ala paredit - barfing, slurping, etc.
-  " Plug 'guns/vim-sexp'
-  " Use snoe's fork which includes improvements to preserve cursor position and recursive capture.
-  " https://github.com/guns/vim-sexp/pull/12
-  " https://github.com/guns/vim-sexp/pull/15
-  Plug 'snoe/vim-sexp', { 'commit': '4161f5c01504b77ab63f2957b943fca0c6e12e83' }
-  Plug 'tpope/vim-repeat'
-  " Plug 'tpope/vim-sexp-mappings-for-regular-people'
-
-  Plug 'neovim/nvim-lspconfig'
-
-  " Syntax highlighting for many languages, lazily loaded
-  " Polyglot provides :Toc command for markdown, otherwise can remove it since
-  " treesitter is now a thing.
-  " Also seems to provide sections for markdown, so that ]] and [[ work to
-  " jump to next / prev sections.
-  " Plug 'https://github.com/sheerun/vim-polyglot.git'
-
-  " Syntax highlighting based on treesitter
-  Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}  " We recommend updating the parsers on update
-
-  " Display treesitter parser tree, open with :TSPlaygroundToggle
-  Plug 'nvim-treesitter/playground', { 'on': 'TSPlaygroundToggle' }
-
-  " A tree like view for symbols in Neovim using the Language Server Protocol
-  Plug 'https://github.com/simrat39/symbols-outline.nvim.git'
-
-  " Plug 'https://github.com/shushcat/vim-minimd.git'
-
-  " Plug 'https://github.com/plasticboy/vim-markdown.git'
-  " Plug 'https://github.com/masukomi/vim-markdown-folding.git'
-
-  " For generating markdown Table of Contents
-  Plug 'mzlogin/vim-markdown-toc'
-
-  " Markdown distraction free writing
-  Plug 'https://github.com/junegunn/goyo.vim.git', { 'for': 'markdown' }
-  " Markdown preview
-  Plug 'https://github.com/iamcco/markdown-preview.nvim.git', { 'for': 'markdown', 'do': 'cd app && npm install' }
-
-  "---- Experimental {{{1
-
-  " Scrollbar with useful information like error/warning diagnostics
-  Plug 'petertriho/nvim-scrollbar'
-
-  " Better quickfix window - good for lsp references list with preview
-  Plug 'kevinhwang91/nvim-bqf'
-
-  " Lists open buffers in a top bar
-  Plug 'akinsho/nvim-bufferline.lua'
-
-  " Plug 'kyazdani42/nvim-web-devicons'
-  " Plug 'romgrk/barbar.nvim'
-
-  " Show list of issues from lsp for fixing
-  Plug 'kyazdani42/nvim-web-devicons'
-  Plug 'folke/trouble.nvim'
-
-  " Show floating parts of a buffer
-  Plug 'hoschi/yode-nvim'
-
-  " Smooth scrolling for window movement commands
-  " like <C-u>, <C-d>, <C-b>, <C-f>, <C-y>, <C-e>, zt, zz, zb.
-  " Plug 'karb94/neoscroll.nvim'
-
-  " List projects and jump to them via Telescope
-  Plug 'ahmedkhalf/project.nvim'
-
-
-call plug#end()
-
-
-"-- Experimental {{{1
 
 lua << EOF
+
+-- Plugins {{{1
+
+local fn = vim.fn
+local install_path = fn.stdpath('data')..'/site/pack/packer/start/packer.nvim'
+if fn.empty(fn.glob(install_path)) > 0 then
+  packer_bootstrap = fn.system({'git', 'clone', '--depth', '1', 'https://github.com/wbthomason/packer.nvim', install_path})
+end
+
+require('packer').startup(function(use)
+  -- I like to specify full url of the plugin, because one can then press `gx` to open
+  -- the plugin home page in a web browser.
+
+  -- Defaults everyone can agree on
+  use 'https://github.com/tpope/vim-sensible.git'
+
+  -- Syntax highlighting theme
+  use 'https://github.com/ghifarit53/tokyonight-vim.git'
+  use { 'https://github.com/dracula/vim.git', as = 'dracula' }
+  -- use 'https://github.com/haishanh/night-owl.vim.git'
+  -- use 'https://github.com/ntk148v/vim-horizon.git'
+  -- use 'https://github.com/arcticicestudio/nord-vim.git'
+  -- use 'https://github.com/drewtempelmeyer/palenight.vim.git'
+  -- use 'https://github.com/joshdick/onedark.vim.git'
+  -- use 'https://github.com/mhartington/oceanic-next.git'
+  -- use 'https://github.com/jacoborus/tender.vim.git'
+  -- use 'https://github.com/challenger-deep-theme/vim.git', { 'as': 'challenger-deep' }
+  -- use 'https://github.com/tomasiser/vim-code-dark.git'
+  -- use 'https://github.com/tomasr/molokai.git'
+
+  -- Light themes
+  use { 'https://github.com/sonph/onehalf.git', rtp = 'vim' }
+  use 'https://github.com/sainnhe/edge.git' -- could use a bit more contrast otherwise pretty good
+  use 'chiendo97/intellij.vim'
+  use 'mvpopuk/inspired-github.vim'
+  use 'Mofiqul/adwaita.nvim'
+  use 'https://github.com/projekt0n/github-nvim-theme.git'
+  -- use 'https://github.com/NLKNguyen/papercolor-theme.git'
+  -- use 'Mofiqul/vscode.nvim'
+  -- use 'liuchengxu/space-vim-theme'
+  -- use 'https://github.com/cormacrelf/vim-colors-github.git'
+  -- use 'https://github.com/rakr/vim-one.git'
+  -- use 'https://github.com/ayu-theme/ayu-vim.git'
+  -- use 'https://github.com/reedes/vim-colors-pencil.git'
+  -- use 'https://github.com/arzg/vim-colors-xcode.git'
+  -- use 'https://github.com/axvr/photon.vim.git'
+  -- use 'https://github.com/jsit/toast.vim.git'
+  -- use 'https://github.com/kkga/vim-envy.git'
+  -- use 'chriskempson/tomorrow-theme'
+
+
+  -- Treesitter based - Dark and light themes
+  -- use 'Th3Whit3Wolf/one-nvim'
+  -- use 'lourenci/github-colors'
+  -- use 'marko-cerovac/material.nvim'
+  use 'https://github.com/RRethy/nvim-base16.git'
+
+  -- Show colors for hex values
+  use 'norcalli/nvim-colorizer.lua'
+
+  -- File tree sidebar with icons
+  use { 'https://github.com/scrooloose/nerdtree.git', cmd = {'NERDTreeToggle', 'NERDTreeFind'} }
+  use { 'https://github.com/ryanoasis/vim-devicons.git', cmd = {'NERDTreeToggle', 'NERDTreeFind'} }
+  use { 'https://github.com/tiagofumo/vim-nerdtree-syntax-highlight.git', cmd = {'NERDTreeToggle', 'NERDTreeFind'} }
+
+  -- Alternative tree plugin in lua
+  -- use 'kyazdani42/nvim-web-devicons' " for file icons
+  -- use 'kyazdani42/nvim-tree.lua'
+
+  -- Another tree plugin
+  use 'nvim-lua/plenary.nvim'
+  use 'kyazdani42/nvim-web-devicons'
+  use 'MunifTanjim/nui.nvim'
+  use 'nvim-neo-tree/neo-tree.nvim'
+
+  -- Close buffers inteligently
+  use {'https://github.com/mhinz/vim-sayonara.git', cmd = 'Sayonara' }
+
+  -- Open file under cursor with gf relative to current file path
+  use 'https://github.com/kkoomen/gfi.vim.git'
+
+  -- Fuzzy file serch
+  use { 'junegunn/fzf', run = ':call fzf#install()' }
+  use 'https://github.com/junegunn/fzf.vim.git'
+
+  -- Lua-based fuzzy finder
+  use 'nvim-lua/popup.nvim'
+  use 'nvim-lua/plenary.nvim'
+  use 'nvim-telescope/telescope.nvim'
+
+  -- Auto completion
+  use 'hrsh7th/cmp-nvim-lsp'
+  use 'hrsh7th/cmp-buffer'
+  use 'hrsh7th/cmp-path'
+  use 'hrsh7th/cmp-nvim-lua'
+  use 'hrsh7th/nvim-cmp'
+  -- adds vscode-like pictograms to neovim built-in lsp
+  use 'https://github.com/onsails/lspkind-nvim.git'
+
+  -- .editorconfig support
+  use 'https://github.com/editorconfig/editorconfig-vim.git'
+  -- Heuristically set buffer options
+  use 'https://github.com/tpope/vim-sleuth.git'
+
+  -- Faster horizontal screen navigation with f, t, F, T
+  use 'https://github.com/unblevable/quick-scope.git'
+
+  -- Utilitity to surround text, alternative to vim-surround
+  -- Add sa{motion/textobject}{addition}
+  -- Delete sd{deletion} sdb searches a set of surrounding automatically.
+  -- Replace sr{deletion}{addition}
+  use 'machakann/vim-sandwich'
+
+  -- Multiple cursors
+  use { 'mg979/vim-visual-multi', branch = 'master' }
+
+  use 'terryma/vim-expand-region'
+
+  -- Toggling comments
+  -- use 'https://github.com/preservim/nerdcommenter.git'
+  use 'numToStr/Comment.nvim'
+
+  -- Git show changes in gutter
+  use 'https://github.com/mhinz/vim-signify.git'
+
+  -- Floating terminal, using it to run lazygit
+  use 'numtostr/FTerm.nvim'
+  -- Git utilities, mostly using :GBrowse
+  use 'https://github.com/tpope/vim-fugitive'
+  -- Add support for :GBrowse command from fugitive to work with github
+  use 'https://github.com/tpope/vim-rhubarb.git'
+
+
+  -- Spacemacs-like menu
+  use 'folke/which-key.nvim'
+
+  -- Dressing for improved selection UI that uses telescope
+  use 'stevearc/dressing.nvim'
+  use 'mrjones2014/legendary.nvim'
+
+  -- Language client
+  use { 'https://github.com/Olical/conjure.git', ft = 'clojure' }
+
+  use { 'https://github.com/eraserhd/parinfer-rust.git', ft = 'clojure', run = 'nix-shell --run \"cargo build --release \"' }
+
+  -- Structural editing of s-expressions ala paredit - barfing, slurping, etc.
+  -- use 'guns/vim-sexp'
+  -- Use snoe's fork which includes improvements to preserve cursor position and recursive capture.
+  -- https://github.com/guns/vim-sexp/pull/12
+  -- https://github.com/guns/vim-sexp/pull/15
+  use { 'snoe/vim-sexp', commit = '4161f5c01504b77ab63f2957b943fca0c6e12e83' }
+  use 'tpope/vim-repeat'
+  -- use 'tpope/vim-sexp-mappings-for-regular-people'
+
+  use 'neovim/nvim-lspconfig'
+
+  -- Syntax highlighting for many languages, lazily loaded
+  -- Polyglot provides :Toc command for markdown, otherwise can remove it since
+  -- treesitter is now a thing.
+  -- Also seems to provide sections for markdown, so that ]] and [[ work to
+  -- jump to next / prev sections.
+  -- use 'https://github.com/sheerun/vim-polyglot.git'
+
+  -- Syntax highlighting based on treesitter
+  use { 'nvim-treesitter/nvim-treesitter', run = ':TSUpdate'}  -- We recommend updating the parsers on update
+
+  -- Display treesitter parser tree, open with :TSPlaygroundToggle
+  use { 'nvim-treesitter/playground', cmd = 'TSPlaygroundToggle' }
+
+  -- A tree like view for symbols in Neovim using the Language Server Protocol
+  use 'https://github.com/simrat39/symbols-outline.nvim.git'
+
+  -- use 'https://github.com/shushcat/vim-minimd.git'
+
+  -- use 'https://github.com/plasticboy/vim-markdown.git'
+  -- use 'https://github.com/masukomi/vim-markdown-folding.git'
+
+  -- For generating markdown Table of Contents
+  use 'mzlogin/vim-markdown-toc'
+
+  -- Markdown distraction free writing
+  use { 'https://github.com/junegunn/goyo.vim.git', ft = 'markdown' }
+  -- Markdown preview
+  use { 'https://github.com/iamcco/markdown-preview.nvim.git', ft = 'markdown', run = 'cd app && npm install' }
+
+---- Experimental {{{1
+
+  -- Scrollbar with useful information like error/warning diagnostics
+  use 'petertriho/nvim-scrollbar'
+
+  -- Better quickfix window - good for lsp references list with preview
+  use 'kevinhwang91/nvim-bqf'
+
+  -- Lists open buffers in a top bar
+  use 'akinsho/nvim-bufferline.lua'
+
+  -- use 'kyazdani42/nvim-web-devicons'
+  -- use 'romgrk/barbar.nvim'
+
+  -- Show list of issues from lsp for fixing
+  use 'kyazdani42/nvim-web-devicons'
+  use 'folke/trouble.nvim'
+
+  -- Show floating parts of a buffer
+  use 'hoschi/yode-nvim'
+
+  -- Smooth scrolling for window movement commands
+  -- like <C-u>, <C-d>, <C-b>, <C-f>, <C-y>, <C-e>, zt, zz, zb.
+  -- use 'karb94/neoscroll.nvim'
+
+  -- List projects and jump to them via Telescope
+  use 'ahmedkhalf/project.nvim'
+
+  -- Automatically set up your configuration after cloning packer.nvim
+  -- Put this at the end after all plugins
+  if packer_bootstrap then
+    require('packer').sync()
+  end
+end)
+
+-- Experimental {{{1
 
 -- `setup()` must be called before `require('which-key).register()`
 require('legendary').setup()
@@ -361,7 +372,6 @@ require('scrollbar').setup {
 
 ---- neoscroll.nvim {{{1
 -- require('neoscroll').setup()
-
 
 EOF
 
