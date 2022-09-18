@@ -46,12 +46,14 @@
   ; (in-terminal vim (str f))
   (sh gvim (str f)))
 
-(defn with-tmp-file [f]
-  (let [tmp-file (str/trim (sh-str mktemp))]
-    (try
-      (f tmp-file)
-      (finally
-        (sh rm -rf (str tmp-file))))))
+(defn with-tmp-file
+  ([f] (with-tmp-file "" f))
+  ([suffix f]
+   (let [tmp-file (str (str/trim (sh-str mktemp)) suffix)]
+     (try
+       (f tmp-file)
+       (finally
+         (sh rm -rf (str tmp-file)))))))
 
 (defn typeout [s]
   ;; Replace LF with CR to preserve new lines when typing out
@@ -192,14 +194,15 @@
              #(run-shortcut-action command))})
 
 (def menu-global-hotkeys
-  (concat
-   (->> (parse-sxhkd-shortcuts (str (getenv "HOME") "/.config/sxhkd/sxhkdrc"))
-        (map (fn [{:keys [shortcut keypresses command description]}]
-               {:name (str shortcut "  -  " description)
-                :action #(apply shell/sh (str/split command #"\s+"))})))
-   (->> (parse-sxhkd-shortcuts (str keys-path "/paperwm"))
-        (map #(update % :description (partial str "PaperWM: ")))
-        (map shortcut->action))))
+  []
+  #_(concat
+     (->> (parse-sxhkd-shortcuts (str (getenv "HOME") "/.config/sxhkd/sxhkdrc"))
+          (map (fn [{:keys [shortcut keypresses command description]}]
+                 {:name (str shortcut "  -  " description)})
+               :action #(apply shell/sh (str/split command #"\s+"))
+               (->> (parse-sxhkd-shortcuts (str keys-path "/paperwm"))))
+          (map #(update % :description (partial str "PaperWM: ")))
+          (map shortcut->action))))
 
 (defn show-shortcuts [app]
   (run-menu (->> (parse-sxhkd-shortcuts (str keys-path "/" app))
@@ -580,8 +583,8 @@
 (def single-link-actions
   [{:name "archive.org wayback machine"
     :action (fn [s] (open-in-default-browser (str "https://web.archive.org/web/*/" s)))}
-   {:name "archive.is"
-    :action (fn [s] (open-in-default-browser (str "https://archive.is/" s)))}
+   {:name "archive.ph"
+    :action (fn [s] (open-in-default-browser (str "https://archive.ph/" s)))}
    {:name "outline.com"
     :action (fn [s] (open-in-default-browser (str "https://outline.com/" s)))}])
 
@@ -590,18 +593,28 @@
 (def menu-open-links
   (let [links (->> (concat (extract-links (:selected-text *context*))
                            (extract-links (:clipboard-text *context*)))
-                   (distinct))]
+                   (distinct))
+        single-link (when (= (count links) 1)
+                      (first links))]
     (concat
+     (when (some->> single-link (re-find #"^https?://twitter\.com/"))
+       [{:name "Open Twitter link in Nitter"
+         :action #(open-in-default-browser
+                   (str/replace single-link #"^https?://twitter\.com/" "https://nitter.cz/"))}])
+     (when (some->> single-link (re-find #"^https?://nitter\.[^/]+/"))
+       [{:name "Open Nitter link in Twitter"
+         :action #(open-in-default-browser
+                   (str/replace single-link #"^https?://nitter\.[^/]+/" "https://twitter.com/"))}])
      (when (seq links)
        (for [{:keys [name action]} browsers]
          {:name (str "Open " (count links) " link(s) in " name)
           :action (fn []
                     (doseq [link links]
                       (action link)))}))
-     (when (= (count links) 1)
+     (when single-link
        (for [{:keys [name action]} single-link-actions]
          {:name (str "Open link using " name)
-          :action (fn [] (action (first links)))})))))
+          :action #(action single-link)})))))
 
 (def menu-download-youtube-links
   (let [links (->> (concat (extract-links (:selected-text *context*))
@@ -623,10 +636,13 @@
                                                 wait-for-key-cmd))))})))))
 
 (defn with-cloned-repo [repo f]
-  (let [tmp-dir (str/trim (sh-str mktemp -d))]
+  (let [tmp-dir (str/trim (sh-str mktemp -d))
+        [_ repo-name] (->> (str/replace repo #"\.git$" "")
+                           (re-find #"([^/]+)$"))
+        clone-dir (str tmp-dir "/" repo-name)]
     (try
-      (in-terminal-wait git clone --depth=1 (str repo) (str tmp-dir))
-      (f tmp-dir)
+      (in-terminal-wait git clone --depth=1 (str repo) (str clone-dir))
+      (f clone-dir)
       (finally
         (sh rm -rf (str tmp-dir))))))
 
@@ -670,6 +686,29 @@
 
 (defn emoji-picker []
   (sh rofimoji --action clipboard))
+
+(defn formatted-current-datetime [fmt-str]
+  (let [formatter (java.time.format.DateTimeFormatter/ofPattern fmt-str)
+        date (java.time.LocalDate/now)]
+    (.format formatter date)))
+
+;; deps: nix-env -iA nixpkgs.tesseract5 nixpkgs.scrot nixpkgs.imagemagick nixpkgs.xclip
+(defn ocr-screen-text
+  ([] (ocr-screen-text "eng"))
+  ([lang]
+   (with-tmp-file ".png"
+     (fn [in-img-file]
+       (with-tmp-file ".txt"
+         (fn [out-txt-file]
+           (sh-ok scrot --select --quality 100 (str in-img-file))
+           ;; Preprocess for better recognition, modifies file in place
+           (sh-ok mogrify -modulate "100,0"  (str in-img-file))
+           (sh-ok tesseract
+                  (str in-img-file)
+                  ;; tesseract takes base name and appends .txt so we strip it
+                  (str/replace out-txt-file #".txt$" "")
+                  -l (str lang))
+           (sh-ok xclip -selection clipboard (str out-txt-file))))))))
 
 (def menu-main
   [{:name "HUD appmenu >"
@@ -731,12 +770,24 @@
                 (fn [filename]
                   (sh qrencode -o (str filename) :in (clipboard-text))
                   (sh xdg-open (str filename)))))}
+   {:name "OCR text on screen to clipboard (English)"
+    :action #(ocr-screen-text "eng")}
+   {:name "OCR text on screen to clipboard (Czech)"
+    :action #(ocr-screen-text "ces")}
+   {:name "OCR text on screen to clipboard (German)"
+    :action #(ocr-screen-text "deu")}
    {:name "Snippet: Shadow REPL"
     :action (fn [] (typeout "(shadow.cljs.devtools.api/repl :app)"))}
    {:name "Snippet: Github markdown detail"
     :action (fn [] (typeout "<details>\n<summary>Details</summary>\nHidden text here...\n</details>"))}
    {:name "Snippet: Clojure filetype meta"
     :action (fn [] (typeout ";; -*- clojure -*-\n;; vim: set filetype=clojure:\n"))}
+   (let [date (formatted-current-datetime "E d.M.")]
+     {:name (str "Snippet: Current date: " date)
+      :action (fn [] (typeout date))})
+   (let [date (formatted-current-datetime "YYYY-MM-dd")]
+     {:name (str "Snippet: Current date: " date)
+      :action (fn [] (typeout date))})
    {:name "Text Upper Case"
     :action (fn []
               (-> (text-selection)
@@ -769,7 +820,7 @@
     :action (fn [] (sh deepin-screenshot --save-path (str (getenv "HOME") "/Downloads") --delay 5))}])
 
 (defn launch-terminal []
-  (sh (str TERMINAL) :dir (str dir))
+  (sh (str TERMINAL)) ;:dir (str dir))
   ;; Try to find cwd of active process and launch terminal with it for more convenience
   ;; It needs more work, for shells we want to get last child, but for nvim we
   ;; might need the child, because descendants might be some language servers.
