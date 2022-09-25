@@ -215,12 +215,14 @@
    "\"sxiv\", \"Sxiv\"" "sxiv"})
 
 (def menu-app-shortcuts
-  (when-let [app (or (shortcut-apps (:app-name *context*))
-                     (cond
-                       (str/ends-with? (:window-title *context*) " - Gmail") "gmail"
-                       (re-find #"^Todoist|Todoist$" (:window-title *context*)) "todoist-web"))]
+  (if-let [app (or (shortcut-apps (:app-name *context*))
+                   (cond
+                     (str/ends-with? (:window-title *context*) " - Gmail") "gmail"
+                     (re-find #"^Todoist|Todoist$" (:window-title *context*)) "todoist-web"))]
     [{:name (str "Show shortcuts for: " app)
-      :action #(show-shortcuts app)}]))
+      :action #(show-shortcuts app)}]
+    [{:name "Show shortcuts for current app"
+      :inactive true}]))
 
 (def menu-keys
   (->> (sh-str ls (str keys-path))
@@ -621,7 +623,7 @@
                            (extract-links (:clipboard-text *context*)))
                    (distinct)
                    (filter #(re-find #"^https?://(www\.|m\.)?youtube\.com/watch|^https?://youtu.be/|^https?://vimeo.com/\d+|https?://soundcloud.com/" %)))]
-    (when (seq links)
+    (if (seq links)
       (cons
        {:name (str "Watch " (count links) " youtube link(s) with mpv")
         :action #(apply shell/sh (cons "mpv" links))}
@@ -633,7 +635,9 @@
                       (in-terminal bash -c (str "echo " links "; echo; "
                                                 "cd ~/Downloads; "
                                                 command " " links "; "
-                                                wait-for-key-cmd))))})))))
+                                                wait-for-key-cmd))))}))
+      [{:name "Youtube links in clipboard: Watch, download video or audio"
+        :inactive true}])))
 
 (defn with-cloned-repo [repo f]
   (let [tmp-dir (str/trim (sh-str mktemp -d))
@@ -647,26 +651,31 @@
         (sh rm -rf (str tmp-dir))))))
 
 (def menu-github-links
-  (when-some [[_ repo] (re-find #"(https?://(github\.com|gitlab\.com|git\.sr\.ht)/[^\s]+)" (str (:selected-text *context*)
-                                                                                                " "
-                                                                                                (:clipboard-text *context*)))]
+  (let [[_ repo] (re-find #"(https?://(github\.com|gitlab\.com|git\.sr\.ht)/[^\s]+)" (str (:selected-text *context*)
+                                                                                          " "
+                                                                                          (:clipboard-text *context*)))
+        inactive (nil? repo)]
     ;; Inspired by https://github.com/conwnet/github1s but better
     [{:name "Git repo: Open with gvim"
+      :inactive inactive
       :action (fn []
                 (with-cloned-repo repo
                   (fn [dir]
                     (sh bash -c (str "cd " (shell-escape dir) "; gvim")))))}
      {:name "Git repo: Open with VSCode"
+      :inactive inactive
       :action (fn []
                 (with-cloned-repo repo
                   (fn [dir]
                     (sh code --wait --new-window (str dir)))))}
      {:name "Git repo: Open in terminal"
+      :inactive inactive
       :action (fn []
                 (with-cloned-repo repo
                   (fn [dir]
                     (in-terminal-wait bash -c (str "cd " (shell-escape dir) "; exec bash")))))}
      {:name "Git repo: Count LOC"
+      :inactive inactive
       :action (fn []
                 (with-cloned-repo repo
                   (fn [dir]
@@ -838,6 +847,7 @@
   ([menu] (run-menu menu nil))
   ([menu {:keys [prompt fallback] :or {prompt "Chose: " fallback (fn [])}}]
    (let [choices (->> menu
+                      (remove :inactive)
                       (map :name)
                       (str/join "\n"))
          choice (str/trim (:out (sh "rofi" "-p" (str prompt) "-i" "-dmenu" :in (identity choices))))]
@@ -962,18 +972,6 @@
 (defn wm-prev-layout []
   (sh awesome-client "awful.layout.inc(-1)"))
 
-(when-let [choice (first *command-line-args*)]
-  (let [f (resolve (symbol choice))]
-    (if (ifn? f)
-      (f)
-      (let [action (->> menu
-                        (filter #(= choice (:name %)))
-                        first
-                        :action)]
-        (when (ifn? action)
-          (action)))))
-  (System/exit 0))
-
 (defn run-special-commands [input]
   (cond
     (str/starts-with? input "t:") (in-terminal bash -c (str (subs input 2) ";"
@@ -988,9 +986,31 @@
                                                               "bb -e " (shell-escape expr) ";"
                                                               wait-for-key-cmd)))))
 
-(run-menu menu {:fallback run-special-commands})
+(defn -main []
+  ; (println "args:" *command-line-args*)
 
-; (println "args:" *command-line-args*)
+  (when (= (first *command-line-args*) "print-menu")
+    (doseq [item (->> menu
+                      (map #(select-keys % [:name :inactive])))]
+      (println item))
+    (System/exit 0))
+
+  (when-let [choice (first *command-line-args*)]
+    (let [f (resolve (symbol choice))]
+      (if (ifn? f)
+        (f)
+        (let [action (->> menu
+                          (remove :inactive)
+                          (filter #(= choice (:name %)))
+                          first
+                          :action)]
+          (when (ifn? action)
+            (action)))))
+    (System/exit 0))
+
+  (run-menu menu {:fallback run-special-commands}))
+
+(-main)
 
 (comment
   (defn run-menu-top []
