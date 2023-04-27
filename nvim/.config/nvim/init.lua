@@ -1,4 +1,3 @@
-lua << EOF
 -- vim: foldmethod=marker
 -- Press zM to close all folds to navigate the structure, zR to open all.
 -- Press zj / zk to jump to next / previous section.
@@ -15,9 +14,10 @@ vim.o.shell = '/usr/bin/bash'
 -- Plugins {{{1
 
 local fn = vim.fn
-local install_path = fn.stdpath('data')..'/site/pack/packer/start/packer.nvim'
+local install_path = fn.stdpath('data') .. '/site/pack/packer/start/packer.nvim'
 if fn.empty(fn.glob(install_path)) > 0 then
-  packer_bootstrap = fn.system({'git', 'clone', '--depth', '1', 'https://github.com/wbthomason/packer.nvim', install_path})
+  packer_bootstrap = fn.system({ 'git', 'clone', '--depth', '1', 'https://github.com/wbthomason/packer.nvim',
+    install_path })
 end
 
 require('packer').startup(function(use)
@@ -31,7 +31,12 @@ require('packer').startup(function(use)
   -- use 'https://github.com/tpope/vim-sensible'
 
   -- Syntax highlighting theme
-  use { 'folke/tokyonight.nvim', config = function() require("tokyonight").setup({ style = "night", styles = { keywords = { italic = false } } }) end }
+  use { 'folke/tokyonight.nvim', config = function()
+    require("tokyonight").setup({
+      style = "night",
+      styles = { keywords = { italic = false } }
+    })
+  end }
   use 'https://github.com/ayu-theme/ayu-vim.git'
   use 'https://github.com/mhartington/oceanic-next.git'
   -- use 'https://github.com/haishanh/night-owl.vim.git'
@@ -59,7 +64,7 @@ require('packer').startup(function(use)
   }
 
   -- Close buffers inteligently
-  use {'https://github.com/mhinz/vim-sayonara.git', cmd = 'Sayonara' }
+  use { 'https://github.com/mhinz/vim-sayonara.git', cmd = 'Sayonara' }
 
   -- Open file under cursor with gf relative to current file path
   use 'https://github.com/kkoomen/gfi.vim.git'
@@ -98,7 +103,7 @@ require('packer').startup(function(use)
   use {
     "kylechui/nvim-surround",
     config = function()
-        require("nvim-surround").setup {}
+      require("nvim-surround").setup {}
     end
   }
 
@@ -171,14 +176,17 @@ require('packer').startup(function(use)
   use 'mzlogin/vim-markdown-toc'
 
   -- Markdown preview
-  use { "iamcco/markdown-preview.nvim", run = "cd app && npm install", setup = function() vim.g.mkdp_filetypes = { "markdown" } end, ft = { "markdown" }, }
+  use { "iamcco/markdown-preview.nvim", run = "cd app && npm install", setup = function()
+    vim.g.mkdp_filetypes = {
+      "markdown" }
+  end, ft = { "markdown" }, }
   -- Useful markdown editing functionality
   -- <C-k> for creating links from selection
   -- <C-b> to bold selection (requires vim-surround)
   -- <C-Space> to toggle task list items
   use { 'walterl/downtools' }
 
----- Experimental {{{1
+  ---- Experimental {{{1
 
   -- Better quickfix window - good for lsp references list with preview
   use 'kevinhwang91/nvim-bqf'
@@ -247,7 +255,7 @@ end
 
 
 vim.o.mouse = 'a'
-vim.opt.guicursor:append { 'a:blinkon100' }  -- blinking cursor to get more comfy
+vim.opt.guicursor:append { 'a:blinkon100' } -- blinking cursor to get more comfy
 
 -- General settings {{{1
 
@@ -342,7 +350,7 @@ set title
 
 " Source the nvim config file after saving it
 " After reloading folds are reset to expr for treesitter, so change it back to marker.
-autocmd! BufWritePost init.vim
+autocmd! BufWritePost */nvim/init.lua
   \ source $MYVIMRC
   \| setlocal foldmethod=marker
 
@@ -500,7 +508,7 @@ command! SyntaxQuery call s:syntax_query()
 ---- colorizer {{{1
 -- Show colors for hex values
 -- names=false to not highlight color names like Green
-require('colorizer').setup(nil, { names=false })
+require('colorizer').setup(nil, { names = false })
 
 
 -- File Explorer {{{1
@@ -589,8 +597,8 @@ require('telescope').setup({
     -- One can also use gg and G to jump to the other end.
     scroll_strategy = "limit",
     --layout_config = {
-      -- vertical = { width = 0.5 }
-      -- other layout configuration here
+    -- vertical = { width = 0.5 }
+    -- other layout configuration here
     --},
   },
   pickers = {
@@ -639,7 +647,7 @@ vim.api.nvim_create_autocmd({ "DirChanged" }, {
 vim.opt.completeopt = { 'menu', 'menuone', 'noselect' }
 
 -- Setup nvim-cmp.
-local cmp = require'cmp'
+local cmp = require 'cmp'
 cmp.setup({
   mapping = {
     ['<C-d>'] = cmp.mapping.scroll_docs(-4),
@@ -655,7 +663,7 @@ cmp.setup({
     { name = 'nvim_lsp' },
     { name = 'nvim_lua' },
     { name = 'path' },
-    { name = 'buffer', keyword_length = 5 },
+    { name = 'buffer',  keyword_length = 5 },
   },
   formatting = {
     -- Show icons for completion items
@@ -674,11 +682,11 @@ cmp.setup({
 
 ---- treesitter {{{1
 
-require'nvim-treesitter.configs'.setup {
+require 'nvim-treesitter.configs'.setup {
   ensure_installed = "all", -- one of "all", "maintained" (parsers with maintainers), or a list of languages
   -- ignore_install = { "javascript" }, -- List of parsers to ignore installing
   highlight = {
-    enable = true,              -- false will disable the whole extension
+    enable = true, -- false will disable the whole extension
     -- disable = { "c", "rust" },  -- list of language that will be disabled
   },
 }
@@ -714,7 +722,7 @@ augroup END
 ---- lspconfig {{{1
 
 -- symbols-outline.nvim
-require'symbols-outline'.setup {
+require 'symbols-outline'.setup {
   keymaps = {
     -- besides enter also mouse double-click to go to location
     goto_location = { "<Cr>", "<2-LeftMouse>" },
@@ -736,7 +744,7 @@ local on_attach = function(client, bufnr)
   buf_set_option('formatexpr', '')
 
   -- Mappings.
-  local opts = { noremap=true, silent=true }
+  local opts = { noremap = true, silent = true }
 
   -- See `:help vim.lsp.*` for documentation on any of the below functions
   buf_set_keymap('n', 'gd', '<Cmd>lua vim.lsp.buf.definition()<CR>', opts)
@@ -826,7 +834,6 @@ local on_attach = function(client, bufnr)
   --     end
   --   })
   -- end
-
 end
 
 local nvim_lsp = require('lspconfig')
@@ -838,7 +845,7 @@ local capabilities = require('cmp_nvim_lsp').default_capabilities(vim.lsp.protoc
 vim.opt.runtimepath:prepend("~/code/lazy-lsp.nvim")
 require("plenary.reload").reload_module("lazy-lsp")
 
-require "lazy-lsp".setup{
+require "lazy-lsp".setup {
   excluded_servers = {
     -- prefer tsserver
     "denols", --"stylelint_lsp", "eslint",
@@ -882,13 +889,13 @@ require "lazy-lsp".setup{
     -- clojure_lsp = { }
     -- https://github.com/bash-lsp/bash-language-server/issues/104#issuecomment-848052436
     efm = {
-      filetypes = { "markdown", "sh",  "vim" },
+      filetypes = { "markdown", "sh", "vim" },
       on_attach = function(client, bufnr)
         local function buf_set_keymap(...) vim.api.nvim_buf_set_keymap(bufnr, ...) end
         local function buf_set_option(...) vim.api.nvim_buf_set_option(bufnr, ...) end
 
         -- Mappings.
-        local opts = { noremap=true, silent=true }
+        local opts = { noremap = true, silent = true }
 
         buf_set_keymap('n', '<localleader>o', '<cmd>lua require"symbols-outline".toggle_outline()<cr>', opts)
       end,
@@ -898,24 +905,26 @@ require "lazy-lsp".setup{
         hover = true,
       },
       settings = {
-          rootMarkers = {".git/"},
-          languages = {
-              markdown = {
-                { symbolCommand = 'markdown-symbols' },
-                -- add dummy hover command which symbols-outline plugin expects
-                { hoverCommand = 'echo' },
-              },
-              sh = {
-                {lintCommand = 'shellcheck -f gcc -x',
-                 lintSource = 'shellcheck',
-                 lintFormats= {'%f:%l:%c: %trror: %m', '%f:%l:%c: %tarning: %m', '%f:%l:%c: %tote: %m'}}
-              },
-              vim = {
-                { symbolCommand = 'vim-marker-symbols' },
-                -- add dummy hover command which symbols-outline plugin expects
-                { hoverCommand = 'echo' },
-              },
+        rootMarkers = { ".git/" },
+        languages = {
+          markdown = {
+            { symbolCommand = 'markdown-symbols' },
+            -- add dummy hover command which symbols-outline plugin expects
+            { hoverCommand = 'echo' },
           },
+          sh = {
+            {
+              lintCommand = 'shellcheck -f gcc -x',
+              lintSource = 'shellcheck',
+              lintFormats = { '%f:%l:%c: %trror: %m', '%f:%l:%c: %tarning: %m', '%f:%l:%c: %tote: %m' }
+            }
+          },
+          vim = {
+            { symbolCommand = 'vim-marker-symbols' },
+            -- add dummy hover command which symbols-outline plugin expects
+            { hoverCommand = 'echo' },
+          },
+        },
       },
     },
     lua_ls = {
@@ -923,16 +932,16 @@ require "lazy-lsp".setup{
         Lua = {
           diagnostics = {
             -- Get the language server to recognize the `vim` global
-            globals = {'vim'},
+            globals = { 'vim' },
           },
         },
       },
     },
     jdtls = {
-      cmd = {"jdt-language-server"},
+      cmd = { "jdt-language-server" },
     },
     dartls = {
-      cmd = {"dart", "language-server"},
+      cmd = { "dart", "language-server" },
     },
     -- tsserver = {
     --   cmd = { "typescript-language-server", "--stdio" },
@@ -1026,56 +1035,73 @@ augroup END
 ---- Git {{{1
 
 -- Open lazygit in a floating window
-local lazygit = require('FTerm'):new({ cmd = 'lazygit', dimensions  = { height = 1, width = 1 } })
+local lazygit = require('FTerm'):new({ cmd = 'lazygit', dimensions = { height = 1, width = 1 } })
 
 ---- legendary.nvim {{{1
 
 vim.keymap.set("n", "<leader><leader>", ":Legendary<cr>", {
-    silent = true,
-    desc = "Command Palette (Legendary)",
+  silent = true,
+  desc = "Command Palette (Legendary)",
 })
 
 -- Register non-frequent command without bindings with legendary to be searchable in command menu
 require('legendary').commands({
-  { ':g/^\\s*$/d', description = 'Delete blank lines' },
-  { ':! chmod +x %', description = 'Make current file executable' },
-  { ':%bd|e#', description = 'Close other buffers' },
+  { ':g/^\\s*$/d',              description = 'Delete blank lines' },
+  {
+    ':! chmod +x %',
+    description =
+    'Make current file executable'
+  },
+  { ':%bd|e#',                  description = 'Close other buffers' },
   { ':ConjureShadowSelect app', description = 'Conjure shadow select app' },
-  { ':ConjureShadowSelect {name}', description = 'Conjure shadow select', unfinished = true },
-  { ':ConjureConnect 48888', description = 'Conjure: Pitch Backend REPL' },
-  { ':ConjureConnect 7888', description = 'Conjure: Pitch Frontend REPL' },
-  { ':ConjureConnect 1667', description = 'Conjure: Babashka REPL' },
+  {
+    ':ConjureShadowSelect {name}',
+    description = 'Conjure shadow select',
+    unfinished = true
+  },
+  {
+    ':ConjureConnect 48888',
+    description =
+    'Conjure: Pitch Backend REPL'
+  },
+  {
+    ':ConjureConnect 7888',
+    description =
+    'Conjure: Pitch Frontend REPL'
+  },
+  { ':ConjureConnect 1667',                                                     description = 'Conjure: Babashka REPL' },
   -- Evaling alert to verify REPL is working and locate which browser provides runtime
-  { ':ConjureEval (js/alert "Hello!")', description = 'Conjure eval alert' },
-  { ':Telescope builtin', description = 'Telescope bultins' },
+  { ':ConjureEval (js/alert "Hello!")',                                         description = 'Conjure eval alert' },
+  { ':Telescope builtin',                                                       description = 'Telescope bultins' },
   -- { ':lua require("litee.ui").toggle_panel()', description = 'LSP Call Tree Hierarchy' },
-  { ':lua vim.lsp.buf.incoming_calls()', description = 'LSP incoming calls' },
-  { ':lua vim.lsp.buf.outgoing_calls()', description = 'LSP outgoing calls' },
+  { ':lua vim.lsp.buf.incoming_calls()',                                        description = 'LSP incoming calls' },
+  { ':lua vim.lsp.buf.outgoing_calls()',                                        description = 'LSP outgoing calls' },
   -- enew+execute is to pipe result into buffer to make it searchable
-  { ":enew|pu=execute('lua print(vim.inspect(vim.lsp.get_active_clients()))')", description = 'LSP client capabilities'},
-  { ':lua vim.g.disable_lsp_formatting = not vim.g.disable_lsp_formatting',
-    description = 'LSP toggle formatting on save' },
-  { ':DownToggleListItem', description = 'Markdown: Toggle list item' },
-  { ':DownMakeLink', description = 'Markdown: Create link' },
+  { ":enew|pu=execute('lua print(vim.inspect(vim.lsp.get_active_clients()))')", description = 'LSP client capabilities' },
+  {
+    ':lua vim.g.disable_lsp_formatting = not vim.g.disable_lsp_formatting',
+    description = 'LSP toggle formatting on save'
+  },
+  { ':DownToggleListItem',     description = 'Markdown: Toggle list item' },
+  { ':DownMakeLink',           description = 'Markdown: Create link' },
   -- { ':split term://fish', description = 'Toggle Terminal' },
-  { ':ToggleTerm', description = 'Toggle Terminal' },
-
+  { ':ToggleTerm',             description = 'Toggle Terminal' },
   { ':Neotree source=buffers', description = 'NeoTree: Opened buffers' },
 })
 
 require('legendary').funcs {
-  { function() vim.opt_local.spell = not vim.opt_local.spell end,
-    description = 'Toggle spell check' },
+  {
+    function() vim.opt_local.spell = not vim.opt_local.spell end,
+    description = 'Toggle spell check'
+  },
 }
 
 --[[
 vim.lsp.set_log_level("debug")
 ]]
-
-
 -- Add Telescope builtin to Command Pallete
 for k, v in pairs(require "telescope.builtin") do
-  require('legendary').command({ ':Telescope ' .. k, description = 'Telescope: ' .. k})
+  require('legendary').command({ ':Telescope ' .. k, description = 'Telescope: ' .. k })
 end
 
 -- Add Telescope extensions to Command Pallete
@@ -1083,7 +1109,10 @@ for ext, funcs in pairs(require("telescope").extensions) do
   for func_name, func_obj in pairs(funcs) do
     -- Only include exported functions whose name doesn't begin with an underscore
     if type(func_obj) == "function" and string.sub(func_name, 0, 1) ~= "_" then
-      require('legendary').command({ ':Telescope ' .. ext .. " " .. func_name, description = 'Telescope: ' .. ext .. " : " .. func_name})
+      require('legendary').command({
+        ':Telescope ' .. ext .. " " .. func_name,
+        description = 'Telescope: ' .. ext .. " : " .. func_name
+      })
     end
   end
 end
@@ -1145,20 +1174,20 @@ wk.register({
   f = {
     name = "+find",
     h = { "<cmd>Telescope command_history<cr>", "Find in command history" }
-  -- ["<leader>ff"] = { "<cmd>Telescope find_files<cr>", "Find File" },
-  -- ["<leader>fr"] = { "<cmd>Telescope oldfiles<cr>", "Open Recent File" },
-  -- ["<leader>fh"] = { "<cmd>Telescope command_history<cr>", "Find in command history" },
-  -- ["<leader>fn"] = { "<cmd>enew<cr>", "New File" },
+    -- ["<leader>ff"] = { "<cmd>Telescope find_files<cr>", "Find File" },
+    -- ["<leader>fr"] = { "<cmd>Telescope oldfiles<cr>", "Open Recent File" },
+    -- ["<leader>fh"] = { "<cmd>Telescope command_history<cr>", "Find in command history" },
+    -- ["<leader>fn"] = { "<cmd>enew<cr>", "New File" },
   },
   g = {
     name = "Git",
     -- l = {"<cmd>Git blame<cr>", "Git: Blame" },
-    b = {"<cmd>Telescope git_branches<cr>", "Git: Branches" },
-    d = {"<cmd>:SignifyHunkDiff<cr>", "Git: Hunk Diff" },
-    U = {"<cmd>:SignifyHunkUndo<cr>", "Git: Undo Hunk" },
-    l = {function() require('git.blame').blame() end, "Git: Blame" },
-    h = {function() require('git.browse').open(false) end, "Git: Browse"},
-    g = {function() lazygit:toggle() end, "Git: Lazygit" },
+    b = { "<cmd>Telescope git_branches<cr>", "Git: Branches" },
+    d = { "<cmd>:SignifyHunkDiff<cr>", "Git: Hunk Diff" },
+    U = { "<cmd>:SignifyHunkUndo<cr>", "Git: Undo Hunk" },
+    l = { function() require('git.blame').blame() end, "Git: Blame" },
+    h = { function() require('git.browse').open(false) end, "Git: Browse" },
+    g = { function() lazygit:toggle() end, "Git: Lazygit" },
   },
   j = {
     name = "Jump",
@@ -1196,8 +1225,7 @@ wk.register({
   },
   r = { "<cmd>:set relativenumber!<cr>", "Toggle relative line numbers" },
   t = {
-    t = { "<cmd>:ConjureEval (kaocha.repl/run {:kaocha/reporter [kaocha.report/documentation]})<cr>", "Run tests in REPL with kaocha" },
+    t = { "<cmd>:ConjureEval (kaocha.repl/run {:kaocha/reporter [kaocha.report/documentation]})<cr>",
+      "Run tests in REPL with kaocha" },
   },
 }, { prefix = "<localleader>" })
-
-EOF
