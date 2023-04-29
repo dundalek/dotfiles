@@ -572,9 +572,6 @@ if executable('rg')
 
   " do not match file name when searching in files
   let spec = {'options': '--delimiter : --nth 4..'}
-  " let spec = {'options': ['--delimiter :', '--nth 4..']}
-  " command! -bang -nargs=* RgFind call fzf#vim#grep('rg --column --line-number --no-heading --fixed-strings --color=always --smart-case --follow --hidden --glob "!.git/*" '.shellescape(<q-args>), 1, fzf#vim#with_preview(spec), <bang>0)
-
 
   function! RipgrepFzf(query, fullscreen)
     let command_fmt = 'rg --column --line-number --no-heading --color=always --smart-case --fixed-strings --follow --hidden --glob "!.git/*" -- %s || true'
@@ -585,11 +582,6 @@ if executable('rg')
   endfunction
 
   command! -nargs=* -bang RG call RipgrepFzf(<q-args>, <bang>0)
-
-  command! -bang -nargs=* RgGrep call fzf#vim#grep('rg --column --line-number --no-heading --color=always --smart-case --follow --hidden --glob "!.git/*" '.shellescape(<q-args>), 1, fzf#vim#with_preview(spec), <bang>0)
-
-  " command! -bang -nargs=* Find call fzf#vim#grep('rg --column --line-number --no-heading --fixed-strings --ignore-case --hidden --follow --glob "!.git/*" --color "always" '.shellescape(<q-args>).'| tr -d "\017"', 1, <bang>0)
-  " command! -bang -nargs=* Rg call fzf#vim#grep("rg --column --line-number --no-heading --color=always --smart-case ".(<q-args>), 1, {'options': '--delimiter : --nth 4..'}, <bang>0)
 endif
 
 " Preview window on the upper side of the window with 40% height,
@@ -1228,49 +1220,6 @@ end
 
 local wk = require("which-key")
 
-vim.keymap.set('n', '<leader>b', '<cmd>:Neotree toggle=true<CR>', {
-  silent = true,
-  desc = 'NeoTree: Toggle file panel'
-})
-
-vim.keymap.set('n', '<C-bslash>', '<cmd>:Neotree reveal=true<CR>', {
-  silent = true,
-  desc = 'NeoTree: Revel current file'
-})
-
-vim.cmd [[
-" TODO: rewrite using which-key
-nnoremap <C-p> :FZF<CR>
-nnoremap <C-b> :Buffers<cr>
-
-nnoremap <leader>fb :Buffers<cr>
-nnoremap <leader>ff :Files<cr>
-" find (grep) in files
-" nnoremap <leader>fg :RgFind<cr>
-nnoremap <leader>fg :RG<cr>
-nnoremap <leader>fr :RgGrep<cr>
-nnoremap <leader>fc :Commands<cr>
-nnoremap <leader>fs :Telescope lsp_workspace_symbols<cr>
-nnoremap <leader>fo :Telescope lsp_document_symbols<cr>
-nnoremap <leader>fe :Telescope live_grep<cr>
-
-" bind it outside of on_attach to use for debugging
-nnoremap <space>ll :LspInfo<cr>
-" :lua print(vim.lsp.get_log_path())
-nnoremap <space>lL :e ~/.local/state/nvim/lsp.log<cr>
-
-" Useful for the efm-markdown wrapper
-nnoremap <space>ls :Telescope lsp_document_symbols<cr>
-]]
-
-wk.register({
-  ["<leader>."] = { "<cmd>e $MYVIMRC<cr>", "open init" },
-  ["gq"] = { "Wrap text" },
-  -- Prefer key sequence over chording
-  -- it works but does not show which key menu for window
-  ["<leader>w"] = { "<c-w>", "+Window" },
-})
-
 -- Register group labels separately so that legendary.nvim does not nest items but shows them in a flat list
 wk.register({
   f = { name = "Find" },
@@ -1340,16 +1289,37 @@ wk.register({
   ['<leader>hD'] = { function() gs.diffthis('~') end, "Git: Diff This Base" },
   ['<leader>td'] = { gs.toggle_deleted, "Git: Toggle Show Deleted Hunks" },
 })
-
+wk.register({
+  ["<leader>."] = { "<cmd>e $MYVIMRC<cr>", "open init" },
+  ["gq"] = { "Wrap text" },
+  -- Prefer key sequence over chording
+  -- it works but does not show which key menu for window
+  ["<leader>w"] = { "<c-w>", "+Window" },
+  ['<leader>b'] = { '<cmd>:Neotree toggle=true<CR>', 'NeoTree: Toggle file panel' },
+  ['<leader><bslash>'] = { '<cmd>:Neotree toggle=true<CR>', 'NeoTree: Toggle file panel' },
+  ['<C-bslash>'] = { '<cmd>:Neotree reveal=true<CR>', 'NeoTree: Revel current file' },
+  ["<C-p>"] = { ":FZF<cr>", "FZF: Find file" },
+  ["<C-b>"] = { ":Buffers<cr>", "FZF: Switch Buffer" },
+  ["<leader>fb"] = { ":Buffers<cr>", "Switch Buffer" },
+  ["<leader>ff"] = { ":Files<cr>", "Find File" },
+  ["<leader>fg"] = { ":RG<cr>", "Grep Files" },
+  ["<leader>fc"] = { ":Commands<cr>", "Find Command" },
+  ["<leader>fs"] = { ":Telescope lsp_workspace_symbols<cr>", "Find Workspace Symbol" },
+  ["<leader>fo"] = { ":Telescope lsp_document_symbols<cr>", "Find document Symbol" },
+  ["<leader>fe"] = { ":Telescope live_grep<cr>", "Telescope: Grep files" },
+})
 
 wk.register({
+  ['/'] = { "<cmd>Telescope live_grep<cr>", "Telescope: Grep files" },
+  [','] = { "<cmd>Telescope buffers<cr>", "Telescope: Find files" },
+  [';'] = { "<cmd>Telescope find_files<cr>", "Telescope: Find files" },
+  [':'] = { "<cmd>Telescope command_history<cr>", "Telescope: Command History" },
   f = {
     h = { "<cmd>Telescope help_tags<cr>", "Find in Help" },
     x = { require('telescope.builtin').resume, "Telescope: Resume last picker" },
     y = { "<cmd>Telescope command_history<cr>", "Find in command history" },
     -- ["<leader>ff"] = { "<cmd>Telescope find_files<cr>", "Find File" },
     -- ["<leader>fr"] = { "<cmd>Telescope oldfiles<cr>", "Open Recent File" },
-    -- ["<leader>fh"] = { "<cmd>Telescope command_history<cr>", "Find in command history" },
     -- ["<leader>fn"] = { "<cmd>enew<cr>", "New File" },
   },
   g = {
@@ -1373,8 +1343,9 @@ wk.register({
   },
   l = {
     c = { "<cmd>:ConjureConnect<cr>", "Conjure: Connect to REPL" },
+    -- bind it outside of on_attach to use for debugging
     l = { "<cmd>LSPInfo<cr>", "Lsp: Show Info" },
-    L = { "<cmd>e ~/.local/state/nvim/lsp.log<cr>", "Lsp: Show Log" },
+    L = { function() vim.cmd(":e " .. vim.lsp.get_log_path()) end, "Lsp: Show Log" },
     p = { require('goto-preview').goto_preview_definition, "Lsp: Preview Definition" },
     y = { require('goto-preview').goto_preview_type_definition, "Lsp: Preview Type Definition" },
     i = { require('goto-preview').goto_preview_implementation, "Lsp: Preview Implementation" },
