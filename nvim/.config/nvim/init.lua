@@ -9,7 +9,7 @@ vim.g.mapleader = " "
 vim.g.maplocalleader = ","
 
 -- Plugins expect POSIX shell which can cause problems when closh is used
-vim.o.shell = '/usr/bin/bash'
+vim.o.shell = "/usr/bin/bash"
 
 -- Plugins {{{1
 
@@ -25,8 +25,8 @@ local plugins = {
 
   -- Syntax highlighting theme
   {
-    'folke/tokyonight.nvim',
-    lazy = false,    -- make sure we load this during startup if it is your main colorscheme
+    "folke/tokyonight.nvim",
+    lazy = false, -- make sure we load this during startup if it is your main colorscheme
     priority = 1000, -- make sure to load this before all the other start plugins
     config = function()
       -- load the colorscheme here
@@ -34,10 +34,10 @@ local plugins = {
     end,
     opts = {
       style = "night",
-    }
+    },
   },
-  'https://github.com/ayu-theme/ayu-vim.git',
-  'https://github.com/mhartington/oceanic-next.git',
+  "https://github.com/ayu-theme/ayu-vim.git",
+  "https://github.com/mhartington/oceanic-next.git",
   -- 'https://github.com/haishanh/night-owl.vim.git',
   -- 'https://github.com/arcticicestudio/nord-vim.git',
   -- 'https://github.com/drewtempelmeyer/palenight.vim.git',
@@ -46,51 +46,51 @@ local plugins = {
 
   -- Light themes
   -- { 'https://github.com/sonph/onehalf.git', rtp = 'vim' }, -- rtp needs to be migrated
-  'https://github.com/sainnhe/edge.git',
-  'chiendo97/intellij.vim',
-  'Mofiqul/adwaita.nvim',
-  'mvpopuk/inspired-github.vim',
-  'https://github.com/projekt0n/github-nvim-theme.git',
-  'https://github.com/habamax/vim-sugarlily',
+  "https://github.com/sainnhe/edge.git",
+  "chiendo97/intellij.vim",
+  "Mofiqul/adwaita.nvim",
+  "mvpopuk/inspired-github.vim",
+  "https://github.com/projekt0n/github-nvim-theme.git",
+  "https://github.com/habamax/vim-sugarlily",
 
   -- Show colors for hex values
-  'norcalli/nvim-colorizer.lua',
+  "norcalli/nvim-colorizer.lua",
 
   -- Tree plugin
   {
-    'nvim-neo-tree/neo-tree.nvim',
-    dependencies = { 'nvim-lua/plenary.nvim', 'kyazdani42/nvim-web-devicons', 'MunifTanjim/nui.nvim' },
+    "nvim-neo-tree/neo-tree.nvim",
+    dependencies = { "nvim-lua/plenary.nvim", "kyazdani42/nvim-web-devicons", "MunifTanjim/nui.nvim" },
   },
 
   -- Close buffers inteligently
-  { 'https://github.com/mhinz/vim-sayonara.git', cmd = 'Sayonara' },
+  { "https://github.com/mhinz/vim-sayonara.git", cmd = "Sayonara" },
 
   -- Open file under cursor with gf relative to current file path
-  'https://github.com/kkoomen/gfi.vim.git',
+  "https://github.com/kkoomen/gfi.vim.git",
 
   -- Fuzzy file serch
-  { 'junegunn/fzf', build = ':call fzf#install()' },
-  'https://github.com/junegunn/fzf.vim.git',
+  { "junegunn/fzf", build = ":call fzf#install()" },
+  "https://github.com/junegunn/fzf.vim.git",
 
   -- Lua-based fuzzy finder
   {
-    'nvim-telescope/telescope.nvim',
-    dependencies = { 'nvim-lua/popup.nvim', 'nvim-lua/plenary.nvim' },
+    "nvim-telescope/telescope.nvim",
+    dependencies = { "nvim-lua/popup.nvim", "nvim-lua/plenary.nvim" },
   },
 
   {
-    'jvgrootveld/telescope-zoxide',
-    dependencies = { 'nvim-telescope/telescope.nvim' },
+    "jvgrootveld/telescope-zoxide",
+    dependencies = { "nvim-telescope/telescope.nvim" },
   },
 
   -- Auto completion
-  'hrsh7th/cmp-nvim-lsp',
-  'hrsh7th/cmp-buffer',
-  'hrsh7th/cmp-path',
-  'hrsh7th/cmp-nvim-lua',
-  'hrsh7th/nvim-cmp',
+  "hrsh7th/cmp-nvim-lsp",
+  "hrsh7th/cmp-buffer",
+  "hrsh7th/cmp-path",
+  "hrsh7th/cmp-nvim-lua",
+  "hrsh7th/nvim-cmp",
   -- adds vscode-like pictograms to neovim built-in lsp
-  'https://github.com/onsails/lspkind-nvim.git',
+  "https://github.com/onsails/lspkind-nvim.git",
 
   -- .editorconfig support
   -- editor config included in 0.9+
@@ -102,48 +102,48 @@ local plugins = {
   { "kylechui/nvim-surround", opts = {} },
 
   -- Multiple cursors
-  { 'mg979/vim-visual-multi', branch = 'master' },
+  { "mg979/vim-visual-multi", branch = "master" },
 
   -- automatically toggle between relative and absolute line numbers
   -- 'https://github.com/sitiom/nvim-numbertoggle',
 
   -- Toggling comments
   -- 'https://github.com/preservim/nerdcommenter.git',
-  'numToStr/Comment.nvim',
+  "numToStr/Comment.nvim",
 
   -- Git show changes in gutter
   -- 'https://github.com/mhinz/vim-signify.git',
-  'lewis6991/gitsigns.nvim',
+  "lewis6991/gitsigns.nvim",
 
   -- Floating terminal, using it to run lazygit
   -- 'numtostr/FTerm.nvim',
   -- Git utilities, mostly using :GBrowse and blame
-  'dinhhuy258/git.nvim',
+  "dinhhuy258/git.nvim",
   -- In contrast to git.nvim, it opens permalinks for browsing (and possibly supports more hosts)
-  { 'https://github.com/ruifm/gitlinker.nvim', opts = { mappings = nil } },
+  { "https://github.com/ruifm/gitlinker.nvim", opts = { mappings = nil } },
 
   -- git diff and merge view
-  { 'sindrets/diffview.nvim', dependencies = 'nvim-lua/plenary.nvim' },
+  { "sindrets/diffview.nvim", dependencies = "nvim-lua/plenary.nvim" },
 
   -- Dressing for improved selection UI that uses telescope
-  'stevearc/dressing.nvim',
-  'mrjones2014/legendary.nvim',
+  "stevearc/dressing.nvim",
+  "mrjones2014/legendary.nvim",
 
   -- Spacemacs-like menu
-  'folke/which-key.nvim',
+  "folke/which-key.nvim",
 
   -- bracketted key mappings like `[b` `]b` for switching buffers or `[q` `]q` for navigating quickfix list
   -- advantage over tpope/vim-unimpaired is that is sets mapping descriptions
   -- todo: it would be nice to add mappings to legendary  require('unimpaired.config').defaults.keymaps
-  { 'tummetott/unimpaired.nvim', opts = {} },
+  { "tummetott/unimpaired.nvim", opts = {} },
 
   -- Language client
-  'https://github.com/Olical/conjure.git',
+  "https://github.com/Olical/conjure.git",
   -- Load CLojure exception trace into location list
-  'walterl/conjure-locstack',
+  "walterl/conjure-locstack",
 
   -- { 'https://github.com/eraserhd/parinfer-rust.git', ft = 'clojure', build = 'nix-shell --run \"cargo build --release \"' },
-  'gpanders/nvim-parinfer',
+  "gpanders/nvim-parinfer",
 
   -- Structural editing of s-expressions ala paredit - barfing, slurping, etc.
   -- 'guns/vim-sexp',
@@ -152,82 +152,86 @@ local plugins = {
   -- https://github.com/guns/vim-sexp/pull/15
   -- { 'snoe/vim-sexp', commit = '4161f5c01504b77ab63f2957b943fca0c6e12e83' },
   -- Enables use of the . command for repeating change operations in vim-sexp
-  'tpope/vim-repeat',
+  "tpope/vim-repeat",
   -- 'tpope/vim-sexp-mappings-for-regular-people',
 
   -- sets lua lsp for signature help, docs and completion for the nvim lua API
   -- IMPORTANT: make sure to setup neodev BEFORE lspconfig
-  'folke/neodev.nvim',
+  "folke/neodev.nvim",
 
-  'neovim/nvim-lspconfig',
+  "neovim/nvim-lspconfig",
   -- Auto install LSP servers
-  { 'dundalek/lazy-lsp.nvim', dependencies = { 'neovim/nvim-lspconfig' }, },
+  { "dundalek/lazy-lsp.nvim", dependencies = { "neovim/nvim-lspconfig" } },
   -- Preview lsp definitions in floating windows
-  { 'rmagatti/goto-preview', opts = {} },
+  { "rmagatti/goto-preview", opts = {} },
 
   -- Syntax highlighting based on treesitter
   {
-    'nvim-treesitter/nvim-treesitter',
-    build = ':TSUpdate', -- We recommend updating the parsers on update
+    "nvim-treesitter/nvim-treesitter",
+    build = ":TSUpdate", -- We recommend updating the parsers on update
   },
 
-  'https://github.com/Dkendal/nvim-treeclimber',
+  "https://github.com/Dkendal/nvim-treeclimber",
 
   -- A tree like view for symbols in Neovim using the Language Server Protocol
-  'https://github.com/simrat39/symbols-outline.nvim.git',
+  "https://github.com/simrat39/symbols-outline.nvim.git",
 
   -- For generating markdown Table of Contents
-  'mzlogin/vim-markdown-toc',
+  "mzlogin/vim-markdown-toc",
 
   -- Markdown preview
   {
     "iamcco/markdown-preview.nvim",
     build = "cd app && npm install",
-    init = function()
-      vim.g.mkdp_filetypes = { "markdown" }
-    end,
-    ft = { "markdown" }
+    init = function() vim.g.mkdp_filetypes = { "markdown" } end,
+    ft = { "markdown" },
   },
   -- Useful markdown editing functionality
   -- <C-k> for creating links from selection
   -- <C-b> to bold selection (requires vim-surround)
   -- <C-Space> to toggle task list items
-  { 'walterl/downtools' },
+  { "walterl/downtools" },
 
   ---- Experimental {{{1
 
   -- Better quickfix window - good for lsp references list with preview
-  'kevinhwang91/nvim-bqf',
+  "kevinhwang91/nvim-bqf",
 
   -- status line
   {
-    'windwp/windline.nvim',
+    "windwp/windline.nvim",
     config = function()
       -- preset for windline status line
       -- require('wlsample.airline')
-      require('wlsample.evil_line')
-    end
+      require("wlsample.evil_line")
+    end,
   },
 
   -- { 'akinsho/toggleterm.nvim', config = function() end },
-  { 'rebelot/terminal.nvim', opts = {} },
+  { "rebelot/terminal.nvim", opts = {} },
 
   -- Show list of issues from lsp for fixing
-  { 'folke/trouble.nvim', dependencies = 'kyazdani42/nvim-web-devicons', opts = {} },
+  { "folke/trouble.nvim", dependencies = "kyazdani42/nvim-web-devicons", opts = {} },
 
   -- Better mode to move windows
-  { 'sindrets/winshift.nvim', cmd = { 'WinShift' }, opts = {} },
+  { "sindrets/winshift.nvim", cmd = { "WinShift" }, opts = {} },
 
   -- Closed unedited buffers
   -- Can also consider https://github.com/chrisgrieser/nvim-early-retirement
   -- for time based buffer clean up
-  { 'axkirillov/hbac.nvim', opts = { autoclose = false } },
+  { "axkirillov/hbac.nvim", opts = { autoclose = false } },
 }
 
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not vim.loop.fs_stat(lazypath) then
-  vim.fn.system({ "git", "clone", "--filter=blob:none", "https://github.com/folke/lazy.nvim.git",
-    "--branch=stable", lazypath })
+  vim.fn.system {
+    "git",
+    "clone",
+    "--filter=blob:none",
+    "https://github.com/folke/lazy.nvim.git",
+    "--branch=stable",
+    lazypath,
+  }
 end
 vim.opt.rtp:prepend(lazypath)
 
@@ -235,11 +239,9 @@ require("lazy").setup(plugins, {})
 
 -- Experimental {{{1
 
-
 -- require("toggleterm").setup {
 --   shell = "zellij",
 -- }
-
 
 -- Globals {{{1
 
@@ -248,18 +250,15 @@ P = function(v)
   return v
 end
 
-RELOAD = function(...)
-  require("plenary.reload").reload_module(...)
-end
+RELOAD = function(...) require("plenary.reload").reload_module(...) end
 
 R = function(name)
   RELOAD(name)
   return require(name)
 end
 
-
-vim.o.mouse = 'a'
-vim.opt.guicursor:append { 'a:blinkon100' } -- blinking cursor to get more comfy
+vim.o.mouse = "a"
+vim.opt.guicursor:append { "a:blinkon100" } -- blinking cursor to get more comfy
 
 -- General settings {{{1
 
@@ -272,7 +271,7 @@ vim.o.smartcase = true
 -- Show search and replace subsctitions incrementally (Neovim only)
 vim.o.inccommand = "nosplit"
 
-vim.cmd [[
+vim.cmd([[
 
 " paste with ctrl+v - clashes with visual block mode
 " nnoremap <C-V> "+gP
@@ -496,7 +495,7 @@ highlight link @lsp.type.typeParameter.typescript Comment
 highlight link @lsp.type.type.typescript Comment
 highlight link @lsp.type.interface.typescript Comment
 
-]]
+]])
 
 local function map(mode, lhs, rhs, opts)
   opts = opts or {}
@@ -515,8 +514,7 @@ map("v", "<A-k>", ":m '<-2<cr>gv=gv", { desc = "Move up" })
 ---- colorizer {{{1
 -- Show colors for hex values
 -- names=false to not highlight color names like Green
-require('colorizer').setup(nil, { names = false })
-
+require("colorizer").setup(nil, { names = false })
 
 -- File Explorer {{{1
 
@@ -524,7 +522,7 @@ require('colorizer').setup(nil, { names = false })
 
 vim.g.neo_tree_remove_legacy_commands = 1
 
-require("neo-tree").setup({
+require("neo-tree").setup {
   default_component_configs = {
     indent = {
       indent_size = 1,
@@ -545,13 +543,13 @@ require("neo-tree").setup({
   },
   -- disable lsp diagnostics as they seem to cause lagging/freezing
   enable_diagnostics = false,
-})
+}
 
 -- Fuzzy file search {{{1
 
 ---- fzf {{{1
 
-vim.cmd [[
+vim.cmd([[
 if executable('rg')
   " .gitignore is applied automatically, --hidden is to search in files
   " starting with a dot, but then we need the --glob parameter to exclude contents of .git
@@ -583,10 +581,10 @@ let g:fzf_action = {
   \ 'ctrl-s': 'split',
   \ 'ctrl-v': 'vsplit'
   \}
-]]
+]])
 
 ---- Telescope {{{1
-require('telescope').setup({
+require("telescope").setup {
   defaults = {
     -- Using vertical strategy because not having cut-off list entries is more
     -- important for narrower window size. TODO: explore flex sizing to switch to
@@ -623,47 +621,43 @@ require('telescope').setup({
       },
     },
   },
-})
-
+}
 
 ---- Telescope zoxide {{{1
-require("telescope").load_extension('zoxide')
+require("telescope").load_extension("zoxide")
 
 -- Add directory to zoxide when changed for example with `:cd`
 local zoxide_group = vim.api.nvim_create_augroup("zoxide", {})
 vim.api.nvim_create_autocmd({ "DirChanged" }, {
   group = zoxide_group,
-  callback = function(ev)
-    vim.fn.system({ "zoxide", "add", ev.file })
-  end
+  callback = function(ev) vim.fn.system { "zoxide", "add", ev.file } end,
 })
-
 
 -- Auto completion {{{1
 
 ---- nvim-cmp {{{1
 
 -- nvim-cmp needs this
-vim.opt.completeopt = { 'menu', 'menuone', 'noselect' }
+vim.opt.completeopt = { "menu", "menuone", "noselect" }
 
 -- Setup nvim-cmp.
-local cmp = require 'cmp'
-cmp.setup({
+local cmp = require("cmp")
+cmp.setup {
   mapping = {
-    ['<C-d>'] = cmp.mapping.scroll_docs(-4),
-    ['<C-f>'] = cmp.mapping.scroll_docs(4),
-    ['<C-Space>'] = cmp.mapping.complete(),
-    ['<C-e>'] = cmp.mapping.close(),
+    ["<C-d>"] = cmp.mapping.scroll_docs(-4),
+    ["<C-f>"] = cmp.mapping.scroll_docs(4),
+    ["<C-Space>"] = cmp.mapping.complete(),
+    ["<C-e>"] = cmp.mapping.close(),
     -- Changed default for enter to behave as newline if no item is selected
-    ['<CR>'] = cmp.mapping.confirm({ select = false }),
+    ["<CR>"] = cmp.mapping.confirm { select = false },
     -- Read :help ins-completion but stayed a lowly tab-completer
-    ['<Tab>'] = cmp.mapping(cmp.mapping.select_next_item(), { 'i', 's' }),
+    ["<Tab>"] = cmp.mapping(cmp.mapping.select_next_item(), { "i", "s" }),
   },
   sources = {
-    { name = 'nvim_lsp' },
-    { name = 'nvim_lua' },
-    { name = 'path' },
-    { name = 'buffer', keyword_length = 5 },
+    { name = "nvim_lsp" },
+    { name = "nvim_lua" },
+    { name = "path" },
+    { name = "buffer", keyword_length = 5 },
   },
   formatting = {
     -- Show icons for completion items
@@ -676,29 +670,28 @@ cmp.setup({
       },
     },
   },
-})
+}
 
 -- Terminal {{{1
 
 require("terminal").setup()
-local bottom_terminal = require("terminal").terminal:new({
+local bottom_terminal = require("terminal").terminal:new {
   layout = { open_cmd = "botright new +resize15" },
   cmd = { "zellij" },
-})
+}
 
-local lazygit_terminal = require("terminal").terminal:new({
+local lazygit_terminal = require("terminal").terminal:new {
   layout = { open_cmd = "float", height = 1, width = 1 },
   cmd = { "lazygit" },
   autoclose = true,
-})
+}
 
-
-local chatgpt_terminal = require('terminal').terminal:new({
+local chatgpt_terminal = require("terminal").terminal:new {
   -- nix-env -iA nixpkgs.chatgpt-cli
-  cmd = { 'chatgpt', '-n' },
+  cmd = { "chatgpt", "-n" },
   layout = { open_cmd = "float", border = "rounded" },
   autoclose = true,
-})
+}
 
 -- Auto insert mode
 vim.api.nvim_create_autocmd({ "WinEnter", "BufWinEnter", "TermOpen" }, {
@@ -711,18 +704,18 @@ vim.api.nvim_create_autocmd({ "WinEnter", "BufWinEnter", "TermOpen" }, {
 
 -- terminal window highlight
 vim.api.nvim_create_autocmd("TermOpen", {
-  command = [[setlocal nonumber norelativenumber winhl=Normal:NormalFloat]]
+  command = [[setlocal nonumber norelativenumber winhl=Normal:NormalFloat]],
 })
 
-vim.cmd [[
+vim.cmd([[
 tnoremap <c-\><c-\> <c-\><c-n>
-]]
+]])
 
 -- Language configs {{{1
 
 ---- treesitter {{{1
 
-require 'nvim-treesitter.configs'.setup {
+require("nvim-treesitter.configs").setup {
   ensure_installed = "all", -- one of "all", "maintained" (parsers with maintainers), or a list of languages
   -- ignore_install = { "javascript" }, -- List of parsers to ignore installing
   highlight = {
@@ -742,7 +735,7 @@ vim.opt.foldenable = false
 ---- lspconfig {{{1
 
 -- symbols-outline.nvim
-require 'symbols-outline'.setup {
+require("symbols-outline").setup {
   keymaps = {
     -- besides enter also mouse double-click to go to location
     goto_location = { "<Cr>", "<2-LeftMouse>" },
@@ -758,72 +751,71 @@ local on_attach = function(client, bufnr)
   local function buf_set_option(...) vim.api.nvim_buf_set_option(bufnr, ...) end
 
   --Enable completion triggered by <c-x><c-o>
-  buf_set_option('omnifunc', 'v:lua.vim.lsp.omnifunc')
+  buf_set_option("omnifunc", "v:lua.vim.lsp.omnifunc")
 
   -- Set blank formatexpr so that wrapping with `gq` works
-  buf_set_option('formatexpr', '')
+  buf_set_option("formatexpr", "")
 
   -- Mappings.
   local opts = { noremap = true, silent = true }
 
   -- See `:help vim.lsp.*` for documentation on any of the below functions
-  buf_set_keymap('n', 'gd', '<Cmd>lua vim.lsp.buf.definition()<CR>', opts)
-  buf_set_keymap('n', 'gD', '<cmd>vsplit | lua vim.lsp.buf.definition()<CR>', opts)
+  buf_set_keymap("n", "gd", "<Cmd>lua vim.lsp.buf.definition()<CR>", opts)
+  buf_set_keymap("n", "gD", "<cmd>vsplit | lua vim.lsp.buf.definition()<CR>", opts)
   -- buf_set_keymap('n', 'gD', '<Cmd>lua vim.lsp.buf.declaration()<CR>', opts)
   -- buf_set_keymap('n', 'gi', '<cmd>lua vim.lsp.buf.implementation()<CR>', opts)
-  buf_set_keymap('n', 'K', '<Cmd>lua vim.lsp.buf.hover()<CR>', opts)
-  buf_set_keymap('n', '<C-k>', '<cmd>lua vim.lsp.buf.signature_help()<CR>', opts)
+  buf_set_keymap("n", "K", "<Cmd>lua vim.lsp.buf.hover()<CR>", opts)
+  buf_set_keymap("n", "<C-k>", "<cmd>lua vim.lsp.buf.signature_help()<CR>", opts)
 
-  buf_set_keymap('n', '<leader>la', '<cmd>lua vim.lsp.buf.code_action()<CR>', opts)
-  buf_set_keymap('n', '<leader>ld', '<cmd>lua vim.lsp.buf.definition()<CR>', opts)
-  buf_set_keymap('n', '<leader>ln', '<cmd>lua vim.lsp.buf.rename()<CR>', opts)
-  buf_set_keymap('n', '<leader>lr', '<cmd>lua vim.lsp.buf.references()<CR>', opts)
-  buf_set_keymap('n', '<leader>li', '<cmd>lua vim.lsp.buf.implementations()<CR>', opts)
-  buf_set_keymap('n', '<leader>lh', '<cmd>lua vim.lsp.buf.signature_help()<CR>', opts)
-  buf_set_keymap('n', '<leader>lq', '<cmd>lua vim.lsp.buf.hover()<CR>', opts)
+  buf_set_keymap("n", "<leader>la", "<cmd>lua vim.lsp.buf.code_action()<CR>", opts)
+  buf_set_keymap("n", "<leader>ld", "<cmd>lua vim.lsp.buf.definition()<CR>", opts)
+  buf_set_keymap("n", "<leader>ln", "<cmd>lua vim.lsp.buf.rename()<CR>", opts)
+  buf_set_keymap("n", "<leader>lr", "<cmd>lua vim.lsp.buf.references()<CR>", opts)
+  buf_set_keymap("n", "<leader>li", "<cmd>lua vim.lsp.buf.implementations()<CR>", opts)
+  buf_set_keymap("n", "<leader>lh", "<cmd>lua vim.lsp.buf.signature_help()<CR>", opts)
+  buf_set_keymap("n", "<leader>lq", "<cmd>lua vim.lsp.buf.hover()<CR>", opts)
 
-
-  buf_set_keymap('n', '<localleader>o', '<cmd>lua require"symbols-outline".toggle_outline()<cr>', opts)
+  buf_set_keymap("n", "<localleader>o", '<cmd>lua require"symbols-outline".toggle_outline()<cr>', opts)
 
   -- Display code lenses which show for example number of references and tests of a funtion
 
   -- set tagfunc to use lsp to jump to definitions with the default key-bindings like CTRL-]
-  vim.cmd [[
+  vim.cmd([[
     setlocal tagfunc=v:lua.vim.lsp.tagfunc
-  ]]
+  ]])
 
   if client.server_capabilities.codeLensProvider then
-    vim.cmd [[
+    vim.cmd([[
       augroup lsp_codelens
         autocmd! * <buffer>
         autocmd BufWritePost,CursorHold,CursorHoldI <buffer> lua vim.lsp.codelens.refresh()
       augroup END
-    ]]
+    ]])
   end
 
   -- Maybe change lower the value (default 4s) like set updatetime=1000
   -- Auto highlight symbols under cursor and its references
   if client.server_capabilities.documentHighlightProvider then
-    vim.cmd [[
+    vim.cmd([[
       augroup lsp_highlight
         autocmd! * <buffer>
         autocmd CursorHold  <buffer> lua vim.lsp.buf.document_highlight()
         autocmd CursorHoldI <buffer> lua vim.lsp.buf.document_highlight()
         autocmd CursorMoved <buffer> lua vim.lsp.buf.clear_references()
       augroup END
-    ]]
+    ]])
   end
 
   -- format on save
   -- don't auto format Liz sources because the formatter messes them up
-  local is_liz_source = vim.fn.bufname():find('.liz$');
+  local is_liz_source = vim.fn.bufname():find(".liz$")
   if not is_liz_source and client.server_capabilities.documentFormattingProvider then
-    vim.cmd [[
+    vim.cmd([[
       augroup lsp_format
         autocmd! * <buffer>
         autocmd BufWritePre  <buffer> lua vim.lsp.buf.format()
       augroup END
-    ]]
+    ]])
   end
 
   -- if client.server_capabilities.documentFormattingProvider then
@@ -842,21 +834,22 @@ end
 
 require("neodev").setup {}
 
-local nvim_lsp = require('lspconfig')
-local util = require 'lspconfig/util'
-local capabilities = require('cmp_nvim_lsp').default_capabilities(vim.lsp.protocol.make_client_capabilities())
+local nvim_lsp = require("lspconfig")
+local util = require("lspconfig/util")
+local capabilities = require("cmp_nvim_lsp").default_capabilities(vim.lsp.protocol.make_client_capabilities())
 
 ---- lazy-lsp {{{1
 
 vim.opt.runtimepath:prepend("~/code/lazy-lsp.nvim")
 require("plenary.reload").reload_module("lazy-lsp")
 
-require "lazy-lsp".setup {
+require("lazy-lsp").setup {
   excluded_servers = {
     -- prefer tsserver
     "denols", --"stylelint_lsp", "eslint",
     -- ghcide and hie seem to be deprecated in favor of haskell-language-server (hls)
-    "ghcide", "hie",
+    "ghcide",
+    "hie",
 
     -- preferring rust_analyzer
     "rls",
@@ -903,7 +896,7 @@ require "lazy-lsp".setup {
         -- Mappings.
         local opts = { noremap = true, silent = true }
 
-        buf_set_keymap('n', '<localleader>o', '<cmd>lua require"symbols-outline".toggle_outline()<cr>', opts)
+        buf_set_keymap("n", "<localleader>o", '<cmd>lua require"symbols-outline".toggle_outline()<cr>', opts)
       end,
       init_options = {
         documentFormatting = true,
@@ -914,21 +907,21 @@ require "lazy-lsp".setup {
         rootMarkers = { ".git/" },
         languages = {
           markdown = {
-            { symbolCommand = 'markdown-symbols' },
+            { symbolCommand = "markdown-symbols" },
             -- add dummy hover command which symbols-outline plugin expects
-            { hoverCommand = 'echo' },
+            { hoverCommand = "echo" },
           },
           sh = {
             {
-              lintCommand = 'shellcheck -f gcc -x',
-              lintSource = 'shellcheck',
-              lintFormats = { '%f:%l:%c: %trror: %m', '%f:%l:%c: %tarning: %m', '%f:%l:%c: %tote: %m' }
-            }
+              lintCommand = "shellcheck -f gcc -x",
+              lintSource = "shellcheck",
+              lintFormats = { "%f:%l:%c: %trror: %m", "%f:%l:%c: %tarning: %m", "%f:%l:%c: %tote: %m" },
+            },
           },
           vim = {
-            { symbolCommand = 'vim-marker-symbols' },
+            { symbolCommand = "vim-marker-symbols" },
             -- add dummy hover command which symbols-outline plugin expects
-            { hoverCommand = 'echo' },
+            { hoverCommand = "echo" },
           },
         },
       },
@@ -947,8 +940,8 @@ require "lazy-lsp".setup {
               align_continuous_assign_statement = "false",
               align_continuous_rect_table_field = "false",
               align_array_table = "false",
-            }
-          }
+            },
+          },
         },
       },
     },
@@ -964,7 +957,6 @@ require "lazy-lsp".setup {
   },
 }
 
-
 nvim_lsp.clojure_lsp.setup {
   -- Override the defaut config to set root in the top-level of a monorepo
   -- root_dir = util.root_pattern(".git"),
@@ -975,13 +967,12 @@ nvim_lsp.clojure_lsp.setup {
   capabilities = capabilities,
 }
 
-
 ---- Markdown {{{1
 
 -- Plugin with markdown folding is built-in, just enable folding support
 vim.g.markdown_folding = 1
 
-vim.cmd [[
+vim.cmd([[
 " Turn spellcheck on for markdown files
 " Look how to do it better with :help ftplugin
 augroup lang_markdown
@@ -1012,16 +1003,15 @@ augroup lang_markdown
     " would be good to find out how to uderline only and then enable it
     " automatically again
 augroup END
-]]
+]])
 
 -- Don't close current markdown preview window when switching away from buffer
 -- let g:mkdp_auto_close = 0
 vim.g.mkdp_auto_close = 0
 
-
 ---- Clojure {{{1
 
-vim.cmd [[
+vim.cmd([[
 augroup lang_clojure
   autocmd!
   " set nolinebreak because line break at words boundary bugs out with parinfer
@@ -1031,10 +1021,9 @@ augroup lang_clojure
     \| nnoremap <LocalLeader>ev :ConjureLogVSplit<cr>
     \| set nolinebreak
 augroup END
-]]
+]])
 
-
-vim.cmd [[
+vim.cmd([[
 "---- Liz {{{1
 augroup lang_liz
   autocmd! BufNewFile,BufRead *.liz
@@ -1058,7 +1047,7 @@ augroup lang_typescript
   autocmd FileType typescript
     \ highlight! link TSType Comment
 augroup END
-]]
+]])
 
 -- Space menu {{{1
 
@@ -1070,33 +1059,33 @@ augroup END
 ---- Command palette - legendary.nvim {{{1
 
 -- clear out so there are no duplicates when config is reloaded
-require('legendary.data.state').items = require('legendary.data.itemlist'):create()
+require("legendary.data.state").items = require("legendary.data.itemlist"):create()
 
 -- `setup()` must be called before `require('which-key).register()`
-local legendary_format = require('legendary.ui.format').default_format
-require('legendary').setup {
+local legendary_format = require("legendary.ui.format").default_format
+require("legendary").setup {
   which_key = {
     -- try to register only once to avoid duplicates on reload
     -- for some reason this workaround does not work completely, there are two duplicates after reload, but at least it does not grow unbounded
-    auto_register = global_legendary_auto_registered == nil
+    auto_register = global_legendary_auto_registered == nil,
   },
   default_item_formatter = function(item)
     -- swap description with command definition
     local icon, cmd, desc = table.unpack(legendary_format(item))
     return { icon, desc, cmd }
-  end
+  end,
 }
 global_legendary_auto_registered = true
 
-require('dressing').setup({
+require("dressing").setup {
   select = {
     get_config = function(opts)
       -- the whole point of the override is to make the legendary window larger so that descriptions can fit and are visible
-      if opts.kind == 'legendary.nvim' then
+      if opts.kind == "legendary.nvim" then
         return {
           telescope = {
             sorting_strategy = "ascending",
-            layout_strategy = 'center',
+            layout_strategy = "center",
             results_title = false,
             layout_config = {
               prompt_position = "top",
@@ -1108,9 +1097,9 @@ require('dressing').setup({
       else
         return {}
       end
-    end
-  }
-})
+    end,
+  },
+}
 
 vim.keymap.set("n", "<leader><leader>", ":Legendary<cr>", {
   silent = true,
@@ -1118,69 +1107,72 @@ vim.keymap.set("n", "<leader><leader>", ":Legendary<cr>", {
 })
 
 -- Register non-frequent command without bindings with legendary to be searchable in command menu
-require('legendary').commands({
-  { ':g/^\\s*$/d', description = 'Delete blank lines' },
-  { ':! chmod +x %', description = 'Make current file executable' },
-  { description = 'Buffers: Close other', ':%bd|e#' },
-  { ':ConjureShadowSelect app', description = 'Conjure shadow select app' },
-  { ':ConjureShadowSelect {name}', description = 'Conjure shadow select', unfinished = true },
-  { ':ConjureConnect 48888', description = 'Conjure: Pitch Backend REPL' },
-  { ':ConjureConnect 7888', description = 'Conjure: Pitch Frontend REPL' },
-  { ':ConjureConnect 1667', description = 'Conjure: Babashka REPL' },
+require("legendary").commands {
+  { ":g/^\\s*$/d", description = "Delete blank lines" },
+  { ":! chmod +x %", description = "Make current file executable" },
+  { description = "Buffers: Close other", ":%bd|e#" },
+  { ":ConjureShadowSelect app", description = "Conjure shadow select app" },
+  { ":ConjureShadowSelect {name}", description = "Conjure shadow select", unfinished = true },
+  { ":ConjureConnect 48888", description = "Conjure: Pitch Backend REPL" },
+  { ":ConjureConnect 7888", description = "Conjure: Pitch Frontend REPL" },
+  { ":ConjureConnect 1667", description = "Conjure: Babashka REPL" },
   -- Evaling alert to verify REPL is working and locate which browser provides runtime
-  { ':ConjureEval (js/alert "Hello!")', description = 'Conjure eval alert' },
-  { ':Telescope builtin', description = 'Telescope bultins' },
-  { ':lua vim.lsp.buf.incoming_calls()', description = 'LSP incoming calls' },
-  { ':lua vim.lsp.buf.outgoing_calls()', description = 'LSP outgoing calls' },
+  { ':ConjureEval (js/alert "Hello!")', description = "Conjure eval alert" },
+  { ":Telescope builtin", description = "Telescope bultins" },
+  { ":lua vim.lsp.buf.incoming_calls()", description = "LSP incoming calls" },
+  { ":lua vim.lsp.buf.outgoing_calls()", description = "LSP outgoing calls" },
   -- enew+execute is to pipe result into buffer to make it searchable
   -- { ":enew|pu=execute('lua print(vim.inspect(vim.lsp.get_active_clients()))')", description = 'LSP client capabilities' },
-  { ':lua vim.g.disable_lsp_formatting = not vim.g.disable_lsp_formatting', description = 'LSP toggle formatting on save' },
-  { description = "Diagnostics: Toggle document issues", ':TroubleToggle document_diagnostics' },
-  { description = "Diagnostics: Toggle workspace issues", ':TroubleToggle workspace_diagnostics' },
-  { ':DownToggleListItem', description = 'Markdown: Toggle list item' },
-  { ':DownMakeLink', description = 'Markdown: Create link' },
+  {
+    ":lua vim.g.disable_lsp_formatting = not vim.g.disable_lsp_formatting",
+    description = "LSP toggle formatting on save",
+  },
+  { description = "Diagnostics: Toggle document issues", ":TroubleToggle document_diagnostics" },
+  { description = "Diagnostics: Toggle workspace issues", ":TroubleToggle workspace_diagnostics" },
+  { ":DownToggleListItem", description = "Markdown: Toggle list item" },
+  { ":DownMakeLink", description = "Markdown: Create link" },
   -- { ':split term://fish', description = 'Toggle Terminal' },
-  { ':Neotree source=buffers', description = 'NeoTree: Opened buffers' },
-  { ':InspectTree', description = 'Treesitter: Inspect tree' }, -- :help inspect_tree
-  { ':DiffviewOpen', description = 'Git: Diff View Open' },
-  { ':DiffviewClose', description = 'Git: Diff View Close' },
-  { ':DiffviewFileHistory', description = 'Git: Diff View File History' },
-})
+  { ":Neotree source=buffers", description = "NeoTree: Opened buffers" },
+  { ":InspectTree", description = "Treesitter: Inspect tree" }, -- :help inspect_tree
+  { ":DiffviewOpen", description = "Git: Diff View Open" },
+  { ":DiffviewClose", description = "Git: Diff View Close" },
+  { ":DiffviewFileHistory", description = "Git: Diff View File History" },
+}
 
-require('legendary').funcs {
+require("legendary").funcs {
   { description = "Buffers: Close unedited", require("hbac").close_unpinned },
   {
     function() vim.opt_local.spell = not vim.opt_local.spell end,
-    description = 'Toggle spell check'
+    description = "Toggle spell check",
   },
   {
     function()
-      require('conjure.eval').command [[
+      require("conjure.eval").command([[
         (do
           (ns dev)
           (def portal ((requiring-resolve 'portal.api/open)))
           (add-tap (requiring-resolve 'portal.api/submit)))
-      ]]
+      ]])
     end,
-    description = 'Clojure: Open Portal'
+    description = "Clojure: Open Portal",
   },
   {
     function()
-      require('conjure.eval').command [[
+      require("conjure.eval").command([[
         (do
           (remove-tap (requiring-resolve 'portal.api/submit))
           ((requiring-resolve 'portal.api/close)))
-      ]]
+      ]])
     end,
-    description = 'Clojure: Close Portal'
+    description = "Clojure: Close Portal",
   },
   {
     function()
-      require('conjure.eval').command [[
+      require("conjure.eval").command([[
         ((requiring-resolve 'dev.nu.morse/launch-in-proc))
-      ]]
+      ]])
     end,
-    description = 'Clojure: Open Morse'
+    description = "Clojure: Open Morse",
   },
 }
 
@@ -1188,8 +1180,8 @@ require('legendary').funcs {
 vim.lsp.set_log_level("debug")
 ]]
 -- Add Telescope builtin to Command Pallete
-for k, v in pairs(require "telescope.builtin") do
-  require('legendary').command({ ':Telescope ' .. k, description = 'Telescope: ' .. k })
+for k, v in pairs(require("telescope.builtin")) do
+  require("legendary").command { ":Telescope " .. k, description = "Telescope: " .. k }
 end
 
 -- Add Telescope extensions to Command Pallete
@@ -1197,14 +1189,13 @@ for ext, funcs in pairs(require("telescope").extensions) do
   for func_name, func_obj in pairs(funcs) do
     -- Only include exported functions whose name doesn't begin with an underscore
     if type(func_obj) == "function" and string.sub(func_name, 0, 1) ~= "_" then
-      require('legendary').command({
-        ':Telescope ' .. ext .. " " .. func_name,
-        description = 'Telescope: ' .. ext .. " : " .. func_name
-      })
+      require("legendary").command {
+        ":Telescope " .. ext .. " " .. func_name,
+        description = "Telescope: " .. ext .. " : " .. func_name,
+      }
     end
   end
 end
-
 
 ---- which-key.nvim {{{1
 
@@ -1222,16 +1213,19 @@ wk.register({
 }, { prefix = "<leader>" })
 
 -- other commands like moving forward/backward do not seem to work that well
-local tc = require('nvim-treeclimber')
+local tc = require("nvim-treeclimber")
 vim.keymap.set({ "n" }, "vv", tc.select_expand, { desc = "TreeClimber: Expand Selection" })
 vim.keymap.set({ "v" }, "v", tc.select_expand, { desc = "TreeClimber: Expand Selection" })
 vim.keymap.set({ "v" }, "z", tc.select_shrink, { desc = "TreeClimber: Shrink Selection" })
 
-vim.api.nvim_set_keymap('v', '<leader>go',
+vim.api.nvim_set_keymap(
+  "v",
+  "<leader>go",
   '<cmd>lua require"gitlinker".get_buf_range_url("v", {action_callback = require"gitlinker.actions".open_in_browser})<cr>',
-  {})
+  {}
+)
 
-require('gitsigns').setup {
+require("gitsigns").setup {
   on_attach = function(bufnr)
     local gs = package.loaded.gitsigns
 
@@ -1242,52 +1236,64 @@ require('gitsigns').setup {
     end
 
     -- Navigation
-    map('n', ']c', function()
-      if vim.wo.diff then return ']c' end
+    map("n", "]c", function()
+      if vim.wo.diff then
+        return "]c"
+      end
       vim.schedule(function() gs.next_hunk() end)
-      return '<Ignore>'
+      return "<Ignore>"
     end, { expr = true })
 
-    map('n', '[c', function()
-      if vim.wo.diff then return '[c' end
+    map("n", "[c", function()
+      if vim.wo.diff then
+        return "[c"
+      end
       vim.schedule(function() gs.prev_hunk() end)
-      return '<Ignore>'
+      return "<Ignore>"
     end, { expr = true })
 
     -- Actions
-    map('v', '<leader>hs', function() gs.stage_hunk { vim.fn.line("."), vim.fn.line("v") } end,
-      { desc = "Git: Visual Stage Hunk" })
-    map('v', '<leader>hr', function() gs.reset_hunk { vim.fn.line("."), vim.fn.line("v") } end,
-      { desc = "Git: Visual Reset Hunk" })
+    map(
+      "v",
+      "<leader>hs",
+      function() gs.stage_hunk { vim.fn.line("."), vim.fn.line("v") } end,
+      { desc = "Git: Visual Stage Hunk" }
+    )
+    map(
+      "v",
+      "<leader>hr",
+      function() gs.reset_hunk { vim.fn.line("."), vim.fn.line("v") } end,
+      { desc = "Git: Visual Reset Hunk" }
+    )
 
     -- Text object
-    map({ 'o', 'x' }, 'ih', ':<C-U>Gitsigns select_hunk<CR>')
-  end
+    map({ "o", "x" }, "ih", ":<C-U>Gitsigns select_hunk<CR>")
+  end,
 }
 
-local gs = require('gitsigns')
-wk.register({
-  ['<leader>hs'] = { gs.stage_hunk, "Git: Stage Hunk" },
-  ['<leader>hr'] = { gs.reset_hunk, "Git: Reset Hunk" },
-  ['<leader>hS'] = { gs.stage_buffer, "Git: Stage Buffer" },
-  ['<leader>hu'] = { gs.undo_stage_hunk, "Git: Undo Stage Hunk" },
-  ['<leader>hR'] = { gs.reset_buffer, "Git: Reset Buffer" },
-  ['<leader>hp'] = { gs.preview_hunk, "Git: Preview Hunk" },
-  ['<leader>hb'] = { function() gs.blame_line { full = true } end, "Git: Blame Line" },
-  ['<leader>tb'] = { gs.toggle_current_line_blame, "Git: Toggle Current Line Blame" },
-  ['<leader>hd'] = { gs.diffthis, "Git: Diff This" },
-  ['<leader>hD'] = { function() gs.diffthis('~') end, "Git: Diff This Base" },
-  ['<leader>td'] = { gs.toggle_deleted, "Git: Toggle Show Deleted Hunks" },
-})
-wk.register({
+local gs = require("gitsigns")
+wk.register {
+  ["<leader>hs"] = { gs.stage_hunk, "Git: Stage Hunk" },
+  ["<leader>hr"] = { gs.reset_hunk, "Git: Reset Hunk" },
+  ["<leader>hS"] = { gs.stage_buffer, "Git: Stage Buffer" },
+  ["<leader>hu"] = { gs.undo_stage_hunk, "Git: Undo Stage Hunk" },
+  ["<leader>hR"] = { gs.reset_buffer, "Git: Reset Buffer" },
+  ["<leader>hp"] = { gs.preview_hunk, "Git: Preview Hunk" },
+  ["<leader>hb"] = { function() gs.blame_line { full = true } end, "Git: Blame Line" },
+  ["<leader>tb"] = { gs.toggle_current_line_blame, "Git: Toggle Current Line Blame" },
+  ["<leader>hd"] = { gs.diffthis, "Git: Diff This" },
+  ["<leader>hD"] = { function() gs.diffthis("~") end, "Git: Diff This Base" },
+  ["<leader>td"] = { gs.toggle_deleted, "Git: Toggle Show Deleted Hunks" },
+}
+wk.register {
   ["<leader>."] = { "<cmd>e $MYVIMRC<cr>", "open init" },
   ["gq"] = { "Wrap text" },
   -- Prefer key sequence over chording
   -- it works but does not show which key menu for window
   ["<leader>w"] = { "<c-w>", "+Window" },
-  ['<leader>b'] = { '<cmd>:Neotree toggle=true<CR>', 'NeoTree: Toggle file panel' },
-  ['<leader><bslash>'] = { '<cmd>:Neotree toggle=true<CR>', 'NeoTree: Toggle file panel' },
-  ['<C-bslash>'] = { '<cmd>:Neotree reveal=true<CR>', 'NeoTree: Revel current file' },
+  ["<leader>b"] = { "<cmd>:Neotree toggle=true<CR>", "NeoTree: Toggle file panel" },
+  ["<leader><bslash>"] = { "<cmd>:Neotree toggle=true<CR>", "NeoTree: Toggle file panel" },
+  ["<C-bslash>"] = { "<cmd>:Neotree reveal=true<CR>", "NeoTree: Revel current file" },
   ["<C-p>"] = { ":FZF<cr>", "FZF: Find file" },
   ["<C-b>"] = { ":Buffers<cr>", "FZF: Switch Buffer" },
   ["<leader>fb"] = { ":Buffers<cr>", "Switch Buffer" },
@@ -1297,16 +1303,16 @@ wk.register({
   ["<leader>fs"] = { ":Telescope lsp_workspace_symbols<cr>", "Find Workspace Symbol" },
   ["<leader>fo"] = { ":Telescope lsp_document_symbols<cr>", "Find document Symbol" },
   ["<leader>fe"] = { ":Telescope live_grep<cr>", "Telescope: Grep files" },
-})
+}
 
 wk.register({
-  ['/'] = { "<cmd>Telescope live_grep<cr>", "Telescope: Grep files" },
-  [','] = { "<cmd>Telescope buffers<cr>", "Telescope: Find files" },
-  [';'] = { "<cmd>Telescope find_files<cr>", "Telescope: Find files" },
-  [':'] = { "<cmd>Telescope command_history<cr>", "Telescope: Command History" },
+  ["/"] = { "<cmd>Telescope live_grep<cr>", "Telescope: Grep files" },
+  [","] = { "<cmd>Telescope buffers<cr>", "Telescope: Find files" },
+  [";"] = { "<cmd>Telescope find_files<cr>", "Telescope: Find files" },
+  [":"] = { "<cmd>Telescope command_history<cr>", "Telescope: Command History" },
   f = {
     h = { "<cmd>Telescope help_tags<cr>", "Find in Help" },
-    x = { require('telescope.builtin').resume, "Telescope: Resume last picker" },
+    x = { require("telescope.builtin").resume, "Telescope: Resume last picker" },
     y = { "<cmd>Telescope command_history<cr>", "Find in command history" },
     -- ["<leader>ff"] = { "<cmd>Telescope find_files<cr>", "Find File" },
     -- ["<leader>fr"] = { "<cmd>Telescope oldfiles<cr>", "Open Recent File" },
@@ -1317,13 +1323,14 @@ wk.register({
     b = { "<cmd>Telescope git_branches<cr>", "Git: Branches" },
     -- d = { "<cmd>:SignifyHunkDiff<cr>", "Git: Hunk Diff" },
     -- U = { "<cmd>:SignifyHunkUndo<cr>", "Git: Undo Hunk" },
-    l = { function() require('git.blame').blame() end, "Git: Blame" },
-    h = { function() require('git.browse').open(false) end, "Git: Browse" },
+    l = { function() require("git.blame").blame() end, "Git: Blame" },
+    h = { function() require("git.browse").open(false) end, "Git: Browse" },
     -- g = { function() lazygit:toggle() end, "Git: Lazygit" },
     g = { function() lazygit_terminal:toggle() end, "Git: Lazygit" },
     o = {
       '<cmd>lua require"gitlinker".get_buf_range_url("n", {action_callback = require"gitlinker.actions".open_in_browser})<cr>',
-      "Git: Browse Permalink" }
+      "Git: Browse Permalink",
+    },
   },
   j = {
     j = { "<cmd>:Buffers<cr>", "Buffers" },
@@ -1336,9 +1343,9 @@ wk.register({
     -- bind it outside of on_attach to use for debugging
     l = { "<cmd>LSPInfo<cr>", "Lsp: Show Info" },
     L = { function() vim.cmd(":e " .. vim.lsp.get_log_path()) end, "Lsp: Show Log" },
-    p = { require('goto-preview').goto_preview_definition, "Lsp: Preview Definition" },
-    y = { require('goto-preview').goto_preview_type_definition, "Lsp: Preview Type Definition" },
-    i = { require('goto-preview').goto_preview_implementation, "Lsp: Preview Implementation" },
+    p = { require("goto-preview").goto_preview_definition, "Lsp: Preview Definition" },
+    y = { require("goto-preview").goto_preview_type_definition, "Lsp: Preview Type Definition" },
+    i = { require("goto-preview").goto_preview_implementation, "Lsp: Preview Implementation" },
   },
   -- TODO: Figure out how to bind these via autocmd
   m = {
@@ -1350,7 +1357,7 @@ wk.register({
     t = { function() bottom_terminal:toggle() end, "Toggle Terminal" },
     -- c = { "<cmd>:lua require('FTerm').scratch({ cmd = {'chatgpt', '-n'} })<cr>", "ChatGPT" },
     c = { function() chatgpt_terminal:open() end, "ChatGPT" },
-    f = { tc.show_control_flow, "TreeCliber: Show Control Flow" }
+    f = { tc.show_control_flow, "TreeCliber: Show Control Flow" },
   },
   w = {
     m = { "<Cmd>:WinShift<CR>", "Move" },
@@ -1366,7 +1373,9 @@ wk.register({
   },
   r = { "<cmd>:set relativenumber!<cr>", "Toggle relative line numbers" },
   t = {
-    t = { "<cmd>:ConjureEval (kaocha.repl/run {:kaocha/reporter [kaocha.report/documentation]})<cr>",
-      "Run tests in REPL with kaocha" },
+    t = {
+      "<cmd>:ConjureEval (kaocha.repl/run {:kaocha/reporter [kaocha.report/documentation]})<cr>",
+      "Run tests in REPL with kaocha",
+    },
   },
 }, { prefix = "<localleader>" })
