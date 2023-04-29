@@ -13,235 +13,225 @@ vim.o.shell = '/usr/bin/bash'
 
 -- Plugins {{{1
 
-local fn = vim.fn
-local install_path = fn.stdpath('data') .. '/site/pack/packer/start/packer.nvim'
-if fn.empty(fn.glob(install_path)) > 0 then
-  packer_bootstrap = fn.system({ 'git', 'clone', '--depth', '1', 'https://github.com/wbthomason/packer.nvim',
-    install_path })
-end
-
-require('packer').startup(function(use)
+local plugins = {
   -- I like to specify full url of the plugin, because one can then press `gx` to open
   -- the plugin home page in a web browser.
 
   -- Packer manages itself, otherwise it tries to clean itself when not specified
-  use 'wbthomason/packer.nvim'
+  -- 'wbthomason/packer.nvim',
 
   -- Defaults everyone can agree on
-  -- use 'https://github.com/tpope/vim-sensible'
+  -- 'https://github.com/tpope/vim-sensible',
 
   -- Syntax highlighting theme
-  use { 'folke/tokyonight.nvim', config = function()
-    require("tokyonight").setup({
+  {
+    'folke/tokyonight.nvim',
+    lazy = false,    -- make sure we load this during startup if it is your main colorscheme
+    priority = 1000, -- make sure to load this before all the other start plugins
+    config = function()
+      -- load the colorscheme here
+      vim.cmd([[colorscheme tokyonight]])
+    end,
+    opts = {
       style = "night",
-    })
-  end }
-  use 'https://github.com/ayu-theme/ayu-vim.git'
-  use 'https://github.com/mhartington/oceanic-next.git'
-  -- use 'https://github.com/haishanh/night-owl.vim.git'
-  -- use 'https://github.com/arcticicestudio/nord-vim.git'
-  -- use 'https://github.com/drewtempelmeyer/palenight.vim.git'
-  -- use 'https://github.com/joshdick/onedark.vim.git'
-  -- use 'https://github.com/tomasiser/vim-code-dark.git'
+    }
+  },
+  'https://github.com/ayu-theme/ayu-vim.git',
+  'https://github.com/mhartington/oceanic-next.git',
+  -- 'https://github.com/haishanh/night-owl.vim.git',
+  -- 'https://github.com/arcticicestudio/nord-vim.git',
+  -- 'https://github.com/drewtempelmeyer/palenight.vim.git',
+  -- 'https://github.com/joshdick/onedark.vim.git',
+  -- 'https://github.com/tomasiser/vim-code-dark.git',
 
   -- Light themes
-  use { 'https://github.com/sonph/onehalf.git', rtp = 'vim' }
-  use 'https://github.com/sainnhe/edge.git'
-  use 'chiendo97/intellij.vim'
-  use 'Mofiqul/adwaita.nvim'
-  use 'mvpopuk/inspired-github.vim'
-  use 'https://github.com/projekt0n/github-nvim-theme.git'
-  use 'https://github.com/habamax/vim-sugarlily'
+  -- { 'https://github.com/sonph/onehalf.git', rtp = 'vim' }, -- rtp needs to be migrated
+  'https://github.com/sainnhe/edge.git',
+  'chiendo97/intellij.vim',
+  'Mofiqul/adwaita.nvim',
+  'mvpopuk/inspired-github.vim',
+  'https://github.com/projekt0n/github-nvim-theme.git',
+  'https://github.com/habamax/vim-sugarlily',
 
   -- Show colors for hex values
-  use 'norcalli/nvim-colorizer.lua'
+  'norcalli/nvim-colorizer.lua',
 
   -- Tree plugin
-  use {
+  {
     'nvim-neo-tree/neo-tree.nvim',
-    requires = { 'nvim-lua/plenary.nvim', 'kyazdani42/nvim-web-devicons', 'MunifTanjim/nui.nvim' },
-  }
+    dependencies = { 'nvim-lua/plenary.nvim', 'kyazdani42/nvim-web-devicons', 'MunifTanjim/nui.nvim' },
+  },
 
   -- Close buffers inteligently
-  use { 'https://github.com/mhinz/vim-sayonara.git', cmd = 'Sayonara' }
+  { 'https://github.com/mhinz/vim-sayonara.git', cmd = 'Sayonara' },
 
   -- Open file under cursor with gf relative to current file path
-  use 'https://github.com/kkoomen/gfi.vim.git'
+  'https://github.com/kkoomen/gfi.vim.git',
 
   -- Fuzzy file serch
-  use { 'junegunn/fzf', run = ':call fzf#install()' }
-  use 'https://github.com/junegunn/fzf.vim.git'
+  { 'junegunn/fzf', build = ':call fzf#install()' },
+  'https://github.com/junegunn/fzf.vim.git',
 
   -- Lua-based fuzzy finder
-  use {
+  {
     'nvim-telescope/telescope.nvim',
-    requires = { 'nvim-lua/popup.nvim', 'nvim-lua/plenary.nvim' },
-  }
+    dependencies = { 'nvim-lua/popup.nvim', 'nvim-lua/plenary.nvim' },
+  },
 
-  use {
+  {
     'jvgrootveld/telescope-zoxide',
-    requires = { 'nvim-telescope/telescope.nvim' },
-  }
+    dependencies = { 'nvim-telescope/telescope.nvim' },
+  },
 
   -- Auto completion
-  use 'hrsh7th/cmp-nvim-lsp'
-  use 'hrsh7th/cmp-buffer'
-  use 'hrsh7th/cmp-path'
-  use 'hrsh7th/cmp-nvim-lua'
-  use 'hrsh7th/nvim-cmp'
+  'hrsh7th/cmp-nvim-lsp',
+  'hrsh7th/cmp-buffer',
+  'hrsh7th/cmp-path',
+  'hrsh7th/cmp-nvim-lua',
+  'hrsh7th/nvim-cmp',
   -- adds vscode-like pictograms to neovim built-in lsp
-  use 'https://github.com/onsails/lspkind-nvim.git'
+  'https://github.com/onsails/lspkind-nvim.git',
 
   -- .editorconfig support
   -- editor config included in 0.9+
-  -- use 'https://github.com/editorconfig/editorconfig-vim.git'
+  -- 'https://github.com/editorconfig/editorconfig-vim.git',
   -- Heuristically set buffer options
-  -- use 'https://github.com/tpope/vim-sleuth.git'
+  -- 'https://github.com/tpope/vim-sleuth.git',
 
-  -- The three "core" operations of add/delete/change can be done with the keymaps ys{motion}{char}, ds{char}, and cs{target}{replacement}
-  use { "kylechui/nvim-surround", config = function()
-    require("nvim-surround").setup()
-  end }
+  -- The three "core" operations of add/delete/change can be done with the keymaps ys{motion},{char}, ds{char}, and cs{target}{replacement}
+  { "kylechui/nvim-surround", opts = {} },
 
   -- Multiple cursors
-  use { 'mg979/vim-visual-multi', branch = 'master' }
+  { 'mg979/vim-visual-multi', branch = 'master' },
 
   -- automatically toggle between relative and absolute line numbers
-  -- use 'https://github.com/sitiom/nvim-numbertoggle'
+  -- 'https://github.com/sitiom/nvim-numbertoggle',
 
   -- Toggling comments
-  -- use 'https://github.com/preservim/nerdcommenter.git'
-  use 'numToStr/Comment.nvim'
+  -- 'https://github.com/preservim/nerdcommenter.git',
+  'numToStr/Comment.nvim',
 
   -- Git show changes in gutter
-  -- use 'https://github.com/mhinz/vim-signify.git'
-  use 'lewis6991/gitsigns.nvim'
+  -- 'https://github.com/mhinz/vim-signify.git',
+  'lewis6991/gitsigns.nvim',
 
   -- Floating terminal, using it to run lazygit
-  -- use 'numtostr/FTerm.nvim'
+  -- 'numtostr/FTerm.nvim',
   -- Git utilities, mostly using :GBrowse and blame
-  use 'dinhhuy258/git.nvim'
+  'dinhhuy258/git.nvim',
   -- In contrast to git.nvim, it opens permalinks for browsing (and possibly supports more hosts)
-  use { 'https://github.com/ruifm/gitlinker.nvim', config = function()
-    require('gitlinker').setup { mappings = nil }
-  end }
+  { 'https://github.com/ruifm/gitlinker.nvim', opts = { mappings = nil } },
 
   -- git diff and merge view
-  use { 'sindrets/diffview.nvim', requires = 'nvim-lua/plenary.nvim' }
+  { 'sindrets/diffview.nvim', dependencies = 'nvim-lua/plenary.nvim' },
 
   -- Dressing for improved selection UI that uses telescope
-  use 'stevearc/dressing.nvim'
-  use 'mrjones2014/legendary.nvim'
+  'stevearc/dressing.nvim',
+  'mrjones2014/legendary.nvim',
 
   -- Spacemacs-like menu
-  use 'folke/which-key.nvim'
+  'folke/which-key.nvim',
 
   -- bracketted key mappings like `[b` `]b` for switching buffers or `[q` `]q` for navigating quickfix list
   -- advantage over tpope/vim-unimpaired is that is sets mapping descriptions
   -- todo: it would be nice to add mappings to legendary  require('unimpaired.config').defaults.keymaps
-  use { 'tummetott/unimpaired.nvim', config = function()
-    require('unimpaired').setup {}
-  end }
+  { 'tummetott/unimpaired.nvim', opts = {} },
 
   -- Language client
-  use 'https://github.com/Olical/conjure.git'
+  'https://github.com/Olical/conjure.git',
   -- Load CLojure exception trace into location list
-  use 'walterl/conjure-locstack'
+  'walterl/conjure-locstack',
 
-  -- use { 'https://github.com/eraserhd/parinfer-rust.git', ft = 'clojure', run = 'nix-shell --run \"cargo build --release \"' }
-  use 'gpanders/nvim-parinfer'
+  -- { 'https://github.com/eraserhd/parinfer-rust.git', ft = 'clojure', build = 'nix-shell --run \"cargo build --release \"' },
+  'gpanders/nvim-parinfer',
 
   -- Structural editing of s-expressions ala paredit - barfing, slurping, etc.
-  -- use 'guns/vim-sexp'
+  -- 'guns/vim-sexp',
   -- Use snoe's fork which includes improvements to preserve cursor position and recursive capture.
   -- https://github.com/guns/vim-sexp/pull/12
   -- https://github.com/guns/vim-sexp/pull/15
-  -- use { 'snoe/vim-sexp', commit = '4161f5c01504b77ab63f2957b943fca0c6e12e83' }
+  -- { 'snoe/vim-sexp', commit = '4161f5c01504b77ab63f2957b943fca0c6e12e83' },
   -- Enables use of the . command for repeating change operations in vim-sexp
-  use 'tpope/vim-repeat'
-  -- use 'tpope/vim-sexp-mappings-for-regular-people'
+  'tpope/vim-repeat',
+  -- 'tpope/vim-sexp-mappings-for-regular-people',
 
   -- sets lua lsp for signature help, docs and completion for the nvim lua API
   -- IMPORTANT: make sure to setup neodev BEFORE lspconfig
-  use 'folke/neodev.nvim'
+  'folke/neodev.nvim',
 
-  use 'neovim/nvim-lspconfig'
+  'neovim/nvim-lspconfig',
   -- Auto install LSP servers
-  use { 'dundalek/lazy-lsp.nvim', requires = { 'neovim/nvim-lspconfig' } }
+  { 'dundalek/lazy-lsp.nvim', dependencies = { 'neovim/nvim-lspconfig' }, },
   -- Preview lsp definitions in floating windows
-  use { 'rmagatti/goto-preview', config = function()
-    require('goto-preview').setup {}
-  end }
+  { 'rmagatti/goto-preview', opts = {} },
 
   -- Syntax highlighting based on treesitter
-  use {
+  {
     'nvim-treesitter/nvim-treesitter',
-    run = ':TSUpdate', -- We recommend updating the parsers on update
-  }
+    build = ':TSUpdate', -- We recommend updating the parsers on update
+  },
 
-  use 'https://github.com/Dkendal/nvim-treeclimber'
+  'https://github.com/Dkendal/nvim-treeclimber',
 
   -- A tree like view for symbols in Neovim using the Language Server Protocol
-  use 'https://github.com/simrat39/symbols-outline.nvim.git'
+  'https://github.com/simrat39/symbols-outline.nvim.git',
 
   -- For generating markdown Table of Contents
-  use 'mzlogin/vim-markdown-toc'
+  'mzlogin/vim-markdown-toc',
 
   -- Markdown preview
-  use { "iamcco/markdown-preview.nvim", run = "cd app && npm install", setup = function()
-    vim.g.mkdp_filetypes = {
-      "markdown" }
-  end, ft = { "markdown" }, }
+  {
+    "iamcco/markdown-preview.nvim",
+    build = "cd app && npm install",
+    init = function()
+      vim.g.mkdp_filetypes = { "markdown" }
+    end,
+    ft = { "markdown" }
+  },
   -- Useful markdown editing functionality
   -- <C-k> for creating links from selection
   -- <C-b> to bold selection (requires vim-surround)
   -- <C-Space> to toggle task list items
-  use { 'walterl/downtools' }
+  { 'walterl/downtools' },
 
   ---- Experimental {{{1
 
   -- Better quickfix window - good for lsp references list with preview
-  use 'kevinhwang91/nvim-bqf'
+  'kevinhwang91/nvim-bqf',
 
   -- status line
-  use { 'windwp/windline.nvim', config = function()
-    -- preset for windline status line
-    -- require('wlsample.airline')
-    require('wlsample.evil_line')
-  end }
+  {
+    'windwp/windline.nvim',
+    config = function()
+      -- preset for windline status line
+      -- require('wlsample.airline')
+      require('wlsample.evil_line')
+    end
+  },
 
-  -- use { 'akinsho/toggleterm.nvim', config = function() end }
-  use { 'rebelot/terminal.nvim', config = function()
-    require("terminal").setup {}
-  end }
+  -- { 'akinsho/toggleterm.nvim', config = function() end },
+  { 'rebelot/terminal.nvim', opts = {} },
 
   -- Show list of issues from lsp for fixing
-  use { 'folke/trouble.nvim', requires = 'kyazdani42/nvim-web-devicons', config = function()
-    require("trouble").setup {}
-  end }
+  { 'folke/trouble.nvim', dependencies = 'kyazdani42/nvim-web-devicons', opts = {} },
 
   -- Better mode to move windows
-  use {
-    'sindrets/winshift.nvim',
-    cmd = { 'WinShift' },
-    config = function()
-      require("winshift").setup({})
-    end,
-  }
+  { 'sindrets/winshift.nvim', cmd = { 'WinShift' }, opts = {} },
 
   -- Closed unedited buffers
   -- Can also consider https://github.com/chrisgrieser/nvim-early-retirement
   -- for time based buffer clean up
-  use { 'axkirillov/hbac.nvim', config = function()
-    require("hbac").setup { autoclose = false }
-  end }
+  { 'axkirillov/hbac.nvim', opts = { autoclose = false } },
+}
 
-  -- Automatically set up your configuration after cloning packer.nvim
-  -- Put this at the end after all plugins
-  if packer_bootstrap then
-    require('packer').sync()
-  end
-end)
+local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
+if not vim.loop.fs_stat(lazypath) then
+  vim.fn.system({ "git", "clone", "--filter=blob:none", "https://github.com/folke/lazy.nvim.git",
+    "--branch=stable", lazypath })
+end
+vim.opt.rtp:prepend(lazypath)
+
+require("lazy").setup(plugins, {})
 
 -- Experimental {{{1
 
@@ -366,10 +356,10 @@ set title
 
 " Source the nvim config file after saving it
 " After reloading folds are reset to expr for treesitter, so change it back to marker.
-autocmd! BufWritePost */nvim/init.lua
-  \ PackerCompile
-  \ source $MYVIMRC
-  \| setlocal foldmethod=marker
+" Lazy.nvim auto-realods?
+" autocmd! BufWritePost */nvim/init.lua
+"   \ source $MYVIMRC
+"   \| setlocal foldmethod=marker
 
 "-- Window and buffer management {{{1
 
