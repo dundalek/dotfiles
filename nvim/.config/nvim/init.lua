@@ -34,7 +34,6 @@ require('packer').startup(function(use)
   use { 'folke/tokyonight.nvim', config = function()
     require("tokyonight").setup({
       style = "night",
-      styles = { keywords = { italic = false } }
     })
   end }
   use 'https://github.com/ayu-theme/ayu-vim.git'
@@ -95,46 +94,59 @@ require('packer').startup(function(use)
 
   -- .editorconfig support
   -- editor config included in 0.9+
-  use 'https://github.com/editorconfig/editorconfig-vim.git'
+  -- use 'https://github.com/editorconfig/editorconfig-vim.git'
   -- Heuristically set buffer options
   -- use 'https://github.com/tpope/vim-sleuth.git'
 
   -- The three "core" operations of add/delete/change can be done with the keymaps ys{motion}{char}, ds{char}, and cs{target}{replacement}
-  use {
-    "kylechui/nvim-surround",
-    config = function()
-      require("nvim-surround").setup {}
-    end
-  }
+  use { "kylechui/nvim-surround", config = function()
+    require("nvim-surround").setup()
+  end }
 
   -- Multiple cursors
   use { 'mg979/vim-visual-multi', branch = 'master' }
 
+  -- automatically toggle between relative and absolute line numbers
+  -- use 'https://github.com/sitiom/nvim-numbertoggle'
 
   -- Toggling comments
   -- use 'https://github.com/preservim/nerdcommenter.git'
   use 'numToStr/Comment.nvim'
 
   -- Git show changes in gutter
-  use 'https://github.com/mhinz/vim-signify.git'
+  -- use 'https://github.com/mhinz/vim-signify.git'
+  use 'lewis6991/gitsigns.nvim'
 
   -- Floating terminal, using it to run lazygit
-  use 'numtostr/FTerm.nvim'
-  -- Git utilities, mostly using :GBrowse
+  -- use 'numtostr/FTerm.nvim'
+  -- Git utilities, mostly using :GBrowse and blame
   use 'dinhhuy258/git.nvim'
-  -- use 'https://github.com/tpope/vim-fugitive'
-  -- Add support for :GBrowse command from fugitive to work with github
-  -- use 'https://github.com/tpope/vim-rhubarb.git'
+  -- In contrast to git.nvim, it opens permalinks for browsing (and possibly supports more hosts)
+  use { 'https://github.com/ruifm/gitlinker.nvim', config = function()
+    require('gitlinker').setup { mappings = nil }
+  end }
 
-  -- Spacemacs-like menu
-  use 'folke/which-key.nvim'
+  -- git diff and merge view
+  use { 'sindrets/diffview.nvim', requires = 'nvim-lua/plenary.nvim' }
 
   -- Dressing for improved selection UI that uses telescope
   use 'stevearc/dressing.nvim'
   use 'mrjones2014/legendary.nvim'
 
+  -- Spacemacs-like menu
+  use 'folke/which-key.nvim'
+
+  -- bracketted key mappings like `[b` `]b` for switching buffers or `[q` `]q` for navigating quickfix list
+  -- advantage over tpope/vim-unimpaired is that is sets mapping descriptions
+  -- todo: it would be nice to add mappings to legendary  require('unimpaired.config').defaults.keymaps
+  use { 'tummetott/unimpaired.nvim', config = function()
+    require('unimpaired').setup {}
+  end }
+
   -- Language client
   use 'https://github.com/Olical/conjure.git'
+  -- Load CLojure exception trace into location list
+  use 'walterl/conjure-locstack'
 
   -- use { 'https://github.com/eraserhd/parinfer-rust.git', ft = 'clojure', run = 'nix-shell --run \"cargo build --release \"' }
   use 'gpanders/nvim-parinfer'
@@ -149,16 +161,17 @@ require('packer').startup(function(use)
   use 'tpope/vim-repeat'
   -- use 'tpope/vim-sexp-mappings-for-regular-people'
 
+  -- sets lua lsp for signature help, docs and completion for the nvim lua API
+  -- IMPORTANT: make sure to setup neodev BEFORE lspconfig
+  use 'folke/neodev.nvim'
+
   use 'neovim/nvim-lspconfig'
   -- Auto install LSP servers
   use { 'dundalek/lazy-lsp.nvim', requires = { 'neovim/nvim-lspconfig' } }
-
-  -- Syntax highlighting for many languages, lazily loaded
-  -- Polyglot provides :Toc command for markdown, otherwise can remove it since
-  -- treesitter is now a thing.
-  -- Also seems to provide sections for markdown, so that ]] and [[ work to
-  -- jump to next / prev sections.
-  -- use 'https://github.com/sheerun/vim-polyglot.git'
+  -- Preview lsp definitions in floating windows
+  use { 'rmagatti/goto-preview', config = function()
+    require('goto-preview').setup {}
+  end }
 
   -- Syntax highlighting based on treesitter
   use {
@@ -166,8 +179,7 @@ require('packer').startup(function(use)
     run = ':TSUpdate', -- We recommend updating the parsers on update
   }
 
-  -- Display treesitter parser tree, open with :TSPlaygroundToggle
-  use { 'nvim-treesitter/playground', cmd = 'TSPlaygroundToggle' }
+  use 'https://github.com/Dkendal/nvim-treeclimber'
 
   -- A tree like view for symbols in Neovim using the Language Server Protocol
   use 'https://github.com/simrat39/symbols-outline.nvim.git'
@@ -190,15 +202,23 @@ require('packer').startup(function(use)
 
   -- Better quickfix window - good for lsp references list with preview
   use 'kevinhwang91/nvim-bqf'
-  -- use { 'kevinhwang91/nvim-bqf', config = function() require('bqf').setup() end }
 
   -- status line
-  use 'windwp/windline.nvim'
+  use { 'windwp/windline.nvim', config = function()
+    -- preset for windline status line
+    -- require('wlsample.airline')
+    require('wlsample.evil_line')
+  end }
 
-  use 'akinsho/toggleterm.nvim'
+  -- use { 'akinsho/toggleterm.nvim', config = function() end }
+  use { 'rebelot/terminal.nvim', config = function()
+    require("terminal").setup {}
+  end }
 
   -- Show list of issues from lsp for fixing
-  use { 'folke/trouble.nvim', requires = 'kyazdani42/nvim-web-devicons' }
+  use { 'folke/trouble.nvim', requires = 'kyazdani42/nvim-web-devicons', config = function()
+    require("trouble").setup {}
+  end }
 
   -- Better mode to move windows
   use {
@@ -209,6 +229,13 @@ require('packer').startup(function(use)
     end,
   }
 
+  -- Closed unedited buffers
+  -- Can also consider https://github.com/chrisgrieser/nvim-early-retirement
+  -- for time based buffer clean up
+  use { 'axkirillov/hbac.nvim', config = function()
+    require("hbac").setup { autoclose = false }
+  end }
+
   -- Automatically set up your configuration after cloning packer.nvim
   -- Put this at the end after all plugins
   if packer_bootstrap then
@@ -218,24 +245,11 @@ end)
 
 -- Experimental {{{1
 
-require("toggleterm").setup {
-  shell = "zellij",
-}
 
--- `setup()` must be called before `require('which-key).register()`
-require('legendary').setup {
-  default_item_formatter = nil,
-  -- formatter = function(item)
-  --   -- require('legendary.formatter').get_default_format_values
-  --   return { "a", "b", "x" }
-  -- end,
-}
+-- require("toggleterm").setup {
+--   shell = "zellij",
+-- }
 
-require("trouble").setup {}
-
--- preset for windline status line
--- require('wlsample.airline')
-require('wlsample.evil_line')
 
 -- Globals {{{1
 
@@ -259,14 +273,16 @@ vim.opt.guicursor:append { 'a:blinkon100' } -- blinking cursor to get more comfy
 
 -- General settings {{{1
 
-vim.cmd [[
-set number  " Show line numbers
-set scrolloff=3             " number of screen lines to show around the cursor
-" Smart case sensitivity handling for / searches
-set ignorecase smartcase
+vim.o.number = true -- Show line numbers
+vim.o.scrolloff = 3 -- number of screen lines to show around the cursor
+-- Smart case sensitivity handling for / searches
+vim.o.ignorecase = true
+vim.o.smartcase = true
 
-" Show search and replace subsctitions incrementally (Neovim only)
-set inccommand=nosplit
+-- Show search and replace subsctitions incrementally (Neovim only)
+vim.o.inccommand = "nosplit"
+
+vim.cmd [[
 
 " paste with ctrl+v - clashes with visual block mode
 " nnoremap <C-V> "+gP
@@ -351,6 +367,7 @@ set title
 " Source the nvim config file after saving it
 " After reloading folds are reset to expr for treesitter, so change it back to marker.
 autocmd! BufWritePost */nvim/init.lua
+  \ PackerCompile
   \ source $MYVIMRC
   \| setlocal foldmethod=marker
 
@@ -371,10 +388,6 @@ nnoremap <leader>d :Sayonara!<CR>
 " Quit window, saner :quit
 nnoremap <leader>q :Sayonara<CR>
 
-"" Split
-noremap <Leader>h :<C-u>split<CR>
-noremap <Leader>v :<C-u>vsplit<CR>
-
 " use ctrl  +hjkl to move between split/vsplit panels
 nnoremap <C-h> <C-w>h
 nnoremap <C-j> <C-w>j
@@ -388,13 +401,8 @@ inoremap <C-l> <C-\><C-N><C-w>l
 " tnoremap <C-j> <C-\><C-n><C-w>j
 " tnoremap <C-k> <C-\><C-n><C-w>k
 " tnoremap <C-l> <C-\><C-n><C-w>l
-" tnoremap <Esc> <C-\><C-n>
 
 "-- Movement {{{1
-
-" Save on need to hold shift for commands for convenience (conflicts with
-" motion repeat)
-" nnoremap ; :
 
 " Move up and down on long wrapped lines
 nnoremap k gk
@@ -425,9 +433,6 @@ nnoremap <silent> 0 :call ToggleMovement('^', '0')<CR>
 nnoremap <silent> G :call ToggleMovement('G', 'gg')<CR>
 " nnoremap <silent> gg :call ToggleMovement('gg', 'G')<CR>
 
-" Trigger a highlight with quuick scope in the appropriate direction when pressing these keys:
-let g:qs_highlight_on_keys = ['f', 'F', 't', 'T']
-
 "-- Editing {{{1
 
 " maintain visual selection after un/indenting with > and <
@@ -439,7 +444,6 @@ vmap <S-Tab> <gv
 " unindent with shift-tab for command mode
 " nnoremap <S-Tab> <<
 vmap <Tab> >gv
-
 
 " Clear search highlighting on escape in normal mode (press esc twice to make
 " it disappear faster)
@@ -491,19 +495,32 @@ if !get(g:, 'initial_colorcheme_selected')
 
 endif
 
+" use :Inspect to figure out syntax highlight groups
 " Code lens is an information line from LSP like number of references or tests
 highlight link LspCodeLens Comment
 " highlight link LspCodeLensSeparator Comment
 
-" Provides :SyntaxQuery command to print syntax group for a location under
-" cursor to debug syntax highlighting
-function! s:syntax_query() abort
-  for id in synstack(line("."), col("."))
-    echo synIDattr(id, "name")
-  endfor
-endfunction
-command! SyntaxQuery call s:syntax_query()
+" Make typescript type noise less prominent
+highlight link @type.typescript Comment
+highlight link @lsp.type.typeParameter.typescript Comment
+highlight link @lsp.type.type.typescript Comment
+highlight link @lsp.type.interface.typescript Comment
+
 ]]
+
+local function map(mode, lhs, rhs, opts)
+  opts = opts or {}
+  opts.silent = opts.silent ~= false
+  vim.keymap.set(mode, lhs, rhs, opts)
+end
+
+-- Move Lines
+map("n", "<A-j>", "<cmd>m .+1<cr>==", { desc = "Move down" })
+map("n", "<A-k>", "<cmd>m .-2<cr>==", { desc = "Move up" })
+map("i", "<A-j>", "<esc><cmd>m .+1<cr>==gi", { desc = "Move down" })
+map("i", "<A-k>", "<esc><cmd>m .-2<cr>==gi", { desc = "Move up" })
+map("v", "<A-j>", ":m '>+1<cr>gv=gv", { desc = "Move down" })
+map("v", "<A-k>", ":m '<-2<cr>gv=gv", { desc = "Move up" })
 
 ---- colorizer {{{1
 -- Show colors for hex values
@@ -596,10 +613,10 @@ require('telescope').setup({
     -- Default cycle scroll strategy is confusing, don't wraparound at the end.
     -- One can also use gg and G to jump to the other end.
     scroll_strategy = "limit",
-    --layout_config = {
-    -- vertical = { width = 0.5 }
-    -- other layout configuration here
-    --},
+    -- layout_config = {
+    --   vertical = { width = 0.9 }
+    --   -- other layout configuration here
+    -- },
   },
   pickers = {
     colorscheme = {
@@ -639,6 +656,7 @@ vim.api.nvim_create_autocmd({ "DirChanged" }, {
   end
 })
 
+
 -- Auto completion {{{1
 
 ---- nvim-cmp {{{1
@@ -663,7 +681,7 @@ cmp.setup({
     { name = 'nvim_lsp' },
     { name = 'nvim_lua' },
     { name = 'path' },
-    { name = 'buffer',  keyword_length = 5 },
+    { name = 'buffer', keyword_length = 5 },
   },
   formatting = {
     -- Show icons for completion items
@@ -678,6 +696,46 @@ cmp.setup({
   },
 })
 
+-- Terminal {{{1
+
+require("terminal").setup()
+local bottom_terminal = require("terminal").terminal:new({
+  layout = { open_cmd = "botright new +resize15" },
+  cmd = { "zellij" },
+})
+
+local lazygit_terminal = require("terminal").terminal:new({
+  layout = { open_cmd = "float", height = 1, width = 1 },
+  cmd = { "lazygit" },
+  autoclose = true,
+})
+
+
+local chatgpt_terminal = require('terminal').terminal:new({
+  -- nix-env -iA nixpkgs.chatgpt-cli
+  cmd = { 'chatgpt', '-n' },
+  layout = { open_cmd = "float", border = "rounded" },
+  autoclose = true,
+})
+
+-- Auto insert mode
+vim.api.nvim_create_autocmd({ "WinEnter", "BufWinEnter", "TermOpen" }, {
+  callback = function(args)
+    if vim.startswith(vim.api.nvim_buf_get_name(args.buf), "term://") then
+      vim.cmd("startinsert")
+    end
+  end,
+})
+
+-- terminal window highlight
+vim.api.nvim_create_autocmd("TermOpen", {
+  command = [[setlocal nonumber norelativenumber winhl=Normal:NormalFloat]]
+})
+
+vim.cmd [[
+tnoremap <c-\><c-\> <c-\><c-n>
+]]
+
 -- Language configs {{{1
 
 ---- treesitter {{{1
@@ -691,33 +749,13 @@ require 'nvim-treesitter.configs'.setup {
   },
 }
 
-vim.cmd [[
-" Use folds based on treesitter parsing
-set foldmethod=expr
-set foldexpr=nvim_treesitter#foldexpr()
+-- Use folds based on treesitter parsing
+vim.opt.foldmethod = "expr"
+vim.opt.foldexpr = "nvim_treesitter#foldexpr()"
 
-" Following is to open all folds by default, they can be closed with zM if necessary
-" augroup open_folds
-  " autocmd! BufWinEnter * silent! :%foldopen!
-" augroup END
-
-" https://stackoverflow.com/questions/8316139/how-to-set-the-default-to-unfolded-when-you-open-a-file
-" Have folds opened by default
-set nofoldenable
-
-"---- conjure {{{1
-" Clojure
-
-augroup lang_clojure
-  autocmd!
-  " set nolinebreak because line break at words boundary bugs out with parinfer
-  autocmd FileType clojure
-    \ nnoremap <LocalLeader>s :ConjureShadowSelect
-    \| nnoremap <LocalLeader>el :ConjureLogSplit<cr>
-    \| nnoremap <LocalLeader>ev :ConjureLogVSplit<cr>
-    \| set nolinebreak
-augroup END
-]]
+-- https://stackoverflow.com/questions/8316139/how-to-set-the-default-to-unfolded-when-you-open-a-file
+-- Following is to open all folds by default, they can be closed with zM if necessary
+vim.opt.foldenable = false
 
 ---- lspconfig {{{1
 
@@ -762,22 +800,6 @@ local on_attach = function(client, bufnr)
   buf_set_keymap('n', '<leader>lh', '<cmd>lua vim.lsp.buf.signature_help()<CR>', opts)
   buf_set_keymap('n', '<leader>lq', '<cmd>lua vim.lsp.buf.hover()<CR>', opts)
 
-  -- buf_set_keymap('n', '<space>wa', '<cmd>lua vim.lsp.buf.add_workspace_folder()<CR>', opts)
-  -- buf_set_keymap('n', '<space>wr', '<cmd>lua vim.lsp.buf.remove_workspace_folder()<CR>', opts)
-  -- buf_set_keymap('n', '<space>wl', '<cmd>lua print(vim.inspect(vim.lsp.buf.list_workspace_folders()))<CR>', opts)
-
-  -- (nvim.buf_set_keymap bufnr :n :<leader>ld "<Cmd>lua vim.lsp.buf.declaration()<CR>" {:noremap true})
-  -- (nvim.buf_set_keymap bufnr :n :<leader>lt "<cmd>lua vim.lsp.buf.type_definition()<CR>" {:noremap true})
-  -- (nvim.buf_set_keymap bufnr :n :<leader>le "<cmd>lua vim.lsp.diagnostic.show_line_diagnostics()<CR>" {:noremap true})
-  -- (nvim.buf_set_keymap bufnr :n :<leader>lq "<cmd>lua vim.lsp.diagnostic.set_loclist()<CR>" {:noremap true})
-  -- (nvim.buf_set_keymap bufnr :n :<leader>lf "<cmd>lua vim.lsp.buf.formatting()<CR>" {:noremap true})
-  -- (nvim.buf_set_keymap bufnr :n :<leader>lj "<cmd>lua vim.lsp.diagnostic.goto_next()<CR>" {:noremap true})
-  -- (nvim.buf_set_keymap bufnr :n :<leader>lk "<cmd>lua vim.lsp.diagnostic.goto_prev()<CR>" {:noremap true})
-  -- ;telescope
-  -- (nvim.buf_set_keymap bufnr :n :<leader>la ":lua require('telescope.builtin').lsp_code_actions(require('telescope.themes').get_cursor())<cr>" {:noremap true})
-  -- (nvim.buf_set_keymap bufnr :v :<leader>la ":lua require('telescope.builtin').lsp_range_code_actions(require('telescope.themes').get_cursor())<cr>" {:noremap true})
-  -- (nvim.buf_set_keymap bufnr :n :<leader>lw ":lua require('telescope.builtin').lsp_workspace_diagnostics()<cr>" {:noremap true})
-  -- (nvim.buf_set_keymap bufnr :n :<leader>li ":lua require('telescope.builtin').lsp_implementations()<cr>" {:noremap true})))]
 
   buf_set_keymap('n', '<localleader>o', '<cmd>lua require"symbols-outline".toggle_outline()<cr>', opts)
 
@@ -835,6 +857,8 @@ local on_attach = function(client, bufnr)
   --   })
   -- end
 end
+
+require("neodev").setup {}
 
 local nvim_lsp = require('lspconfig')
 local util = require 'lspconfig/util'
@@ -930,10 +954,19 @@ require "lazy-lsp".setup {
     lua_ls = {
       settings = {
         Lua = {
-          diagnostics = {
-            -- Get the language server to recognize the `vim` global
-            globals = { 'vim' },
-          },
+          -- shouldn't be needed with neodev.nvim
+          -- diagnostics = {
+          --   -- Get the language server to recognize the `vim` global
+          --   globals = { 'vim' },
+          -- },
+          format = {
+            enable = true,
+            defaultConfig = {
+              align_continuous_assign_statement = "false",
+              align_continuous_rect_table_field = "false",
+              align_array_table = "false",
+            }
+          }
         },
       },
     },
@@ -952,7 +985,7 @@ require "lazy-lsp".setup {
 
 nvim_lsp.clojure_lsp.setup {
   -- Override the defaut config to set root in the top-level of a monorepo
-  root_dir = util.root_pattern(".git"),
+  -- root_dir = util.root_pattern(".git"),
   on_attach = on_attach,
   flags = {
     debounce_text_changes = 150,
@@ -985,7 +1018,6 @@ augroup lang_markdown
   " inserted to continue lists on newline https://www.reddit.com/r/neovim/comments/wdmmgc/comment/iimaym0/
   autocmd FileType markdown
     \  setlocal linebreak
-    \| setlocal relativenumber
     \| setlocal formatoptions+=r
     \| setlocal comments-=fb:- comments+=:-
     \| lua require('cmp').setup.buffer { enabled = false }
@@ -1003,6 +1035,22 @@ augroup END
 -- Don't close current markdown preview window when switching away from buffer
 -- let g:mkdp_auto_close = 0
 vim.g.mkdp_auto_close = 0
+
+
+---- Clojure {{{1
+
+vim.cmd [[
+augroup lang_clojure
+  autocmd!
+  " set nolinebreak because line break at words boundary bugs out with parinfer
+  autocmd FileType clojure
+    \ nnoremap <LocalLeader>s :ConjureShadowSelect
+    \| nnoremap <LocalLeader>el :ConjureLogSplit<cr>
+    \| nnoremap <LocalLeader>ev :ConjureLogVSplit<cr>
+    \| set nolinebreak
+augroup END
+]]
+
 
 vim.cmd [[
 "---- Liz {{{1
@@ -1035,9 +1083,52 @@ augroup END
 ---- Git {{{1
 
 -- Open lazygit in a floating window
-local lazygit = require('FTerm'):new({ cmd = 'lazygit', dimensions = { height = 1, width = 1 } })
+-- local lazygit = require('FTerm'):new({ cmd = 'lazygit', dimensions = { height = 1, width = 1 } })
 
----- legendary.nvim {{{1
+---- Command palette - legendary.nvim {{{1
+
+-- clear out so there are no duplicates when config is reloaded
+require('legendary.data.state').items = require('legendary.data.itemlist'):create()
+
+-- `setup()` must be called before `require('which-key).register()`
+local legendary_format = require('legendary.ui.format').default_format
+require('legendary').setup {
+  which_key = {
+    -- try to register only once to avoid duplicates on reload
+    -- for some reason this workaround does not work completely, there are two duplicates after reload, but at least it does not grow unbounded
+    auto_register = global_legendary_auto_registered == nil
+  },
+  default_item_formatter = function(item)
+    -- swap description with command definition
+    local icon, cmd, desc = table.unpack(legendary_format(item))
+    return { icon, desc, cmd }
+  end
+}
+global_legendary_auto_registered = true
+
+require('dressing').setup({
+  select = {
+    get_config = function(opts)
+      -- the whole point of the override is to make the legendary window larger so that descriptions can fit and are visible
+      if opts.kind == 'legendary.nvim' then
+        return {
+          telescope = {
+            sorting_strategy = "ascending",
+            layout_strategy = 'center',
+            results_title = false,
+            layout_config = {
+              prompt_position = "top",
+              width = 0.8,
+              height = 0.6,
+            },
+          },
+        }
+      else
+        return {}
+      end
+    end
+  }
+})
 
 vim.keymap.set("n", "<leader><leader>", ":Legendary<cr>", {
   silent = true,
@@ -1046,53 +1137,68 @@ vim.keymap.set("n", "<leader><leader>", ":Legendary<cr>", {
 
 -- Register non-frequent command without bindings with legendary to be searchable in command menu
 require('legendary').commands({
-  { ':g/^\\s*$/d',              description = 'Delete blank lines' },
-  {
-    ':! chmod +x %',
-    description =
-    'Make current file executable'
-  },
-  { ':%bd|e#',                  description = 'Close other buffers' },
+  { ':g/^\\s*$/d', description = 'Delete blank lines' },
+  { ':! chmod +x %', description = 'Make current file executable' },
+  { description = 'Buffers: Close other', ':%bd|e#' },
   { ':ConjureShadowSelect app', description = 'Conjure shadow select app' },
-  {
-    ':ConjureShadowSelect {name}',
-    description = 'Conjure shadow select',
-    unfinished = true
-  },
-  {
-    ':ConjureConnect 48888',
-    description =
-    'Conjure: Pitch Backend REPL'
-  },
-  {
-    ':ConjureConnect 7888',
-    description =
-    'Conjure: Pitch Frontend REPL'
-  },
-  { ':ConjureConnect 1667',                                                     description = 'Conjure: Babashka REPL' },
+  { ':ConjureShadowSelect {name}', description = 'Conjure shadow select', unfinished = true },
+  { ':ConjureConnect 48888', description = 'Conjure: Pitch Backend REPL' },
+  { ':ConjureConnect 7888', description = 'Conjure: Pitch Frontend REPL' },
+  { ':ConjureConnect 1667', description = 'Conjure: Babashka REPL' },
   -- Evaling alert to verify REPL is working and locate which browser provides runtime
-  { ':ConjureEval (js/alert "Hello!")',                                         description = 'Conjure eval alert' },
-  { ':Telescope builtin',                                                       description = 'Telescope bultins' },
-  -- { ':lua require("litee.ui").toggle_panel()', description = 'LSP Call Tree Hierarchy' },
-  { ':lua vim.lsp.buf.incoming_calls()',                                        description = 'LSP incoming calls' },
-  { ':lua vim.lsp.buf.outgoing_calls()',                                        description = 'LSP outgoing calls' },
+  { ':ConjureEval (js/alert "Hello!")', description = 'Conjure eval alert' },
+  { ':Telescope builtin', description = 'Telescope bultins' },
+  { ':lua vim.lsp.buf.incoming_calls()', description = 'LSP incoming calls' },
+  { ':lua vim.lsp.buf.outgoing_calls()', description = 'LSP outgoing calls' },
   -- enew+execute is to pipe result into buffer to make it searchable
-  { ":enew|pu=execute('lua print(vim.inspect(vim.lsp.get_active_clients()))')", description = 'LSP client capabilities' },
-  {
-    ':lua vim.g.disable_lsp_formatting = not vim.g.disable_lsp_formatting',
-    description = 'LSP toggle formatting on save'
-  },
-  { ':DownToggleListItem',     description = 'Markdown: Toggle list item' },
-  { ':DownMakeLink',           description = 'Markdown: Create link' },
+  -- { ":enew|pu=execute('lua print(vim.inspect(vim.lsp.get_active_clients()))')", description = 'LSP client capabilities' },
+  { ':lua vim.g.disable_lsp_formatting = not vim.g.disable_lsp_formatting', description = 'LSP toggle formatting on save' },
+  { description = "Diagnostics: Toggle document issues", ':TroubleToggle document_diagnostics' },
+  { description = "Diagnostics: Toggle workspace issues", ':TroubleToggle workspace_diagnostics' },
+  { ':DownToggleListItem', description = 'Markdown: Toggle list item' },
+  { ':DownMakeLink', description = 'Markdown: Create link' },
   -- { ':split term://fish', description = 'Toggle Terminal' },
-  { ':ToggleTerm',             description = 'Toggle Terminal' },
   { ':Neotree source=buffers', description = 'NeoTree: Opened buffers' },
+  { ':InspectTree', description = 'Treesitter: Inspect tree' }, -- :help inspect_tree
+  { ':DiffviewOpen', description = 'Git: Diff View Open' },
+  { ':DiffviewClose', description = 'Git: Diff View Close' },
+  { ':DiffviewFileHistory', description = 'Git: Diff View File History' },
 })
 
 require('legendary').funcs {
+  { description = "Buffers: Close unedited", require("hbac").close_unpinned },
   {
     function() vim.opt_local.spell = not vim.opt_local.spell end,
     description = 'Toggle spell check'
+  },
+  {
+    function()
+      require('conjure.eval').command [[
+        (do
+          (ns dev)
+          (def portal ((requiring-resolve 'portal.api/open)))
+          (add-tap (requiring-resolve 'portal.api/submit)))
+      ]]
+    end,
+    description = 'Clojure: Open Portal'
+  },
+  {
+    function()
+      require('conjure.eval').command [[
+        (do
+          (remove-tap (requiring-resolve 'portal.api/submit))
+          ((requiring-resolve 'portal.api/close)))
+      ]]
+    end,
+    description = 'Clojure: Close Portal'
+  },
+  {
+    function()
+      require('conjure.eval').command [[
+        ((requiring-resolve 'dev.nu.morse/launch-in-proc))
+      ]]
+    end,
+    description = 'Clojure: Open Morse'
   },
 }
 
@@ -1117,6 +1223,7 @@ for ext, funcs in pairs(require("telescope").extensions) do
   end
 end
 
+
 ---- which-key.nvim {{{1
 
 local wk = require("which-key")
@@ -1135,6 +1242,7 @@ vim.cmd [[
 " TODO: rewrite using which-key
 nnoremap <C-p> :FZF<CR>
 nnoremap <C-b> :Buffers<cr>
+
 nnoremap <leader>fb :Buffers<cr>
 nnoremap <leader>ff :Files<cr>
 " find (grep) in files
@@ -1142,13 +1250,6 @@ nnoremap <leader>ff :Files<cr>
 nnoremap <leader>fg :RG<cr>
 nnoremap <leader>fr :RgGrep<cr>
 nnoremap <leader>fc :Commands<cr>
-" nnoremap <silent> <Leader>fa :Find<CR>
-" nnoremap <leader>fh :Helptags<cr>
-" nnoremap <leader>fm :Maps<cr>
-" nnoremap <leader>f: :History:<cr>
-" nnoremap <leader>ft :Filetypes<cr>
-" nnoremap <leader>fr :History<cr>
-" nnoremap <leader>* :Rg <c-r><c-w><cr>
 nnoremap <leader>fs :Telescope lsp_workspace_symbols<cr>
 nnoremap <leader>fo :Telescope lsp_document_symbols<cr>
 nnoremap <leader>fe :Telescope live_grep<cr>
@@ -1164,53 +1265,131 @@ nnoremap <space>ls :Telescope lsp_document_symbols<cr>
 
 wk.register({
   ["<leader>."] = { "<cmd>e $MYVIMRC<cr>", "open init" },
-  ["gq"] = { "wrap text" },
+  ["gq"] = { "Wrap text" },
   -- Prefer key sequence over chording
   -- it works but does not show which key menu for window
-  ["<leader>w"] = { "<c-w>", "+window" },
+  ["<leader>w"] = { "<c-w>", "+Window" },
 })
+
+-- Register group labels separately so that legendary.nvim does not nest items but shows them in a flat list
+wk.register({
+  f = { name = "Find" },
+  g = { name = "Git" },
+  h = { name = "Git Hunks" },
+  j = { name = "Jump" },
+  l = { name = "Lsp" },
+  m = { name = "Markdown" },
+  t = { name = "Toggle" },
+}, { prefix = "<leader>" })
+
+-- other commands like moving forward/backward do not seem to work that well
+local tc = require('nvim-treeclimber')
+vim.keymap.set({ "n" }, "vv", tc.select_expand, { desc = "TreeClimber: Expand Selection" })
+vim.keymap.set({ "v" }, "v", tc.select_expand, { desc = "TreeClimber: Expand Selection" })
+vim.keymap.set({ "v" }, "z", tc.select_shrink, { desc = "TreeClimber: Shrink Selection" })
+
+vim.api.nvim_set_keymap('v', '<leader>go',
+  '<cmd>lua require"gitlinker".get_buf_range_url("v", {action_callback = require"gitlinker.actions".open_in_browser})<cr>',
+  {})
+
+require('gitsigns').setup {
+  on_attach = function(bufnr)
+    local gs = package.loaded.gitsigns
+
+    local function map(mode, l, r, opts)
+      opts = opts or {}
+      opts.buffer = bufnr
+      vim.keymap.set(mode, l, r, opts)
+    end
+
+    -- Navigation
+    map('n', ']c', function()
+      if vim.wo.diff then return ']c' end
+      vim.schedule(function() gs.next_hunk() end)
+      return '<Ignore>'
+    end, { expr = true })
+
+    map('n', '[c', function()
+      if vim.wo.diff then return '[c' end
+      vim.schedule(function() gs.prev_hunk() end)
+      return '<Ignore>'
+    end, { expr = true })
+
+    -- Actions
+    map('v', '<leader>hs', function() gs.stage_hunk { vim.fn.line("."), vim.fn.line("v") } end,
+      { desc = "Git: Visual Stage Hunk" })
+    map('v', '<leader>hr', function() gs.reset_hunk { vim.fn.line("."), vim.fn.line("v") } end,
+      { desc = "Git: Visual Reset Hunk" })
+
+    -- Text object
+    map({ 'o', 'x' }, 'ih', ':<C-U>Gitsigns select_hunk<CR>')
+  end
+}
+
+local gs = require('gitsigns')
+wk.register({
+  ['<leader>hs'] = { gs.stage_hunk, "Git: Stage Hunk" },
+  ['<leader>hr'] = { gs.reset_hunk, "Git: Reset Hunk" },
+  ['<leader>hS'] = { gs.stage_buffer, "Git: Stage Buffer" },
+  ['<leader>hu'] = { gs.undo_stage_hunk, "Git: Undo Stage Hunk" },
+  ['<leader>hR'] = { gs.reset_buffer, "Git: Reset Buffer" },
+  ['<leader>hp'] = { gs.preview_hunk, "Git: Preview Hunk" },
+  ['<leader>hb'] = { function() gs.blame_line { full = true } end, "Git: Blame Line" },
+  ['<leader>tb'] = { gs.toggle_current_line_blame, "Git: Toggle Current Line Blame" },
+  ['<leader>hd'] = { gs.diffthis, "Git: Diff This" },
+  ['<leader>hD'] = { function() gs.diffthis('~') end, "Git: Diff This Base" },
+  ['<leader>td'] = { gs.toggle_deleted, "Git: Toggle Show Deleted Hunks" },
+})
+
 
 wk.register({
   f = {
-    name = "+find",
-    h = { "<cmd>Telescope command_history<cr>", "Find in command history" }
+    h = { "<cmd>Telescope help_tags<cr>", "Find in Help" },
+    x = { require('telescope.builtin').resume, "Telescope: Resume last picker" },
+    y = { "<cmd>Telescope command_history<cr>", "Find in command history" },
     -- ["<leader>ff"] = { "<cmd>Telescope find_files<cr>", "Find File" },
     -- ["<leader>fr"] = { "<cmd>Telescope oldfiles<cr>", "Open Recent File" },
     -- ["<leader>fh"] = { "<cmd>Telescope command_history<cr>", "Find in command history" },
     -- ["<leader>fn"] = { "<cmd>enew<cr>", "New File" },
   },
   g = {
-    name = "Git",
     -- l = {"<cmd>Git blame<cr>", "Git: Blame" },
     b = { "<cmd>Telescope git_branches<cr>", "Git: Branches" },
-    d = { "<cmd>:SignifyHunkDiff<cr>", "Git: Hunk Diff" },
-    U = { "<cmd>:SignifyHunkUndo<cr>", "Git: Undo Hunk" },
+    -- d = { "<cmd>:SignifyHunkDiff<cr>", "Git: Hunk Diff" },
+    -- U = { "<cmd>:SignifyHunkUndo<cr>", "Git: Undo Hunk" },
     l = { function() require('git.blame').blame() end, "Git: Blame" },
     h = { function() require('git.browse').open(false) end, "Git: Browse" },
-    g = { function() lazygit:toggle() end, "Git: Lazygit" },
+    -- g = { function() lazygit:toggle() end, "Git: Lazygit" },
+    g = { function() lazygit_terminal:toggle() end, "Git: Lazygit" },
+    o = {
+      '<cmd>lua require"gitlinker".get_buf_range_url("n", {action_callback = require"gitlinker.actions".open_in_browser})<cr>',
+      "Git: Browse Permalink" }
   },
   j = {
-    name = "Jump",
     j = { "<cmd>:Buffers<cr>", "Buffers" },
     k = { "<cmd>:Neotree toggle=true<cr>", "File Tree: Toggle" },
     l = { "<cmd>:Neotree reveal=true<cr>", "File Tree: Reveal current" },
     d = { "<cmd>:lua require('telescope').extensions.zoxide.list()<cr>", "Jump to directory" },
   },
   l = {
-    name = "+lsp",
     c = { "<cmd>:ConjureConnect<cr>", "Conjure: Connect to REPL" },
+    l = { "<cmd>LSPInfo<cr>", "Lsp: Show Info" },
+    L = { "<cmd>e ~/.local/state/nvim/lsp.log<cr>", "Lsp: Show Log" },
+    p = { require('goto-preview').goto_preview_definition, "Lsp: Preview Definition" },
+    y = { require('goto-preview').goto_preview_type_definition, "Lsp: Preview Type Definition" },
+    i = { require('goto-preview').goto_preview_implementation, "Lsp: Preview Implementation" },
   },
   -- TODO: Figure out how to bind these via autocmd
   m = {
-    name = "+markdown",
     p = { "<cmd>MarkdownPreview<cr>", "Markdown: Preview" },
     t = { "<cmd>GenTocGFM<cr>", "Markdown: Generate TOC Table of Contents" },
   },
   t = {
-    name = "Toggle",
-    t = { "<cmd>:ToggleTerm<cr>", "Terminal" },
-    -- replace cmd with chatgpt when new version supporting -n flag is tagged upstream and updated in nixpkgs
-    c = { "<cmd>:lua require('FTerm').scratch({ cmd = {'/home/me/dl/git/chatgpt/chatgpt', '-n'} })<cr>", "ChatGPT" },
+    -- t = { "<cmd>:ToggleTerm<cr>", "Terminal" },
+    t = { function() bottom_terminal:toggle() end, "Toggle Terminal" },
+    -- c = { "<cmd>:lua require('FTerm').scratch({ cmd = {'chatgpt', '-n'} })<cr>", "ChatGPT" },
+    c = { function() chatgpt_terminal:open() end, "ChatGPT" },
+    f = { tc.show_control_flow, "TreeCliber: Show Control Flow" }
   },
   w = {
     m = { "<Cmd>:WinShift<CR>", "Move" },
@@ -1220,6 +1399,7 @@ wk.register({
 wk.register({
   e = {
     -- Conjure omits exception stacktrace by default, add a shorthad eval the exception to get to the stacktrace
+    s = { "<cmd>:LocStack<cr>", "Load exception stacktrace into location list" }, -- walterl/conjure-locstack plugin
     x = { "<cmd>:ConjureEval *e<cr>", "Eval REPL exception" },
     t = { "<cmd>:ConjureEval (tap> *1)<cr>", "Eval: Tap last value" },
   },
