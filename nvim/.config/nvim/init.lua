@@ -26,7 +26,7 @@ local plugins = {
   -- Syntax highlighting theme
   {
     "folke/tokyonight.nvim",
-    lazy = false, -- make sure we load this during startup if it is your main colorscheme
+    lazy = false,    -- make sure we load this during startup if it is your main colorscheme
     priority = 1000, -- make sure to load this before all the other start plugins
     config = function()
       -- load the colorscheme here
@@ -56,10 +56,38 @@ local plugins = {
   -- Show colors for hex values
   "norcalli/nvim-colorizer.lua",
 
+  -- File Explorer {{{1
+
+  ---- neo-tree {{{1
+
   -- Tree plugin
   {
     "nvim-neo-tree/neo-tree.nvim",
     dependencies = { "nvim-lua/plenary.nvim", "kyazdani42/nvim-web-devicons", "MunifTanjim/nui.nvim" },
+    -- cmd = "Neotree", -- loading Neotree lazily breaks legendary paletter for some reason
+    init = function() vim.g.neo_tree_remove_legacy_commands = 1 end,
+    opts = {
+      default_component_configs = {
+        indent = {
+          indent_size = 1,
+          padding = 0, -- extra padding on left hand side
+          -- indent guides
+          with_markers = false,
+        },
+      },
+      window = {
+        position = "right",
+        width = 30,
+      },
+      filesystem = {
+        filtered_items = {
+          -- show hidden files like dotfiles and git ignored
+          visible = true,
+        },
+      },
+      -- disable lsp diagnostics as they seem to cause lagging/freezing
+      enable_diagnostics = false,
+    },
   },
 
   -- Close buffers inteligently
@@ -120,10 +148,30 @@ local plugins = {
   -- Git utilities, mostly using :GBrowse and blame
   "dinhhuy258/git.nvim",
   -- In contrast to git.nvim, it opens permalinks for browsing (and possibly supports more hosts)
-  { "https://github.com/ruifm/gitlinker.nvim", opts = { mappings = nil } },
+  {
+    "https://github.com/ruifm/gitlinker.nvim",
+    opts = { mappings = nil },
+    keys = {
+      {
+        "<leader>go",
+        '<cmd>lua require("gitlinker").get_buf_range_url("v", {action_callback = require("gitlinker.actions").open_in_browser})<cr>',
+        mode = "v"
+      },
+      {
+        "<leader>go",
+        '<cmd>lua require("gitlinker").get_buf_range_url("n", {action_callback = require("gitlinker.actions").open_in_browser})<cr>',
+        desc = "Git: Browse Permalink"
+      },
+    },
+  },
+
 
   -- git diff and merge view
-  { "sindrets/diffview.nvim", dependencies = "nvim-lua/plenary.nvim" },
+  {
+    "sindrets/diffview.nvim",
+    dependencies = "nvim-lua/plenary.nvim",
+    cmd = { "DiffviewOpen", "DiffviewClose", "DiffviewFileHistory" },
+  },
 
   -- Dressing for improved selection UI that uses telescope
   "stevearc/dressing.nvim",
@@ -140,7 +188,12 @@ local plugins = {
   -- Language client
   "https://github.com/Olical/conjure.git",
   -- Load CLojure exception trace into location list
-  "walterl/conjure-locstack",
+  {
+    "walterl/conjure-locstack",
+    keys = {
+      { "<localleader>es", "<cmd>:LocStack<cr>", desc = "Load exception stacktrace into location list" },
+    }
+  },
 
   -- { 'https://github.com/eraserhd/parinfer-rust.git', ft = 'clojure', build = 'nix-shell --run \"cargo build --release \"' },
   "gpanders/nvim-parinfer",
@@ -157,13 +210,22 @@ local plugins = {
 
   -- sets lua lsp for signature help, docs and completion for the nvim lua API
   -- IMPORTANT: make sure to setup neodev BEFORE lspconfig
-  "folke/neodev.nvim",
+  -- "folke/neodev.nvim",
 
   "neovim/nvim-lspconfig",
   -- Auto install LSP servers
   { "dundalek/lazy-lsp.nvim", dependencies = { "neovim/nvim-lspconfig" } },
   -- Preview lsp definitions in floating windows
-  { "rmagatti/goto-preview", opts = {} },
+  {
+    "rmagatti/goto-preview",
+    opts = {},
+    keys = {
+      { "<leader>lp", function() require("goto-preview").goto_preview_definition() end, "Lsp: Preview Definition" },
+      { "<leader>ly", function() require("goto-preview").goto_preview_type_definition() end,
+        "Lsp: Preview Type Definition" },
+      { "<leader>li", function() require("goto-preview").goto_preview_implementation() end, "Lsp: Preview Implementation" },
+    }
+  },
 
   -- Syntax highlighting based on treesitter
   {
@@ -174,7 +236,18 @@ local plugins = {
   "https://github.com/Dkendal/nvim-treeclimber",
 
   -- A tree like view for symbols in Neovim using the Language Server Protocol
-  "https://github.com/simrat39/symbols-outline.nvim.git",
+  {
+    "https://github.com/simrat39/symbols-outline.nvim.git",
+    opts = {
+      keymaps = {
+        -- besides enter also mouse double-click to go to location
+        goto_location = { "<Cr>", "<2-LeftMouse>" },
+      }
+    },
+    keys = {
+      { "<localleader>o", '<cmd>lua require"symbols-outline".toggle_outline()<cr>', "Lsp: SYmbols outline" }
+    }
+  },
 
   -- For generating markdown Table of Contents
   "mzlogin/vim-markdown-toc",
@@ -211,7 +284,7 @@ local plugins = {
   { "rebelot/terminal.nvim", opts = {} },
 
   -- Show list of issues from lsp for fixing
-  { "folke/trouble.nvim", dependencies = "kyazdani42/nvim-web-devicons", opts = {} },
+  { "folke/trouble.nvim", dependencies = "kyazdani42/nvim-web-devicons", opts = {}, cmd = "TroubleToggle" },
 
   -- Better mode to move windows
   { "sindrets/winshift.nvim", cmd = { "WinShift" }, opts = {} },
@@ -355,10 +428,9 @@ set title
 
 " Source the nvim config file after saving it
 " After reloading folds are reset to expr for treesitter, so change it back to marker.
-" Lazy.nvim auto-realods?
-" autocmd! BufWritePost */nvim/init.lua
-"   \ source $MYVIMRC
-"   \| setlocal foldmethod=marker
+autocmd! BufWritePost */nvim/init.lua
+  \ source $MYVIMRC
+  \| setlocal foldmethod=marker
 
 "-- Window and buffer management {{{1
 
@@ -386,10 +458,6 @@ inoremap <C-h> <C-\><C-N><C-w>h
 inoremap <C-j> <C-\><C-N><C-w>j
 inoremap <C-k> <C-\><C-N><C-w>k
 inoremap <C-l> <C-\><C-N><C-w>l
-" tnoremap <C-h> <C-\><C-n><C-w>h
-" tnoremap <C-j> <C-\><C-n><C-w>j
-" tnoremap <C-k> <C-\><C-n><C-w>k
-" tnoremap <C-l> <C-\><C-n><C-w>l
 
 "-- Movement {{{1
 
@@ -516,34 +584,6 @@ map("v", "<A-k>", ":m '<-2<cr>gv=gv", { desc = "Move up" })
 -- names=false to not highlight color names like Green
 require("colorizer").setup(nil, { names = false })
 
--- File Explorer {{{1
-
----- neo-tree {{{1
-
-vim.g.neo_tree_remove_legacy_commands = 1
-
-require("neo-tree").setup {
-  default_component_configs = {
-    indent = {
-      indent_size = 1,
-      padding = 0, -- extra padding on left hand side
-      -- indent guides
-      with_markers = false,
-    },
-  },
-  window = {
-    position = "right",
-    width = 30,
-  },
-  filesystem = {
-    filtered_items = {
-      -- show hidden files like dotfiles and git ignored
-      visible = true,
-    },
-  },
-  -- disable lsp diagnostics as they seem to cause lagging/freezing
-  enable_diagnostics = false,
-}
 
 -- Fuzzy file search {{{1
 
@@ -708,7 +748,7 @@ vim.api.nvim_create_autocmd("TermOpen", {
 })
 
 vim.cmd([[
-tnoremap <c-\><c-\> <c-\><c-n>
+tnoremap <c-\><c-\> <c-\><c-n><c-w>k
 ]])
 
 -- Language configs {{{1
@@ -733,14 +773,6 @@ vim.opt.foldexpr = "nvim_treesitter#foldexpr()"
 vim.opt.foldenable = false
 
 ---- lspconfig {{{1
-
--- symbols-outline.nvim
-require("symbols-outline").setup {
-  keymaps = {
-    -- besides enter also mouse double-click to go to location
-    goto_location = { "<Cr>", "<2-LeftMouse>" },
-  },
-}
 
 vim.g.disable_lsp_formatting = false
 
@@ -775,7 +807,6 @@ local on_attach = function(client, bufnr)
   buf_set_keymap("n", "<leader>lh", "<cmd>lua vim.lsp.buf.signature_help()<CR>", opts)
   buf_set_keymap("n", "<leader>lq", "<cmd>lua vim.lsp.buf.hover()<CR>", opts)
 
-  buf_set_keymap("n", "<localleader>o", '<cmd>lua require"symbols-outline".toggle_outline()<cr>', opts)
 
   -- Display code lenses which show for example number of references and tests of a funtion
 
@@ -832,7 +863,8 @@ local on_attach = function(client, bufnr)
   -- end
 end
 
-require("neodev").setup {}
+-- seems to show popup `Do you need to configure your work environment as `luv`?` disabling for now
+-- require("neodev").setup {}
 
 local nvim_lsp = require("lspconfig")
 local util = require("lspconfig/util")
@@ -895,8 +927,6 @@ require("lazy-lsp").setup {
 
         -- Mappings.
         local opts = { noremap = true, silent = true }
-
-        buf_set_keymap("n", "<localleader>o", '<cmd>lua require"symbols-outline".toggle_outline()<cr>', opts)
       end,
       init_options = {
         documentFormatting = true,
@@ -1218,12 +1248,6 @@ vim.keymap.set({ "n" }, "vv", tc.select_expand, { desc = "TreeClimber: Expand Se
 vim.keymap.set({ "v" }, "v", tc.select_expand, { desc = "TreeClimber: Expand Selection" })
 vim.keymap.set({ "v" }, "z", tc.select_shrink, { desc = "TreeClimber: Shrink Selection" })
 
-vim.api.nvim_set_keymap(
-  "v",
-  "<leader>go",
-  '<cmd>lua require"gitlinker".get_buf_range_url("v", {action_callback = require"gitlinker.actions".open_in_browser})<cr>',
-  {}
-)
 
 require("gitsigns").setup {
   on_attach = function(bufnr)
@@ -1327,10 +1351,6 @@ wk.register({
     h = { function() require("git.browse").open(false) end, "Git: Browse" },
     -- g = { function() lazygit:toggle() end, "Git: Lazygit" },
     g = { function() lazygit_terminal:toggle() end, "Git: Lazygit" },
-    o = {
-      '<cmd>lua require"gitlinker".get_buf_range_url("n", {action_callback = require"gitlinker.actions".open_in_browser})<cr>',
-      "Git: Browse Permalink",
-    },
   },
   j = {
     j = { "<cmd>:Buffers<cr>", "Buffers" },
@@ -1343,9 +1363,6 @@ wk.register({
     -- bind it outside of on_attach to use for debugging
     l = { "<cmd>LSPInfo<cr>", "Lsp: Show Info" },
     L = { function() vim.cmd(":e " .. vim.lsp.get_log_path()) end, "Lsp: Show Log" },
-    p = { require("goto-preview").goto_preview_definition, "Lsp: Preview Definition" },
-    y = { require("goto-preview").goto_preview_type_definition, "Lsp: Preview Type Definition" },
-    i = { require("goto-preview").goto_preview_implementation, "Lsp: Preview Implementation" },
   },
   -- TODO: Figure out how to bind these via autocmd
   m = {
@@ -1353,6 +1370,7 @@ wk.register({
     t = { "<cmd>GenTocGFM<cr>", "Markdown: Generate TOC Table of Contents" },
   },
   t = {
+    l = { "<cmd>:Lazy<cr>", "Toggle Lazy package manager" },
     -- t = { "<cmd>:ToggleTerm<cr>", "Terminal" },
     t = { function() bottom_terminal:toggle() end, "Toggle Terminal" },
     -- c = { "<cmd>:lua require('FTerm').scratch({ cmd = {'chatgpt', '-n'} })<cr>", "ChatGPT" },
@@ -1367,7 +1385,6 @@ wk.register({
 wk.register({
   e = {
     -- Conjure omits exception stacktrace by default, add a shorthad eval the exception to get to the stacktrace
-    s = { "<cmd>:LocStack<cr>", "Load exception stacktrace into location list" }, -- walterl/conjure-locstack plugin
     x = { "<cmd>:ConjureEval *e<cr>", "Eval REPL exception" },
     t = { "<cmd>:ConjureEval (tap> *1)<cr>", "Eval: Tap last value" },
   },
