@@ -1,4 +1,4 @@
-#!/usr/bin/env lumo
+#!/usr/bin/env bb
 ;; -*- clojure -*-
 ;; vim: set filetype=clojure:
 
@@ -10,17 +10,25 @@
 ; QClipboard's void selectionChanged() and void dataChanged()
 ; or like GTK's owner-changed.
 
+(require '[babashka.process :refer [shell]])
+
+;; could be set to newline in case outputs feel too crowded
 (def separator "")
 
-(def exec-sync (-> (js/require "child_process") (.-execSync)))
-
 (defn get-clipboard []
-  (exec-sync "xclip -selection clipboard -o" #js{:encoding "utf-8"}))
+  (-> (shell {:out :string} "xclip -selection clipboard -o") :out))
 
-(defn check-clipboard [content]
-  (let [val (get-clipboard)]
-    (when (not= content val)
-      (js/console.log (str separator val)))
-    (js/setTimeout #(check-clipboard val) 250)))
+(defn monitor-clipboard []
+  (let [!val (atom (get-clipboard))]
+    (while true
+      (let [val (get-clipboard)]
+        (when (not= @!val val)
+          (reset! !val val)
+          (println (str separator val)))
+        (Thread/sleep 250)))))
 
-(check-clipboard (get-clipboard))
+(defn -main [& _args]
+  (monitor-clipboard))
+
+(when (= *file* (System/getProperty "babashka.file"))
+  (apply -main *command-line-args*))

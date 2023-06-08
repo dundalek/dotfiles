@@ -1,0 +1,45 @@
+#!/usr/bin/env bb
+;; -*- clojure -*-
+;; vim: set filetype=clojure:
+
+(require '[clojure.string :as str]
+         '[babashka.fs :as fs])
+
+(def divider #"==========")
+
+(defn write-items [coll outdir]
+  (doseq [[name items] coll]
+    (let [filename (str outdir "/" name ".txt")
+          output (->> items
+                      (map (fn [{:keys [meta body]}]
+                             (str "[comment]: # (" meta ")\n" body)))
+                      (str/join "\n\n"))]
+      (spit filename (str output "\n")))))
+
+(defn parse-entry [s]
+  (let [[entry meta body] (->> (str/split s #"\n" 3) (map str/trim))]
+        ; [name author] (if (str/ends-with? entry ")")
+        ;                 (let [idx (str/last-index-of entry "(")
+        ;                       author (subs entry (inc idx) (dec (count entry)))
+        ;                       name (subs entry 0 (dec idx))]
+        ;                   [author name])
+        ;                 [entry nil])]
+    {:name entry :meta meta :body body}))
+
+(defn parse-items [input]
+  (->>
+    (str/split input divider)
+    (map str/trim)
+    (filter #(not (str/blank? %)))
+    (map parse-entry)
+    (group-by :name)))
+
+(let [args (drop 2 *command-line-args*)
+      infile (or (first args) "My Clippings.txt")
+      outdir (or (second args) "out")]
+  (when (not (fs/directory? outdir))
+    (fs/create-dirs outdir))
+  (->
+    (slurp infile)
+    (parse-items)
+    (write-items outdir)))

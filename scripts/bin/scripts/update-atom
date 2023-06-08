@@ -1,7 +1,0 @@
-#!/bin/bash
-# Update atom from downloaded deb file
-rm -f /tmp/atom.deb
-curl -L https://atom.io/download/deb > /tmp/atom.deb
-
-(cd /tmp && dpkg-repack atom)
-dpkg --install /tmp/atom.deb 

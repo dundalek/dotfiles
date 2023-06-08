@@ -14,6 +14,7 @@
 (def manday-rate 370)
 
 (let [dt (LocalDate/now)
+      ; dt (LocalDate/of (.getYear dt) 1 1)
       current-month (.getMonthValue dt)
       groups (->> (day-seq (.withDayOfMonth dt 1))
                   (take-while #(= (.getMonthValue %) current-month))

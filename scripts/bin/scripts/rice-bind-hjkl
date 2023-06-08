@@ -1,5 +1,7 @@
 #!/usr/bin/env sh
 
+# Motivation: https://tonsky.me/blog/cursor-keys/
+
 # Maps keys so that Capslock + hjkl works as movement in all apps
 # Use shift+capslock to toggle capslock
 

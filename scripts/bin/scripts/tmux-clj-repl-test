@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+session="$RANDOM"
+repo="$PWD"
+
+export SHELL=/bin/bash
+
+tmux new-session -d -s $session -c "$repo"
+
+tmux send-keys 'clj -M:test --watch' 'C-m'
+
+tmux split-window -h -t $session -c "$repo"
+tmux send-keys 'clj -M:nrepl' 'C-m'
+
+tmux select-layout -t $session main-vertical
+# tmux rotate-window -t $session -U
+tmux attach -t $session

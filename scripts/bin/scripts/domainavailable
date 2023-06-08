@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # https://gist.github.com/peterc/63893
 # domainavailable

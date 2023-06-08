@@ -1,0 +1,11 @@
+#!/usr/bin/env bb
+;; -*- clojure -*-
+;; vim: set filetype=clojure:
+
+;; Checkout branch from a Github PR
+
+(require '[babashka.process :refer [shell]])
+
+(let [pr-number (first *command-line-args*)]
+  (shell "git fetch origin" (str "pull/" pr-number "/head:PR-" pr-number))
+  (shell "git checkout" (str "PR-" pr-number)))

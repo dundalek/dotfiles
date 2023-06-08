@@ -1,4 +1,6 @@
 #!/usr/bin/env sh
 # Rofi wrapper from nix sets gtk environment, which does not play well when launching base gnome apps.
-# This will need to get updated when rofi breaks when new version in nix is published.
-exec "/nix/store/w02is5naxbfwx46mrg6w0b0y4w99kh60-rofi-unwrapped-1.7.2/bin/rofi"  "$@"
+
+# When a version is hard-coded it breaks on update.
+# Using wildcard is a hack and assumes only one packages instance is present.
+exec /nix/store/*-rofi-unwrapped-*/bin/rofi  "$@"

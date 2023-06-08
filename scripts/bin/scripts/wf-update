@@ -1,0 +1,6 @@
+#!/usr/bin/env sh
+
+set -eux
+
+sudo apt update && sudo apt upgrade -V && apt-env
+wf-nix-update

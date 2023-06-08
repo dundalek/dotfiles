@@ -6,12 +6,18 @@
 
 set -euo pipefail
 
-base="$HOME/dotfiles/base-packages.txt"
-pkgs="$HOME/dotfiles/packages.txt"
+base="$HOME/dotfiles/private/apt-base-packages.txt"
+pkgs="$HOME/dotfiles/private/apt-user-packages.txt"
 
 if [ ! -f "$base" ]
 then
   apt-mark showmanual > "$base"
+fi
+
+if [ $# == 1 ]
+then
+  # open an editor to edit packages
+  "$EDITOR" "$pkgs"
 fi
 
 # sed is to remove comments marked with #

@@ -1,0 +1,23 @@
+#!/usr/bin/env bb
+;; -*- clojure -*-
+;; vim: set filetype=clojure:
+(ns calver
+  (:require [clojure.java.shell :refer [sh]]))
+
+(defn formatted-current-datetime [fmt-str]
+  (let [formatter (java.time.format.DateTimeFormatter/ofPattern fmt-str)
+        date (java.time.LocalDate/now)]
+    (.format formatter date)))
+
+(defn create-tag [version]
+  (loop [i 0]
+    (let [tag (cond-> version
+                (pos? i) (str "-" i))
+          message (str "Release " tag)
+          {:keys [exit]} (sh "git" "tag" "--annotate" "--message" message #_ "--edit" tag)]
+      (if (= exit 128)
+        (recur (inc i))
+        tag))))
+
+(let [version (formatted-current-datetime "YYYY.MM.dd")]
+  (println "Tagged release:" (create-tag version)))

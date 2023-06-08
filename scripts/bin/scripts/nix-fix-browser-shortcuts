@@ -1,0 +1,42 @@
+#!/usr/bin/env bb
+;; -*- clojure -*-
+;; vim: set filetype=clojure:
+
+;; When browsers under Nix create web app shortcuts they include path directly
+;; into /nix/store binary, which breaks on update. This scripts fixes it by
+;; modifying the files to point to the binary wrapper in nix-profile.
+
+(ns script
+  (:require [clojure.java.io :as io]
+            [clojure.string :as str]))
+
+(defn detect-applications-dir []
+  (let [data-dir (or (System/getenv "XDG_DATA_HOME")
+                     (str (System/getenv "HOME") "/.local/share"))]
+    (str data-dir "/applications")))
+
+(defn split-lines-all
+  "Preserves trailing empty lines"
+  [s]
+  (str/split s #"\r?\n" -1))
+
+(def binaries
+  {"brave" "brave"
+   "chrome" "google-chrome-stable"})
+
+(let [files (->> (io/file (detect-applications-dir))
+                 (.listFiles))]
+  (doseq [file files]
+    (let [filename (.getName file)
+          [_ prefix] (re-find #"^([a-z]+)-" filename)]
+      (when (contains? binaries prefix)
+        (println "Fixing:" filename)
+        (let [binary (str "Exec=/home/me/.nix-profile/bin/" (get binaries prefix))
+              out (->> (slurp file)
+                       (split-lines-all)
+                       (map (fn [line]
+                              (cond-> line
+                                (str/starts-with? line "Exec=")
+                                (str/replace #"^Exec=[^\s]+" binary))))
+                       (str/join "\n"))]
+          (spit file out))))))

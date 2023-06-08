@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env sh
 
 export CLOSH_SOURCES_PATH=/home/me/github/closh
 

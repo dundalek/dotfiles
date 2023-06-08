@@ -1,0 +1,24 @@
+#!/usr/bin/env sh
+
+set -eu
+
+# clean up garbage, this will still allow to rolback to previous version before the update
+# keep last two generations for rollback
+nix-env --delete-generations +2
+nix-collect-garbage -d
+
+nix-channel --update
+# print out packages that are to be updated
+NIXPKGS_ALLOW_UNFREE=1 nix-env -u --dry-run
+
+echo -n "Update? [Y/n] "
+read -r response
+
+case $response in
+    [yY]|'')
+      NIXPKGS_ALLOW_UNFREE=1 nix-env -u
+    ;;
+    *)
+      echo canceled
+    ;;
+esac
