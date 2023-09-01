@@ -1,0 +1,93 @@
+#!/usr/bin/env bb
+;; -*- clojure -*-
+;; vim: set filetype=clojure:
+
+(require '[babashka.fs :as fs])
+(require '[babashka.http-client :as http])
+(require '[cheshire.core :as json])
+(require '[clojure.java.io :as io])
+(require '[clojure.string :as str])
+
+(defn glob->regex [s]
+  ;; very naive and limited, but should work for most common cases
+  (let [pattern (->> s (map (fn [c]
+                              (case c
+                                \* ".*"
+                                \? "."
+                                \. "\\."
+                                \\ "\\\\"
+                                c)))
+                     (str/join ""))]
+    (re-pattern (str "^" pattern "$"))))
+
+;; Update info string based on https://github.com/AppImage/AppImageSpec/blob/master/draft.md#github-releases
+(defn parse-update-info [update-info-string]
+  (let [[transport owner repo release file] (str/split update-info-string #"\|")]
+    {:transport transport
+     :owner owner
+     :repo repo
+     :release release
+     :file file}))
+
+(comment
+  (parse-update-info "gh-releases-direct|smol-ai|GodMode|latest|GodMode-*.AppImage"))
+
+(defn find-asset [file assets]
+  (let [file-pattern (glob->regex file)]
+    (->> assets
+         (some (fn [{:keys [browser_download_url name] :as asset}]
+                 (let [filename (last (str/split browser_download_url #"/"))]
+                   (assert (= name filename))
+                   (when (re-matches file-pattern name)
+                     asset)))))))
+(comment
+  (def assets
+    [{:browser_download_url "https://github.com/smol-ai/GodMode/releases/download/v1.0.0-beta.6/GodMode-1.0.0-beta.6-universal.dmg", :name "GodMode-1.0.0-beta.6-universal.dmg"}
+     {:browser_download_url "https://github.com/smol-ai/GodMode/releases/download/v1.0.0-beta.6/GodMode-1.0.0-beta.6.AppImage", :name "GodMode-1.0.0-beta.6.AppImage"}
+     {:browser_download_url "https://github.com/smol-ai/GodMode/releases/download/v1.0.0-beta.6/GodMode.1.0.0-beta.6.dmg", :name "GodMode.1.0.0-beta.6.dmg"}
+     {:browser_download_url "https://github.com/smol-ai/GodMode/releases/download/v1.0.0-beta.6/GodMode.1.0.0-beta.6arm64.pkg", :name "GodMode.1.0.0-beta.6arm64.pkg"}
+     {:browser_download_url "https://github.com/smol-ai/GodMode/releases/download/v1.0.0-beta.6/GodMode.Setup.1.0.0-beta.6.exe", :name "GodMode.Setup.1.0.0-beta.6.exe"}])
+
+  (find-asset "GodMode-*.AppImage" assets))
+
+(defn fetch-release-metadata [{:keys [owner repo release]}]
+  (let [url (str "https://api.github.com/repos/" owner "/" repo "/releases/" release)
+        resp (http/get url {:headers {"Accept" "application/json"}})]
+    (assert (= (:status resp) 200))
+    (json/parse-string (:body resp) true)))
+
+(defn download-asset [{:keys [name browser_download_url]} target-dir]
+  (io/copy
+   (:body (http/get browser_download_url
+                    {:as :stream}))
+   (io/file target-dir name)))
+    ;; some way to verify checksum?
+
+(defn update-appimage [update-info-string target-dir]
+  (let [{:keys [transport owner repo file] :as update-info} (parse-update-info update-info-string)
+        _ (assert (= transport "gh-releases-direct"))
+        _ (println (str "Checking updates for " owner "/" repo "..."))
+        {:keys [assets]} (fetch-release-metadata update-info)
+        {:keys [browser_download_url name] :as asset} (find-asset file assets)
+        _ (assert (string? name))
+        _ (assert (string? browser_download_url))
+        update-available? (not (fs/exists? (io/file target-dir name)))
+        existing-files (fs/glob target-dir file)]
+    (if update-available?
+      (do
+        (print "Dowloading" browser_download_url "to" (str target-dir) "...")
+        (flush)
+        (download-asset asset target-dir)
+        (doseq [source existing-files]
+          (let [target (-> source (str ".old"))]
+            (fs/move source target)))
+        (println " done"))
+      (println "Up-to-date:" name))))
+
+(defn -main [& args]
+  (let [target-dir (io/file (System/getenv "HOME") "Applications")]
+    (update-appimage "gh-releases-direct|smol-ai|GodMode|latest|GodMode-*.AppImage" target-dir)
+    (update-appimage "gh-releases-direct|sunner|ChatALL|latest|ChatALL-*-x86_64.AppImage" target-dir)))
+
+(when (= *file* (System/getProperty "babashka.file"))
+  (apply -main *command-line-args*))
