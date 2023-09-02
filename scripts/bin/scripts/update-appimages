@@ -4,6 +4,7 @@
 
 (require '[babashka.fs :as fs])
 (require '[babashka.http-client :as http])
+(require '[babashka.process :as process])
 (require '[cheshire.core :as json])
 (require '[clojure.java.io :as io])
 (require '[clojure.string :as str])
@@ -32,14 +33,40 @@
 (comment
   (parse-update-info "gh-releases-direct|smol-ai|GodMode|latest|GodMode-*.AppImage"))
 
+(defn filename->pattern [filename]
+  ;; heuristic: strip part after fist slash which likely contains version
+  (str/replace filename #"-.*" "*.AppImage"))
+
+(comment
+  [(filename->pattern "appimagepool-5.0.0-x86_64.AppImage")
+   (filename->pattern "appimagepool.AppImage")])
+
 (defn find-asset [file assets]
-  (let [file-pattern (glob->regex file)]
-    (->> assets
-         (some (fn [{:keys [browser_download_url name] :as asset}]
-                 (let [filename (last (str/split browser_download_url #"/"))]
-                   (assert (= name filename))
-                   (when (re-matches file-pattern name)
-                     asset)))))))
+  (or
+   ;; first try to match filename exactly which will handle assets without version string appimagetool-x86_64.AppImage
+   (->> assets
+        (some (fn [{:keys [browser_download_url name] :as asset}]
+                (let [filename (last (str/split browser_download_url #"/"))]
+                  (assert (= name filename))
+                  (when (= file name)
+                    asset)))))
+   ;; then try to match pattern like GodMode-*.AppImage
+   (let [file-pattern (glob->regex file)]
+     (->> assets
+          (some (fn [{:keys [browser_download_url name] :as asset}]
+                  (let [filename (last (str/split browser_download_url #"/"))]
+                    (assert (= name filename))
+                    (when (re-matches file-pattern filename)
+                      asset))))))
+   ;; finally try to deduce pattern in case we get exact file name like appimagepool-5.0.0-x86_64.AppImage
+   (let [file-pattern (glob->regex (filename->pattern file))]
+     (->> assets
+          (some (fn [{:keys [browser_download_url name] :as asset}]
+                  (let [filename (last (str/split browser_download_url #"/"))]
+                    (assert (= name filename))
+                    (when (re-matches file-pattern filename)
+                      asset))))))))
+
 (comment
   (def assets
     [{:browser_download_url "https://github.com/smol-ai/GodMode/releases/download/v1.0.0-beta.6/GodMode-1.0.0-beta.6-universal.dmg", :name "GodMode-1.0.0-beta.6-universal.dmg"}
@@ -50,9 +77,8 @@
 
   (find-asset "GodMode-*.AppImage" assets))
 
-(defn fetch-release-metadata [{:keys [owner repo release]}]
-  (let [url (str "https://api.github.com/repos/" owner "/" repo "/releases/" release)
-        resp (http/get url {:headers {"Accept" "application/json"}})]
+(defn fetch-json [url]
+  (let [resp (http/get url {:headers {"Accept" "application/json"}})]
     (assert (= (:status resp) 200))
     (json/parse-string (:body resp) true)))
 
@@ -63,14 +89,26 @@
    (io/file target-dir name)))
     ;; some way to verify checksum?
 
-(defn update-appimage [update-info-string target-dir]
-  (let [{:keys [transport owner repo file] :as update-info} (parse-update-info update-info-string)
-        _ (assert (= transport "gh-releases-direct"))
+(defn fetch-release [{:keys [owner repo release]}]
+  (let [releases-url (str "https://api.github.com/repos/" owner "/" repo "/releases")
+        specified-release-url (str releases-url "/" release)]
+    (try
+      (fetch-json specified-release-url)
+      (catch Exception e
+        (if (= (:status (ex-data e)) 404)
+          ;; if a specified release is not found try to fallback on all releases, first one is the latest published one
+          (first (fetch-json releases-url))
+          (throw e))))))
+
+(defn update-from-github [{:keys [transport owner repo file release]} target-dir]
+  (let [_ (assert (= transport "gh-releases-direct"))
         _ (println (str "Checking updates for " owner "/" repo "..."))
-        {:keys [assets]} (fetch-release-metadata update-info)
+        {:keys [assets]} (fetch-release {:owner owner :repo repo :release release})
         {:keys [browser_download_url name] :as asset} (find-asset file assets)
         _ (assert (string? name))
         _ (assert (string? browser_download_url))
+        ;; ideally be smarter and compare checksums since comparing filenames
+        ;; might not work well for appimages that do not contain version in the name
         update-available? (not (fs/exists? (io/file target-dir name)))
         existing-files (fs/glob target-dir file)]
     (if update-available?
@@ -84,10 +122,142 @@
         (println " done"))
       (println "Up-to-date:" name))))
 
+(defn find-github-releases-repo [pkg-filename items]
+  (let [pkg-filename (str/lower-case pkg-filename)
+        items (->> items
+                   (filter (fn [item]
+                             ;; using starts-with? to make sure we get match since pkg-name can have suffixes like MyApp-x86_64.AppImage
+                             (str/starts-with? pkg-filename
+                                               (str/lower-case (:name item)))))
+                   ;; maybe warn if multiple matches, for now just pick the longest match
+                   (sort-by #(- (count (:name %)))))]
+    (when-some [{:keys [links]} (first items)]
+      (when-some [url (->> links
+                           (filter (comp #{"Download" "Install"} :type))
+                           first
+                           :url)]
+        (let [[_ owner repo] (re-find #"^https?://github.com/([^/]+)/([^/]+)/releases" url)]
+          {:owner owner
+           :repo repo})))))
+
+(comment
+  (def data (fetch-json "https://appimage.github.io/feed.json"))
+
+  (let [pkg-filename
+        "appimagepool-5.0.0-x86_64.AppImage"]
+        ; "appimagepool"]
+    (find-github-releases-repo pkg-filename (:items data)))
+
+  ;; verify are there some links without Download type?
+    ;; total items: 1305
+    ;; items without links: 279
+    ;; items with links without Download or Install: 0
+  (->> data :items
+       (filter (fn [item]
+                 (not (seq (->> item :links)))
+                 #_(and (seq (->> item :links))
+                        (not (seq (->> item :links
+                                       (filter (comp #{"Download" "Install"} :type))))))))
+       (count))
+
+  ;; are there items with non-github download link? 15
+    ;; 1 https://bitbucket.org
+    ;; 14 https://download.opensuse.org
+  (->> data :items
+       (filter (fn [item]
+                 (and (seq (->> item :links))
+                      (not (seq (->> item :links
+                                     (filter (comp #{"Download" "Install"} :type))
+                                     (map :url)
+                                     (filter (fn [url]
+                                               (let [[_ releases-url] (re-find #"(^https?://github.com/[^/]+/[^/]+/releases)" url)]
+                                                 releases-url)))))))))
+       (mapcat :links)
+       (map :url)
+       (count)))
+
+(defn update-via-appimageupdatetool [appimageupdatetool-bin path]
+  (try
+    (println "* update-via-appimageupdatetool")
+    (process/shell {:out :inherit :err :inherit} appimageupdatetool-bin (str path))
+    true
+    (catch Exception e
+      (let [{:keys [exit]} (ex-data e)]
+        (case exit
+          2 (println "Missing update info")
+          (println "Unexpected error from appimageupdatetool" e))
+        false))))
+
+(defn update-via-appimagehub-lookup [!feed path]
+  (try
+    (println "* update-via-appimagehub-lookup")
+    (let [target-dir (.getParent path)
+          pkg-filename (str (.getFileName path))]
+      (when-some [{:keys [owner repo]} (find-github-releases-repo pkg-filename (:items @!feed))]
+        (let [update-info {:transport "gh-releases-direct"
+                           :owner owner
+                           :repo repo
+                           :file pkg-filename
+                           :release "latest"}]
+          (update-from-github update-info (.toFile target-dir))
+          true)))
+    (catch Exception e
+      (println "Unexpected error when upgrading via appimagehub lookup" e)
+      false)))
+
+(defn update-via-update-infos [update-infos path]
+  (try
+    (println "* update-via-update-infos")
+    (let [target-dir (.getParent path)
+          pkg-filename (str (.getFileName path))]
+      (when-some [update-info (->> update-infos
+                                   (some (fn [update-info-string]
+                                           (let [{:keys [file] :as parsed} (parse-update-info update-info-string)
+                                                 file-pattern (glob->regex file)]
+                                             (when (re-matches file-pattern pkg-filename)
+                                               parsed)))))]
+        (update-from-github update-info (.toFile target-dir))
+        true))
+    (catch Exception e
+      (println "Unexpected error when upgrading via custom update info" e)
+      false)))
+
+(comment
+  (let [path (.toPath (io/file "/home/me/Applications/appimagepool-5.1.0-x86_64.AppImage"))]
+    (update-via-appimagehub-lookup !feed path))
+
+  (let [path (.toPath (io/file "/home/me/Applications/GodMode-1.0.0-beta.6.AppImage"))
+        update-infos (->> (str/split-lines update-infos)
+                          (mapv str/trim))]
+    (update-via-update-infos update-infos path)))
+
+(defn update-appimage [{:keys [path !feed appimageupdatetool-bin update-infos]}]
+  (or (update-via-appimageupdatetool appimageupdatetool-bin path)
+      (update-via-appimagehub-lookup !feed path)
+      (update-via-update-infos update-infos path)))
+
+(def update-infos
+  "gh-releases-direct|smol-ai|GodMode|latest|GodMode-*.AppImage
+   gh-releases-direct|sunner|ChatALL|latest|ChatALL-*-x86_64.AppImage")
+
+(def !feed (delay (fetch-json "https://appimage.github.io/feed.json")))
+
 (defn -main [& args]
-  (let [target-dir (io/file (System/getenv "HOME") "Applications")]
-    (update-appimage "gh-releases-direct|smol-ai|GodMode|latest|GodMode-*.AppImage" target-dir)
-    (update-appimage "gh-releases-direct|sunner|ChatALL|latest|ChatALL-*-x86_64.AppImage" target-dir)))
+  (let [apps-dir (io/file (System/getenv "HOME") "Applications")
+        ;; maybe list files and manual filter so we can match .AppImage suffix case insensitively?
+        app-paths (fs/glob apps-dir "*.AppImage")
+        ;; todo: lookup appimageupdatetool path
+        appimageupdatetool-bin "/home/me/Applications/appimageupdatetool-x86_64.AppImage"
+        ; !feed (delay (fetch-json "https://appimage.github.io/feed.json"))
+        update-infos (->> (str/split-lines update-infos)
+                          (mapv str/trim))]
+    (doseq [path app-paths]
+      (println "== Checking update for" (str (.getFileName path)))
+      (update-appimage {:path path
+                        :appimageupdatetool-bin appimageupdatetool-bin
+                        :!feed !feed
+                        :update-infos update-infos})
+      (println))))
 
 (when (= *file* (System/getProperty "babashka.file"))
   (apply -main *command-line-args*))
