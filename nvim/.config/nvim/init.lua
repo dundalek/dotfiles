@@ -122,7 +122,7 @@ local plugins = {
 
   -- .editorconfig support
   -- editor config included in 0.9+
-  -- 'https://github.com/editorconfig/editorconfig-vim.git',
+  'https://github.com/editorconfig/editorconfig-vim.git',
   -- Heuristically set buffer options
   -- 'https://github.com/tpope/vim-sleuth.git',
 
@@ -195,18 +195,51 @@ local plugins = {
     }
   },
 
-  -- { 'https://github.com/eraserhd/parinfer-rust.git', ft = 'clojure', build = 'nix-shell --run \"cargo build --release \"' },
-  "gpanders/nvim-parinfer",
+  -- Structural editing of s-expressions
+  {
+    -- "dundalek/parpar.nvim",
+    dir = "~/projects/parpar.nvim",
+    dependencies = { "gpanders/nvim-parinfer", "julienvincent/nvim-paredit" },
+    config = function()
+      local paredit = require("nvim-paredit")
+      local keys = vim.tbl_extend("force", require("nvim-paredit.defaults").default_keys, {
+        -- custom bindings are automatically wrapped
+        ["<A-H>"] = { paredit.api.slurp_backwards, "Slurp backwards" },
+        ["<A-J>"] = { paredit.api.barf_backwards, "Barf backwards" },
+        ["<A-K>"] = { paredit.api.barf_forwards, "Barf forwards" },
+        ["<A-L>"] = { paredit.api.slurp_forwards, "Slurp forwards" },
 
-  -- Structural editing of s-expressions ala paredit - barfing, slurping, etc.
-  -- 'guns/vim-sexp',
-  -- Use snoe's fork which includes improvements to preserve cursor position and recursive capture.
-  -- https://github.com/guns/vim-sexp/pull/12
-  -- https://github.com/guns/vim-sexp/pull/15
-  -- { 'snoe/vim-sexp', commit = '4161f5c01504b77ab63f2957b943fca0c6e12e83' },
-  -- Enables use of the . command for repeating change operations in vim-sexp
-  "tpope/vim-repeat",
-  -- 'tpope/vim-sexp-mappings-for-regular-people',
+        ["<o"] = { paredit.api.raise_form, "Raise form" },
+        ["<O"] = { paredit.api.raise_element, "Raise element" },
+        -- These are text object selection keybindings which can used with standard `d, y, c`, `v`
+        -- ["af"] = {
+        --   paredit.api.select_around_form,
+        --   "Around form",
+        --   repeatable = false,
+        --   mode = { "o", "v" }
+        -- },
+        -- ["if"] = {
+        --   paredit.api.select_in_form,
+        --   "In form",
+        --   repeatable = false,
+        --   mode = { "o", "v" }
+        -- },
+      })
+      keys["<localleader>o"] = nil
+      keys["<localleader>O"] = nil
+
+      require("parpar").setup {
+        paredit = {
+          use_default_keys = false,
+          keys = keys
+        }
+      }
+
+      -- Workaround for joining lines with J, https://github.com/gpanders/nvim-parinfer/issues/12#issuecomment-1534552172
+      -- todo: map only for clojure files
+      vim.cmd "nnoremap J A<space><esc>J"
+    end
+  },
 
   -- sets lua lsp for signature help, docs and completion for the nvim lua API
   -- IMPORTANT: make sure to setup neodev BEFORE lspconfig
@@ -214,16 +247,19 @@ local plugins = {
 
   "neovim/nvim-lspconfig",
   -- Auto install LSP servers
-  { "dundalek/lazy-lsp.nvim", dependencies = { "neovim/nvim-lspconfig" } },
+  -- Loaded locally by adding to runtimepath
+  -- { "dundalek/lazy-lsp.nvim", dependencies = { "neovim/nvim-lspconfig" } },
   -- Preview lsp definitions in floating windows
   {
     "rmagatti/goto-preview",
     opts = {},
     keys = {
-      { "<leader>lp", function() require("goto-preview").goto_preview_definition() end, "Lsp: Preview Definition" },
+      { "<leader>lp", function() require("goto-preview").goto_preview_definition() end,
+        "Lsp: Preview Definition" },
       { "<leader>ly", function() require("goto-preview").goto_preview_type_definition() end,
         "Lsp: Preview Type Definition" },
-      { "<leader>li", function() require("goto-preview").goto_preview_implementation() end, "Lsp: Preview Implementation" },
+      { "<leader>li", function() require("goto-preview").goto_preview_implementation() end,
+        "Lsp: Preview Implementation" },
     }
   },
 
@@ -245,7 +281,8 @@ local plugins = {
       }
     },
     keys = {
-      { "<localleader>o", '<cmd>lua require"symbols-outline".toggle_outline()<cr>', "Lsp: SYmbols outline" }
+      { "<localleader>o", '<cmd>lua require"symbols-outline".toggle_outline()<cr>',
+        "Lsp: SYmbols outline" }
     }
   },
 
@@ -293,6 +330,33 @@ local plugins = {
   -- Can also consider https://github.com/chrisgrieser/nvim-early-retirement
   -- for time based buffer clean up
   { "axkirillov/hbac.nvim", opts = { autoclose = false } },
+
+  -- AI autocompletion
+  {
+    'Exafunction/codeium.vim',
+    dependencies = { "parpar.nvim" },
+    -- event = 'BufEnter',
+    init = function()
+      vim.g.codeium_disable_bindings = 1
+    end,
+    config = function()
+      vim.g.codeium_filetypes = { markdown = false }
+      local parpar = require('parpar')
+      local accept = function()
+        -- codeium clashes with parinfer when running synchronously,
+        -- but it seems to work when scheduling asynchronously
+        -- (hypothesis: `vim.fn` run is deferred (:help fast-api))
+        vim.schedule(parpar.pause())
+        return vim.fn['codeium#Accept']()
+      end
+
+      vim.keymap.set('i', '<Tab>', accept, { expr = true })
+      -- vim.keymap.set('i', '<C-g>', accept, { expr = true })
+      -- vim.keymap.set('i', '<c-;>', function() return vim.fn['codeium#CycleCompletions'](1) end, { expr = true })
+      -- vim.keymap.set('i', '<c-,>', function() return vim.fn['codeium#CycleCompletions'](-1) end, { expr = true })
+      -- vim.keymap.set('i', '<c-x>', function() return vim.fn['codeium#Clear']() end, { expr = true })
+    end
+  },
 }
 
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
@@ -388,7 +452,7 @@ set breakindent breakindentopt=min:40
 " Copy indent from current line when starting a new line
 set autoindent
 " Do smart autoindenting when starting a new line
-set smartindent
+" set smartindent
 
 " show a vertical column at 80 characters
 set colorcolumn=80
@@ -683,7 +747,7 @@ vim.opt.completeopt = { "menu", "menuone", "noselect" }
 -- Setup nvim-cmp.
 local cmp = require("cmp")
 cmp.setup {
-  mapping = {
+  mapping = cmp.mapping.preset.insert({
     ["<C-d>"] = cmp.mapping.scroll_docs(-4),
     ["<C-f>"] = cmp.mapping.scroll_docs(4),
     ["<C-Space>"] = cmp.mapping.complete(),
@@ -691,8 +755,11 @@ cmp.setup {
     -- Changed default for enter to behave as newline if no item is selected
     ["<CR>"] = cmp.mapping.confirm { select = false },
     -- Read :help ins-completion but stayed a lowly tab-completer
-    ["<Tab>"] = cmp.mapping(cmp.mapping.select_next_item(), { "i", "s" }),
-  },
+    -- disabling tab temporarily to avoid clashing with codeium
+    -- ["<Tab>"] = cmp.mapping(cmp.mapping.select_next_item(), { "i", "s" }),
+    ["<C-n>"] = cmp.mapping(cmp.mapping.select_next_item(), { "i", "s" }),
+    ["<C-p>"] = cmp.mapping(cmp.mapping.select_prev_item(), { "i", "s" }),
+  }),
   sources = {
     { name = "nvim_lsp" },
     { name = "nvim_lua" },
@@ -844,7 +911,7 @@ local on_attach = function(client, bufnr)
     vim.cmd([[
       augroup lsp_format
         autocmd! * <buffer>
-        autocmd BufWritePre  <buffer> lua vim.lsp.buf.format()
+        autocmd BufWritePre  <buffer> lua if not vim.g.disable_lsp_formatting then vim.lsp.buf.format() end
       augroup END
     ]])
   end
@@ -875,6 +942,9 @@ local capabilities = require("cmp_nvim_lsp").default_capabilities(vim.lsp.protoc
 vim.opt.runtimepath:prepend("~/code/lazy-lsp.nvim")
 require("plenary.reload").reload_module("lazy-lsp")
 
+local jdtls_cmd = vim.list_slice(require("lspconfig").jdtls.document_config.default_config.cmd, 2)
+table.insert(jdtls_cmd, 1, "jdt-language-server")
+
 require("lazy-lsp").setup {
   excluded_servers = {
     -- prefer tsserver
@@ -892,6 +962,7 @@ require("lazy-lsp").setup {
     "diagnosticls",
     -- seems to get into infinite loop
     "marksman",
+    "tailwindcss",
 
     -- prefer clangd
     "ccls",
@@ -908,6 +979,12 @@ require("lazy-lsp").setup {
 
     -- marked as deprecated
     "sqls",
+  },
+  preferred_servers = {
+    haskell = { "hls" },
+    rust = { "rust_analyzer" },
+    python = { "pyright" },
+    -- typescript = { "tsserver" },
   },
   default_config = {
     on_attach = on_attach,
@@ -945,7 +1022,8 @@ require("lazy-lsp").setup {
             {
               lintCommand = "shellcheck -f gcc -x",
               lintSource = "shellcheck",
-              lintFormats = { "%f:%l:%c: %trror: %m", "%f:%l:%c: %tarning: %m", "%f:%l:%c: %tote: %m" },
+              lintFormats = { "%f:%l:%c: %trror: %m", "%f:%l:%c: %tarning: %m",
+                "%f:%l:%c: %tote: %m" },
             },
           },
           vim = {
@@ -960,10 +1038,10 @@ require("lazy-lsp").setup {
       settings = {
         Lua = {
           -- shouldn't be needed with neodev.nvim
-          -- diagnostics = {
-          --   -- Get the language server to recognize the `vim` global
-          --   globals = { 'vim' },
-          -- },
+          diagnostics = {
+            -- Get the language server to recognize the `vim` global
+            globals = { 'vim' },
+          },
           format = {
             enable = true,
             defaultConfig = {
@@ -976,11 +1054,15 @@ require("lazy-lsp").setup {
       },
     },
     jdtls = {
-      cmd = { "jdt-language-server" },
+      cmd = jdtls_cmd, -- { "jdt-language-server" },
     },
-    dartls = {
-      cmd = { "dart", "language-server" },
+    gopls = {
+      -- lspconfig tries to look up mod_cache which seems broken, do just simple root pattern
+      root_dir = util.root_pattern('go.work', 'go.mod', '.git')
     },
+    -- dartls = {
+    --   cmd = { "dart", "language-server" },
+    -- },
     -- tsserver = {
     --   cmd = { "typescript-language-server", "--stdio" },
     -- },
@@ -1176,6 +1258,7 @@ require("legendary").funcs {
     description = "Toggle spell check",
   },
   {
+    description = "Clojure: Open Portal",
     function()
       require("conjure.eval").command([[
         (do
@@ -1184,9 +1267,9 @@ require("legendary").funcs {
           (add-tap (requiring-resolve 'portal.api/submit)))
       ]])
     end,
-    description = "Clojure: Open Portal",
   },
   {
+    description = "Clojure: Close Portal",
     function()
       require("conjure.eval").command([[
         (do
@@ -1194,15 +1277,18 @@ require("legendary").funcs {
           ((requiring-resolve 'portal.api/close)))
       ]])
     end,
-    description = "Clojure: Close Portal",
   },
   {
+    description = "Clojure: Open Morse",
     function()
       require("conjure.eval").command([[
         ((requiring-resolve 'dev.nu.morse/launch-in-proc))
       ]])
     end,
-    description = "Clojure: Open Morse",
+  },
+  {
+    description = "Toggle Dark/Light background",
+    function() vim.o.background = vim.o.background == "light" and "dark" or "light" end,
   },
 }
 
@@ -1361,7 +1447,7 @@ wk.register({
   l = {
     c = { "<cmd>:ConjureConnect<cr>", "Conjure: Connect to REPL" },
     -- bind it outside of on_attach to use for debugging
-    l = { "<cmd>LSPInfo<cr>", "Lsp: Show Info" },
+    l = { "<cmd>LspInfo<cr>", "Lsp: Show Info" },
     L = { function() vim.cmd(":e " .. vim.lsp.get_log_path()) end, "Lsp: Show Log" },
   },
   -- TODO: Figure out how to bind these via autocmd
@@ -1384,6 +1470,10 @@ wk.register({
 
 wk.register({
   e = {
+    -- mark some form with K, shortharnd to eval it with i<localleader>ek nstead of <localleader>emK (mainly avoiding need to hold shift)
+    k = { function()
+      vim.schedule(function() require("conjure.eval")["marked-form"]("K") end)
+    end, "Eval marKed form K" },
     -- Conjure omits exception stacktrace by default, add a shorthad eval the exception to get to the stacktrace
     x = { "<cmd>:ConjureEval *e<cr>", "Eval REPL exception" },
     t = { "<cmd>:ConjureEval (tap> *1)<cr>", "Eval: Tap last value" },
