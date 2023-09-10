@@ -54,9 +54,14 @@ local plugins = {
   "https://github.com/habamax/vim-sugarlily",
 
   -- Show colors for hex values
-  "norcalli/nvim-colorizer.lua",
-
-  -- File Explorer {{{1
+  {
+    "norcalli/nvim-colorizer.lua",
+    config = function()
+      -- Show colors for hex values
+      -- names=false to not highlight color names like Green
+      require("colorizer").setup(nil, { names = false })
+    end,
+  },
 
   ---- neo-tree {{{1
 
@@ -123,8 +128,6 @@ local plugins = {
   -- .editorconfig support
   -- editor config included in 0.9+
   'https://github.com/editorconfig/editorconfig-vim.git',
-  -- Heuristically set buffer options
-  -- 'https://github.com/tpope/vim-sleuth.git',
 
   -- The three "core" operations of add/delete/change can be done with the keymaps ys{motion},{char}, ds{char}, and cs{target}{replacement}
   { "kylechui/nvim-surround", opts = {} },
@@ -135,9 +138,19 @@ local plugins = {
   -- automatically toggle between relative and absolute line numbers
   -- 'https://github.com/sitiom/nvim-numbertoggle',
 
-  -- Toggling comments
+  -- Editing {{{1
+  ---- Toggling comments {{{1
   -- 'https://github.com/preservim/nerdcommenter.git',
-  "numToStr/Comment.nvim",
+  {
+    "numToStr/Comment.nvim",
+    opts = {},
+    keys = {
+      -- nmap <silent> <C-_>  gcc
+      -- vmap <silent> <C-_>  gcgv
+      { "<C-_>", "gcc", silent = true, remap = true, desc = "Toggle Line Comment" },
+      { "<C-_>", "gcgv", mode = "v", silent = true, remap = true, desc = "Toggle Visual Selection Comment" },
+    },
+  },
 
   -- Git show changes in gutter
   -- 'https://github.com/mhinz/vim-signify.git',
@@ -293,7 +306,12 @@ local plugins = {
   {
     "iamcco/markdown-preview.nvim",
     build = "cd app && npm install",
-    init = function() vim.g.mkdp_filetypes = { "markdown" } end,
+    init = function()
+      vim.g.mkdp_filetypes = { "markdown" }
+
+      -- Don't close current markdown preview window when switching away from buffer
+      vim.g.mkdp_auto_close = 0
+    end,
     ft = { "markdown" },
   },
   -- Useful markdown editing functionality
@@ -578,13 +596,6 @@ vnoremap // y/\V<C-R>=escape(@",'/\')<CR><CR>
 " Make gf create a new file if it not exists
 map gf :e <cfile><CR>
 
-"---- Comment.nvim {{{1
-lua require('Comment').setup()
-" nnoremap <silent> <C-_>  :lua require('Comment').toggle()<CR>
-" vnoremap <silent> <C-_>  <cmd>:lua require('Comment').toggle()<CR>gv
-nmap <silent> <C-_>  gcc
-vmap <silent> <C-_>  gcgv
-
 "-- Theme / Colorscheme {{{1
 if has("termguicolors")
   set termguicolors
@@ -642,12 +653,6 @@ map("i", "<A-j>", "<esc><cmd>m .+1<cr>==gi", { desc = "Move down" })
 map("i", "<A-k>", "<esc><cmd>m .-2<cr>==gi", { desc = "Move up" })
 map("v", "<A-j>", ":m '>+1<cr>gv=gv", { desc = "Move down" })
 map("v", "<A-k>", ":m '<-2<cr>gv=gv", { desc = "Move up" })
-
----- colorizer {{{1
--- Show colors for hex values
--- names=false to not highlight color names like Green
-require("colorizer").setup(nil, { names = false })
-
 
 -- Fuzzy file search {{{1
 
@@ -1116,10 +1121,6 @@ augroup lang_markdown
     " automatically again
 augroup END
 ]])
-
--- Don't close current markdown preview window when switching away from buffer
--- let g:mkdp_auto_close = 0
-vim.g.mkdp_auto_close = 0
 
 ---- Clojure {{{1
 
