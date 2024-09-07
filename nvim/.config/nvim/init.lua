@@ -1,7 +1,7 @@
 -- vim: foldmethod=marker
 -- Press zM to close all folds to navigate the structure, zR to open all.
 -- Press zj / zk to jump to next / previous section.
-
+--
 ---- Global {{{1
 
 -- Set our leader key to space. This needs to be set first before all plugins are loaded.
@@ -17,27 +17,24 @@ local plugins = {
   -- I like to specify full url of the plugin, because one can then press `gx` to open
   -- the plugin home page in a web browser.
 
-  -- Packer manages itself, otherwise it tries to clean itself when not specified
-  -- 'wbthomason/packer.nvim',
-
-  -- Defaults everyone can agree on
-  -- 'https://github.com/tpope/vim-sensible',
-
   -- Syntax highlighting theme
+  -- Dark+Light
+  -- Dark
   {
     "folke/tokyonight.nvim",
     lazy = false,    -- make sure we load this during startup if it is your main colorscheme
     priority = 1000, -- make sure to load this before all the other start plugins
     config = function()
+      require("tokyonight").setup {
+        style = "night",
+      }
       -- load the colorscheme here
       vim.cmd([[colorscheme tokyonight]])
     end,
-    opts = {
-      style = "night",
-    },
   },
   "https://github.com/ayu-theme/ayu-vim.git",
   "https://github.com/mhartington/oceanic-next.git",
+
   -- 'https://github.com/haishanh/night-owl.vim.git',
   -- 'https://github.com/arcticicestudio/nord-vim.git',
   -- 'https://github.com/drewtempelmeyer/palenight.vim.git',
@@ -72,6 +69,8 @@ local plugins = {
     -- cmd = "Neotree", -- loading Neotree lazily breaks legendary paletter for some reason
     init = function() vim.g.neo_tree_remove_legacy_commands = 1 end,
     opts = {
+      -- override to add the experimental "document_symbols" source
+      sources = { "filesystem", "buffers", "git_status", "document_symbols", },
       default_component_configs = {
         indent = {
           indent_size = 1,
@@ -83,16 +82,42 @@ local plugins = {
       window = {
         position = "right",
         width = 30,
+        mappings = {
+          -- override to not use floating window for preview
+          ["P"] = { "toggle_preview", config = { use_float = false } },
+        }
       },
       filesystem = {
+        group_empty_dirs = true, -- flatten empty nested folders
+        scan_mode = "deep",      -- scan into directories to detect possible empty folders
         filtered_items = {
           -- show hidden files like dotfiles and git ignored
           visible = true,
+        },
+        commands = {
+          -- Override delete to use trash instead of rm
+          -- https://github.com/nvim-neo-tree/neo-tree.nvim/issues/202
+          delete = function(state)
+            local inputs = require "neo-tree.ui.inputs"
+            local path = state.tree:get_node().path
+            local msg = "Are you sure you want to trash " .. path
+            inputs.confirm(msg, function(confirmed)
+              if not confirmed then return end
+
+              vim.fn.system { "gio", "trash", path }
+              require("neo-tree.sources.manager").refresh(state.name)
+            end)
+          end,
         },
       },
       -- disable lsp diagnostics as they seem to cause lagging/freezing
       enable_diagnostics = false,
     },
+    -- my efm markdown source does not work with neotree symbols, keep symbols-outline as default for now
+    -- keys = {
+    --   { "<localleader>o", '<cmd>:Neotree document_symbols<cr>',
+    --     "Lsp: SYmbols outline" }
+    -- }
   },
 
   -- Close buffers inteligently
@@ -126,7 +151,7 @@ local plugins = {
   "https://github.com/onsails/lspkind-nvim.git",
 
   -- .editorconfig support
-  -- editor config included in 0.9+
+  -- editor config included in 0.9+, not needed anymore?
   'https://github.com/editorconfig/editorconfig-vim.git',
 
   -- The three "core" operations of add/delete/change can be done with the keymaps ys{motion},{char}, ds{char}, and cs{target}{replacement}
@@ -140,7 +165,7 @@ local plugins = {
 
   -- Editing {{{1
   ---- Toggling comments {{{1
-  -- 'https://github.com/preservim/nerdcommenter.git',
+  -- commenting included in 0.10, plugin no longer needed?
   {
     "numToStr/Comment.nvim",
     opts = {},
@@ -148,7 +173,15 @@ local plugins = {
       -- nmap <silent> <C-_>  gcc
       -- vmap <silent> <C-_>  gcgv
       { "<C-_>", "gcc", silent = true, remap = true, desc = "Toggle Line Comment" },
-      { "<C-_>", "gcgv", mode = "v", silent = true, remap = true, desc = "Toggle Visual Selection Comment" },
+      {
+        "<C-_>",
+        "gcgv",
+        mode = "v",
+        silent = true,
+        remap = true,
+        desc =
+        "Toggle Visual Selection Comment"
+      },
     },
   },
 
@@ -191,7 +224,8 @@ local plugins = {
   "mrjones2014/legendary.nvim",
 
   -- Spacemacs-like menu
-  "folke/which-key.nvim",
+  -- v3 is breaking key format - will need time to upgrade
+  { "folke/which-key.nvim", tag = "v2.1.0" },
 
   -- bracketted key mappings like `[b` `]b` for switching buffers or `[q` `]q` for navigating quickfix list
   -- advantage over tpope/vim-unimpaired is that is sets mapping descriptions
@@ -199,7 +233,12 @@ local plugins = {
   { "tummetott/unimpaired.nvim", opts = {} },
 
   -- Language client
-  "https://github.com/Olical/conjure.git",
+  {
+    "https://github.com/Olical/conjure.git",
+    init = function()
+      vim.g["conjure#client#clojure#nrepl#refresh#backend"] = "clj-reload"
+    end,
+  },
   -- Load CLojure exception trace into location list
   {
     "walterl/conjure-locstack",
@@ -211,7 +250,7 @@ local plugins = {
   -- Structural editing of s-expressions
   {
     -- "dundalek/parpar.nvim",
-    dir = "~/projects/parpar.nvim",
+    dir = "~/code/parpar.nvim",
     dependencies = { "gpanders/nvim-parinfer", "julienvincent/nvim-paredit" },
     config = function()
       local paredit = require("nvim-paredit")
@@ -260,8 +299,35 @@ local plugins = {
 
   "neovim/nvim-lspconfig",
   -- Auto install LSP servers
-  -- Loaded locally by adding to runtimepath
-  -- { "dundalek/lazy-lsp.nvim", dependencies = { "neovim/nvim-lspconfig" } },
+  {
+    -- "dundalek/lazy-lsp.nvim",
+    dir = "~/code/lazy-lsp.nvim",
+    dependencies = { "neovim/nvim-lspconfig", "b0o/schemastore.nvim", }
+  },
+
+  -- {
+  --   "dundalek/lazy-lsp.nvim",
+  --   dependencies = {
+  --     "neovim/nvim-lspconfig",
+  --     { "VonHeikemen/lsp-zero.nvim", branch = "v3.x" },
+  --     "hrsh7th/cmp-nvim-lsp",
+  --     "hrsh7th/nvim-cmp",
+  --   },
+  --   config = function()
+  --     local lsp_zero = require("lsp-zero")
+  --
+  --     lsp_zero.on_attach(function(client, bufnr)
+  --       -- see :help lsp-zero-keybindings to learn the available actions
+  --       lsp_zero.default_keymaps({
+  --         buffer = bufnr,
+  --         preserve_mappings = false
+  --       })
+  --     end)
+  --
+  --     require("lazy-lsp").setup {}
+  --   end,
+  -- },
+
   -- Preview lsp definitions in floating windows
   {
     "rmagatti/goto-preview",
@@ -282,12 +348,14 @@ local plugins = {
     build = ":TSUpdate", -- We recommend updating the parsers on update
   },
 
-  "https://github.com/Dkendal/nvim-treeclimber",
+  -- "https://github.com/Dkendal/nvim-treeclimber",
 
   -- A tree like view for symbols in Neovim using the Language Server Protocol
+  -- plugin archived on on Jan 3, 2024, trying neotree with document_symbols source as an alternative
   {
     "https://github.com/simrat39/symbols-outline.nvim.git",
     opts = {
+      autofold_depth = 1,
       keymaps = {
         -- besides enter also mouse double-click to go to location
         goto_location = { "<Cr>", "<2-LeftMouse>" },
@@ -305,7 +373,7 @@ local plugins = {
   -- Markdown preview
   {
     "iamcco/markdown-preview.nvim",
-    build = "cd app && npm install",
+    build = "cd app && npx --yes yarn install",
     init = function()
       vim.g.mkdp_filetypes = { "markdown" }
 
@@ -351,30 +419,77 @@ local plugins = {
 
   -- AI autocompletion
   {
-    'Exafunction/codeium.vim',
+    "Exafunction/codeium.vim",
+    -- local fork to set option to disable autocomplete in comments
+    -- https://github.com/Exafunction/codeium.vim/issues/29#issuecomment-1771907425
+    -- but neither lua nor clojure have grammar so disabling comments does not work, but works e.g. for javascript
+    -- dir = "/home/me/Downloads/git/codeium.vim",
     dependencies = { "parpar.nvim" },
-    -- event = 'BufEnter',
+    -- event = "BufEnter",
     init = function()
       vim.g.codeium_disable_bindings = 1
     end,
     config = function()
-      vim.g.codeium_filetypes = { markdown = false }
-      local parpar = require('parpar')
+      vim.g.codeium_filetypes = {
+        markdown = false,
+        text = false,
+        dotenv = false,
+      }
+
+      -- Disable completion in comments - does not work because the original implementation is likely kept in closure
+      -- https://github.com/Exafunction/codeium.vim/issues/29#issuecomment-1771907425
+      -- local original_get_editor_options = vim.fn["codeium#doc#GetEditorOptions"]
+      -- vim.fn["codeium#doc#GetEditorOptions"] = function()
+      --   local options = original_get_editor_options()
+      --   options.disable_autocomplete_in_comments = true
+      --   return options
+      -- end
+
+      -- Detection inspired by nvim-treesitter.configs.attach_module
+      local ts_parsers = require "nvim-treesitter.parsers"
+      local ts_configs = require 'nvim-treesitter.configs'
+      local function treesitter_enabled(bufnr, lang)
+        local mod_name = "highlight"
+        bufnr = bufnr or vim.api.nvim_get_current_buf()
+        lang = lang or ts_parsers.get_buf_lang(bufnr)
+
+        if vim.g.codeium_filetypes[lang] ~= false and ts_configs.is_enabled(mod_name, lang, bufnr) then
+          return true
+        end
+        return false
+      end
+
+      -- I don't want AI completions in non-code buffers like Telescope prompt or neo-tree inputs.
+      -- I don't know all special buffer types upfront, so the the idea is to detect if a buffer is a source code.
+      -- The heuristic is by checking if a treesitter grammar exists, then we consider it a code.
+      vim.api.nvim_create_autocmd({ "BufEnter" }, {
+        callback = function(ev)
+          if not treesitter_enabled() then
+            -- If not then set local buffer option to disable Codeium which is checked in codeium#Enabled()
+            vim.b.codeium_enabled = false
+          end
+        end,
+      })
+
+      local parpar = require("parpar")
       local accept = function()
         -- codeium clashes with parinfer when running synchronously,
         -- but it seems to work when scheduling asynchronously
         -- (hypothesis: `vim.fn` run is deferred (:help fast-api))
         vim.schedule(parpar.pause())
-        return vim.fn['codeium#Accept']()
+        return vim.fn["codeium#Accept"]()
       end
 
-      vim.keymap.set('i', '<Tab>', accept, { expr = true })
-      -- vim.keymap.set('i', '<C-g>', accept, { expr = true })
-      -- vim.keymap.set('i', '<c-;>', function() return vim.fn['codeium#CycleCompletions'](1) end, { expr = true })
-      -- vim.keymap.set('i', '<c-,>', function() return vim.fn['codeium#CycleCompletions'](-1) end, { expr = true })
-      -- vim.keymap.set('i', '<c-x>', function() return vim.fn['codeium#Clear']() end, { expr = true })
+      vim.keymap.set("i", "<Tab>", accept, { expr = true })
+      -- vim.keymap.set("i", "<C-g>", accept, { expr = true })
+      -- vim.keymap.set("i", "<c-;>", function() return vim.fn["codeium#CycleCompletions"](1) end, { expr = true })
+      -- vim.keymap.set("i", "<c-,>", function() return vim.fn["codeium#CycleCompletions"](-1) end, { expr = true })
+      -- vim.keymap.set("i", "<c-x>", function() return vim.fn["codeium#Clear"]() end, { expr = true })
     end
   },
+
+  -- render a keyboard displaying which keys have assigned actions
+  { 'jokajak/keyseer.nvim', version = false },
 }
 
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
@@ -390,9 +505,28 @@ if not vim.loop.fs_stat(lazypath) then
 end
 vim.opt.rtp:prepend(lazypath)
 
+-- bisecting bad plugins
+-- local from = 1
+-- local to = 55 -- #plugins
+-- print((from + to) / 2)
+-- plugins = vim.list_slice(plugins, from, to)
+
 require("lazy").setup(plugins, {})
 
 -- Experimental {{{1
+
+-- adding dotenv filetype so that can be ignored for Codeium completions
+vim.filetype.add({
+  filename = {
+    [".env"] = "dotenv",
+  },
+  -- pattern does not seem to work
+  -- maybe just do it using autocmd
+  -- https://neovim.discourse.group/t/how-to-add-custom-filetype-detection-to-various-env-files/4272/4
+  pattern = {
+    [".*%.env.*"] = { "dotenv", { priority = 100 } },
+  },
+})
 
 -- require("toggleterm").setup {
 --   shell = "zellij",
@@ -690,6 +824,7 @@ let g:fzf_action = {
   \ 'ctrl-s': 'split',
   \ 'ctrl-v': 'vsplit'
   \}
+
 ]])
 
 ---- Telescope {{{1
@@ -717,6 +852,10 @@ require("telescope").setup {
         height = 15,
         anchor = "S",
       },
+    },
+    live_grep = {
+      -- Args for ripgrep to follow links to search in linked files, e.g. Logseq pages vault
+      additional_args = { "--follow" },
     },
     lsp_document_symbols = {
       -- For document symbols (which is used also for markdown heading jumping)
@@ -781,6 +920,11 @@ cmp.setup {
         nvim_lua = "[Lua]",
       },
     },
+  },
+  snippet = {
+    expand = function(arg)
+      vim.snippet.expand(arg.body)
+    end,
   },
 }
 
@@ -879,6 +1023,8 @@ local on_attach = function(client, bufnr)
   buf_set_keymap("n", "<leader>lh", "<cmd>lua vim.lsp.buf.signature_help()<CR>", opts)
   buf_set_keymap("n", "<leader>lq", "<cmd>lua vim.lsp.buf.hover()<CR>", opts)
 
+  -- Disable semantic highlighting (to just use treesitter)
+  -- client.server_capabilities.semanticTokensProvider = nil
 
   -- Display code lenses which show for example number of references and tests of a funtion
 
@@ -887,11 +1033,12 @@ local on_attach = function(client, bufnr)
     setlocal tagfunc=v:lua.vim.lsp.tagfunc
   ]])
 
-  if client.server_capabilities.codeLensProvider then
+  -- if client.server_capabilities.codeLensProvider then
+  if client.supports_method("textDocument/codeLens") then
     vim.cmd([[
       augroup lsp_codelens
         autocmd! * <buffer>
-        autocmd BufWritePost,CursorHold,CursorHoldI <buffer> lua vim.lsp.codelens.refresh()
+        autocmd BufWritePost,CursorHold,CursorHoldI <buffer> lua vim.lsp.codelens.refresh({bufnr = 0})
       augroup END
     ]])
   end
@@ -938,59 +1085,41 @@ end
 -- seems to show popup `Do you need to configure your work environment as `luv`?` disabling for now
 -- require("neodev").setup {}
 
-local nvim_lsp = require("lspconfig")
-local util = require("lspconfig/util")
+local lspconfig = require("lspconfig")
 local capabilities = require("cmp_nvim_lsp").default_capabilities(vim.lsp.protocol.make_client_capabilities())
 
 ---- lazy-lsp {{{1
 
-vim.opt.runtimepath:prepend("~/code/lazy-lsp.nvim")
-require("plenary.reload").reload_module("lazy-lsp")
-
-local jdtls_cmd = vim.list_slice(require("lspconfig").jdtls.document_config.default_config.cmd, 2)
-table.insert(jdtls_cmd, 1, "jdt-language-server")
+-- vim.opt.runtimepath:prepend("~/code/lazy-lsp.nvim")
+-- require("plenary.reload").reload_module("lazy-lsp")
 
 require("lazy-lsp").setup {
   excluded_servers = {
-    -- prefer tsserver
-    "denols", --"stylelint_lsp", "eslint",
-    -- ghcide and hie seem to be deprecated in favor of haskell-language-server (hls)
-    "ghcide",
-    "hie",
+    -- "als", -- getting warning, workaround for https://github.com/dundalek/lazy-lsp.nvim/issues/47
 
-    -- preferring rust_analyzer
-    "rls",
+    -- Curated recommendations
+    "ccls",                            -- prefer clangd
+    "denols",                          -- prefer eslint and tsserver
+    "docker_compose_language_service", -- yamlls should be enough?
+    "flow",                            -- prefer eslint and tsserver
+    -- "ltex",                            -- grammar tool using too much CPU
+    "quick_lint_js",                   -- prefer eslint and tsserver
+    "scry",                            -- archived on Jun 1, 2023
+    "tailwindcss",                     -- associates with too many filetypes
 
-    -- to avoid interference with markdown files
-    "zk",
-    -- interferes with efm for markdown files
-    "diagnosticls",
-    -- seems to get into infinite loop
-    "marksman",
-    "tailwindcss",
+    "solargraph", "syntax_tree",
 
-    -- prefer clangd
-    "ccls",
+    "bashls",
 
-    -- it is nice to offer grammar suggestions for markdown files, but uses too much CPU and noise for rough notes
-    -- figure out a workflow to toggle it manually
-    "ltex",
-
-    -- causes error to be printed: E484: Can't open file /home/me/.m2/repository/com/fujitsu/lsp
-    "vdmj",
-
+    "sourcekit",
     -- configured manually due to having issues installing it via nix
     "clojure_lsp",
-
-    -- marked as deprecated
-    "sqls",
   },
   preferred_servers = {
-    haskell = { "hls" },
-    rust = { "rust_analyzer" },
-    python = { "pyright" },
-    -- typescript = { "tsserver" },
+    markdown = { "efm", "ltex" },
+    python = { "pyright", "ruff_lsp" },
   },
+  prefer_local = true,
   default_config = {
     on_attach = on_attach,
     flags = {
@@ -999,17 +1128,16 @@ require("lazy-lsp").setup {
     capabilities = capabilities,
   },
   configs = {
-    -- clojure_lsp = { }
     -- https://github.com/bash-lsp/bash-language-server/issues/104#issuecomment-848052436
     efm = {
       filetypes = { "markdown", "sh", "vim" },
-      on_attach = function(client, bufnr)
-        local function buf_set_keymap(...) vim.api.nvim_buf_set_keymap(bufnr, ...) end
-        local function buf_set_option(...) vim.api.nvim_buf_set_option(bufnr, ...) end
-
-        -- Mappings.
-        local opts = { noremap = true, silent = true }
-      end,
+      -- on_attach = function(client, bufnr)
+      --   local function buf_set_keymap(...) vim.api.nvim_buf_set_keymap(bufnr, ...) end
+      --   local function buf_set_option(...) vim.api.nvim_buf_set_option(bufnr, ...) end
+      --
+      --   -- Mappings.
+      --   local opts = { noremap = true, silent = true }
+      -- end,
       init_options = {
         documentFormatting = true,
         documentSymbol = true,
@@ -1038,6 +1166,21 @@ require("lazy-lsp").setup {
           },
         },
       },
+      on_new_config = function(new_config)
+        -- Override used packages to add additional dependencies
+        local nix_pkgs = { "efm-langserver", "shellcheck" }
+        new_config.cmd = require("lazy-lsp").in_shell(nix_pkgs, new_config.cmd)
+      end,
+    },
+    jsonls = {
+      on_new_config = function(config)
+        config.settings = {
+          json = {
+            schemas = require('schemastore').json.schemas(),
+            validate = { enable = true },
+          },
+        }
+      end,
     },
     lua_ls = {
       settings = {
@@ -1058,26 +1201,32 @@ require("lazy-lsp").setup {
         },
       },
     },
-    jdtls = {
-      cmd = jdtls_cmd, -- { "jdt-language-server" },
+    ltex = {
+      -- Have ltext enabled, but don't start it by default
+      -- Can start it explicitly with :LspStart
+      autostart = false,
     },
-    gopls = {
-      -- lspconfig tries to look up mod_cache which seems broken, do just simple root pattern
-      root_dir = util.root_pattern('go.work', 'go.mod', '.git')
-    },
-    -- dartls = {
-    --   cmd = { "dart", "language-server" },
-    -- },
-    -- tsserver = {
-    --   cmd = { "typescript-language-server", "--stdio" },
-    -- },
   },
 }
 
-nvim_lsp.clojure_lsp.setup {
+lspconfig.clojure_lsp.setup {
   -- Override the defaut config to set root in the top-level of a monorepo
-  -- root_dir = util.root_pattern(".git"),
-  on_attach = on_attach,
+  root_dir = function(filename)
+    return lspconfig.util.root_pattern(".git")(filename) or
+        lspconfig.util.root_pattern("deps.edn", "project.clj")(filename)
+  end,
+  -- cmd = { "clojure-lsp", "--trace-level", "verbose", "--log-path", "/tmp/clojure-lsp.log" },
+  on_attach = function(client, bufnr)
+    -- Do not attach in conjure logs, inspired by
+    -- https://github.com/Olical/conjure/issues/571
+    local bufname = vim.fn.fnamemodify(vim.api.nvim_buf_get_name(bufnr), ":t")
+    local is_conjure_log = string.sub(bufname, 1, 12) == "conjure-log-"
+    if is_conjure_log then
+      vim.lsp.buf_detach_client(bufnr, client.id)
+    else
+      on_attach(client, bufnr)
+    end
+  end,
   flags = {
     debounce_text_changes = 150,
   },
@@ -1130,7 +1279,7 @@ augroup lang_clojure
   " set nolinebreak because line break at words boundary bugs out with parinfer
   autocmd FileType clojure
     \ nnoremap <LocalLeader>s :ConjureShadowSelect
-    \| nnoremap <LocalLeader>el :ConjureLogSplit<cr>
+    \| nnoremap <LocalLeader>el :ConjureLogToggle<cr>
     \| nnoremap <LocalLeader>ev :ConjureLogVSplit<cr>
     \| set nolinebreak
 augroup END
@@ -1177,10 +1326,12 @@ require("legendary.data.state").items = require("legendary.data.itemlist"):creat
 -- `setup()` must be called before `require('which-key).register()`
 local legendary_format = require("legendary.ui.format").default_format
 require("legendary").setup {
-  which_key = {
-    -- try to register only once to avoid duplicates on reload
-    -- for some reason this workaround does not work completely, there are two duplicates after reload, but at least it does not grow unbounded
-    auto_register = global_legendary_auto_registered == nil,
+  extensions = {
+    which_key = {
+      -- try to register only once to avoid duplicates on reload
+      -- for some reason this workaround does not work completely, there are two duplicates after reload, but at least it does not grow unbounded
+      auto_register = global_legendary_auto_registered == nil,
+    },
   },
   default_item_formatter = function(item)
     -- swap description with command definition
@@ -1226,6 +1377,7 @@ require("legendary").commands {
   { description = "Buffers: Close other", ":%bd|e#" },
   { ":ConjureShadowSelect app", description = "Conjure shadow select app" },
   { ":ConjureShadowSelect {name}", description = "Conjure shadow select", unfinished = true },
+  { ":ConjureConnect {port}", description = "Conjure: Connect", unfinished = true },
   { ":ConjureConnect 48888", description = "Conjure: Pitch Backend REPL" },
   { ":ConjureConnect 7888", description = "Conjure: Pitch Frontend REPL" },
   { ":ConjureConnect 1667", description = "Conjure: Babashka REPL" },
@@ -1246,6 +1398,7 @@ require("legendary").commands {
   { ":DownMakeLink", description = "Markdown: Create link" },
   -- { ':split term://fish', description = 'Toggle Terminal' },
   { ":Neotree source=buffers", description = "NeoTree: Opened buffers" },
+  { ":Neotree source=document_symbols", description = "NeoTree: LSP - Document Symbols" },
   { ":InspectTree", description = "Treesitter: Inspect tree" }, -- :help inspect_tree
   { ":DiffviewOpen", description = "Git: Diff View Open" },
   { ":DiffviewClose", description = "Git: Diff View Close" },
@@ -1289,7 +1442,25 @@ require("legendary").funcs {
   },
   {
     description = "Toggle Dark/Light background",
-    function() vim.o.background = vim.o.background == "light" and "dark" or "light" end,
+    function()
+      if vim.o.background == "light" then
+        vim.cmd([[colorscheme tokyonight]])
+        vim.o.background = "dark"
+      else
+        vim.cmd([[colorscheme github_light]])
+        vim.o.background = "light"
+      end
+    end,
+  },
+  {
+    description = "Toggle Diagnostics",
+    function()
+      if vim.diagnostic.is_disabled() then
+        vim.diagnostic.enable()
+      else
+        vim.diagnostic.disable()
+      end
+    end,
   },
 }
 
@@ -1330,11 +1501,13 @@ wk.register({
 }, { prefix = "<leader>" })
 
 -- other commands like moving forward/backward do not seem to work that well
-local tc = require("nvim-treeclimber")
-vim.keymap.set({ "n" }, "vv", tc.select_expand, { desc = "TreeClimber: Expand Selection" })
-vim.keymap.set({ "v" }, "v", tc.select_expand, { desc = "TreeClimber: Expand Selection" })
-vim.keymap.set({ "v" }, "z", tc.select_shrink, { desc = "TreeClimber: Shrink Selection" })
+-- local tc = require("nvim-treeclimber")
+-- vim.keymap.set({ "n" }, "vv", tc.select_expand, { desc = "TreeClimber: Expand Selection" })
+-- vim.keymap.set({ "v" }, "v", tc.select_expand, { desc = "TreeClimber: Expand Selection" })
+-- vim.keymap.set({ "v" }, "z", tc.select_shrink, { desc = "TreeClimber: Shrink Selection" })
 
+
+vim.keymap.set({ 'n' }, '<C-a>', 'ggVG', { noremap = true, silent = true, desc = "Select All Text" })
 
 require("gitsigns").setup {
   on_attach = function(bufnr)
@@ -1462,7 +1635,7 @@ wk.register({
     t = { function() bottom_terminal:toggle() end, "Toggle Terminal" },
     -- c = { "<cmd>:lua require('FTerm').scratch({ cmd = {'chatgpt', '-n'} })<cr>", "ChatGPT" },
     c = { function() chatgpt_terminal:open() end, "ChatGPT" },
-    f = { tc.show_control_flow, "TreeCliber: Show Control Flow" },
+    -- f = { tc.show_control_flow, "TreeCliber: Show Control Flow" },
   },
   w = {
     m = { "<Cmd>:WinShift<CR>", "Move" },
